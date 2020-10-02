@@ -33,7 +33,7 @@ brew install libomp
 
 ### Sentiment Analysis
 
-First, download the [pretrained model](sentiment.onnx).
+First, download the [pretrained model](https://github.com/ankane/informers/releases/download/v0.1.0/sentiment-analysis.onnx).
 
 Predict sentiment
 
@@ -56,7 +56,7 @@ model.predict(["This is super cool", "I didn't like it"])
 
 ### Question Answering
 
-First, download the [pretrained model](question-answering.onnx) and add Numo to your application’s Gemfile:
+First, download the [pretrained model](https://github.com/ankane/informers/releases/download/v0.1.0/question-answering.onnx) and add Numo to your application’s Gemfile:
 
 ```ruby
 gem 'numo-narray'
@@ -66,7 +66,10 @@ Ask a question with some context
 
 ```ruby
 model = Informers::QuestionAnswering.new("question-answering.onnx")
-model.predict(question: "Who invented Ruby?", context: "Ruby is a programming language created by Matz")
+model.predict(
+  question: "Who invented Ruby?",
+  context: "Ruby is a programming language created by Matz"
+)
 ```
 
 This returns
