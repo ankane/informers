@@ -114,7 +114,7 @@ Models are [quantized](https://medium.com/microsoftazure/faster-and-smaller-quan
 This project uses many state-of-the-art technologies:
 
 - [Transformers](https://github.com/huggingface/transformers) for transformer models
-- [BlingFire](https://github.com/microsoft/BlingFire) and [BERT](https://github.com/google-research/bert) for high-performance text tokenization
+- [Bling Fire](https://github.com/microsoft/BlingFire) and [BERT](https://github.com/google-research/bert) for high-performance text tokenization
 - [ONNX Runtime](https://github.com/Microsoft/onnxruntime) for high-performance inference
 
 Some code was ported from Transformers and is available under the same license.
