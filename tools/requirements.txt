@@ -1,2 +1,4 @@
 torch
 transformers
+onnx
+onnxruntime
