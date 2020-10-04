@@ -1,6 +1,10 @@
 require_relative "test_helper"
 
 class NERTest < Minitest::Test
+  def setup
+    skip if ENV["CI"]
+  end
+
   def test_predict
     entities = model.predict("Nat works at GitHub in San Francisco")
     assert_equal 3, entities.size

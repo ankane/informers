@@ -18,7 +18,7 @@ class QuestionAnsweringTest < Minitest::Test
 
   def assert_answer(result, answer, score, start, stop)
     assert_equal answer, result[:answer]
-    assert_in_delta score, result[:score]
+    assert_in_delta score, result[:score], 0.01 # for Travis
     assert_equal start, result[:start]
     assert_equal stop, result[:end]
   end

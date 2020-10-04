@@ -11,6 +11,8 @@ Supports:
 - Summarization - *in development*
 - Translation - *in development*
 
+[![Build Status](https://travis-ci.org/ankane/informers.svg?branch=master)](https://travis-ci.org/ankane/informers)
+
 ## Installation
 
 Add this line to your application’s Gemfile:
