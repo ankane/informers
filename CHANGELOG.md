@@ -1,4 +1,4 @@
-## 0.1.1 (unreleased)
+## 0.1.1 (2020-10-05)
 
 - Fixed question answering for Ruby < 2.7
 
