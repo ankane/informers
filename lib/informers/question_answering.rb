@@ -103,7 +103,7 @@ module Informers
         starts, ends, scores = decode(start_, end_, topk, max_answer_len)
 
         # char_to_word
-        doc_tokens, char_to_word_offset = self.doc_tokens(questions[i][:context])
+        doc_tokens, char_to_word_offset = send(:doc_tokens, questions[i][:context])
         char_to_word = Numo::Int64.cast(char_to_word_offset)
 
         # token_to_orig_map
