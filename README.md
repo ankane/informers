@@ -7,6 +7,7 @@ Supports:
 - Sentiment analysis
 - Question answering
 - Named-entity recognition
+- Zero-shot classification
 - Text generation - *in development*
 - Summarization - *in development*
 - Translation - *in development*
@@ -32,6 +33,7 @@ brew install libomp
 - [Sentiment analysis](#sentiment-analysis)
 - [Question answering](#question-answering)
 - [Named-entity recognition](#named-entity-recognition)
+- [Zero-shot classification](#zero-shot-classification)
 
 ### Sentiment Analysis
 
@@ -101,6 +103,23 @@ This returns
 ]
 ```
 
+### Zero-Shot Classification
+
+First, download the [pretrained model](https://github.com/ankane/informers/releases/download/v0.1.0/zero-shot-classification.onnx).
+
+Get entities
+
+```ruby
+model = Informers::ZeroShotClassification.new("zero-shot-classification.onnx")
+model.predict("Who are you voting for in 2020?", ["Europe", "public health", "politics"])
+```
+
+This returns the score for each label
+
+```ruby
+[123, 123, 123]
+```
+
 ## Models
 
 Task | Description | Contributor | License | Link
@@ -108,6 +127,7 @@ Task | Description | Contributor | License | Link
 Sentiment analysis | DistilBERT fine-tuned on SST-2 | Hugging Face | Apache-2.0 | [Link](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english)
 Question answering | DistilBERT | Hugging Face | Apache-2.0 | [Link](https://huggingface.co/distilbert-base-cased-distilled-squad)
 Named-entity recognition | BERT fine-tuned on CoNLL03 | Bayerische Staatsbibliothek | In-progress | [Link](https://huggingface.co/dbmdz/bert-large-cased-finetuned-conll03-english)
+Zero-shot classification | BART | Facebook | MIT | [Link](https://huggingface.co/facebook/bart-large-mnli)
 
 Models are [quantized](https://medium.com/microsoftazure/faster-and-smaller-quantized-nlp-with-hugging-face-and-onnx-runtime-ec5525473bb7) to make them faster and smaller.
 
