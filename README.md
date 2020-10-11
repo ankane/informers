@@ -107,11 +107,14 @@ This returns
 
 First, download the [pretrained model](https://github.com/ankane/informers/releases/download/v0.1.0/zero-shot-classification.onnx).
 
-Get entities
+Pass some text and labels
 
 ```ruby
 model = Informers::ZeroShotClassification.new("zero-shot-classification.onnx")
-model.predict("Who are you voting for in 2020?", ["Europe", "public health", "politics"])
+model.predict(
+  sequence: "Who are you voting for in 2020?",
+  labels: ["Europe", "public health", "politics"]
+)
 ```
 
 This returns the score for each label
