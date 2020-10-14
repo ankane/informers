@@ -130,7 +130,7 @@ Task | Description | Contributor | License | Link
 Sentiment analysis | DistilBERT fine-tuned on SST-2 | Hugging Face | Apache-2.0 | [Link](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english)
 Question answering | DistilBERT | Hugging Face | Apache-2.0 | [Link](https://huggingface.co/distilbert-base-cased-distilled-squad)
 Named-entity recognition | BERT fine-tuned on CoNLL03 | Bayerische Staatsbibliothek | In-progress | [Link](https://huggingface.co/dbmdz/bert-large-cased-finetuned-conll03-english)
-Zero-shot classification | BART | Facebook | MIT | [Link](https://huggingface.co/facebook/bart-large-mnli)
+Zero-shot classification | BART NLI | Facebook | MIT | [Link](https://huggingface.co/facebook/bart-large-mnli)
 
 Models are [quantized](https://medium.com/microsoftazure/faster-and-smaller-quantized-nlp-with-hugging-face-and-onnx-runtime-ec5525473bb7) to make them faster and smaller.
 
