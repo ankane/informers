@@ -14,6 +14,9 @@ if [ ! -d "$CACHE_DIR" ]; then
 
   wget https://github.com/ankane/informers/releases/download/v$MODELS_VERSION/question-answering.onnx
   mv question-answering.onnx $CACHE_DIR
+
+  wget https://github.com/ankane/informers/releases/download/v$MODELS_VERSION/feature-extraction.onnx
+  mv feature-extraction.onnx $CACHE_DIR
 else
   echo "Models cached"
 fi
