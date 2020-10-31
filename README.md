@@ -111,6 +111,14 @@ Named-entity recognition | BERT fine-tuned on CoNLL03 | Bayerische Staatsbibliot
 
 Models are [quantized](https://medium.com/microsoftazure/faster-and-smaller-quantized-nlp-with-hugging-face-and-onnx-runtime-ec5525473bb7) to make them faster and smaller.
 
+## Deployment
+
+Check out [Trove](https://github.com/ankane/trove) for deploying models.
+
+```sh
+trove push sentiment-analysis.onnx
+```
+
 ## Credits
 
 This project uses many state-of-the-art technologies:
