@@ -11,7 +11,7 @@ Supports:
 - Summarization - *in development*
 - Translation - *in development*
 
-[![Build Status](https://travis-ci.org/ankane/informers.svg?branch=master)](https://travis-ci.org/ankane/informers)
+[![Build Status](https://github.com/ankane/informers/workflows/build/badge.svg?branch=master)](https://github.com/ankane/informers/actions)
 
 ## Installation
 
