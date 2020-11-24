@@ -1,4 +1,4 @@
-## 0.1.2 (unreleased)
+## 0.1.2 (2020-11-24)
 
 - Added feature extraction
 
