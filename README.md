@@ -21,12 +21,6 @@ Add this line to your application’s Gemfile:
 gem 'informers'
 ```
 
-On Mac, also install OpenMP:
-
-```sh
-brew install libomp
-```
-
 ## Getting Started
 
 - [Sentiment analysis](#sentiment-analysis)
