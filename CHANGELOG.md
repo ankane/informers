@@ -1,3 +1,7 @@
+## 0.1.3 (unreleased)
+
+- Added fill mask
+
 ## 0.1.2 (2020-11-24)
 
 - Added feature extraction

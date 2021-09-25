@@ -15,6 +15,6 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.5"
 
-  spec.add_dependency "blingfire", ">= 0.1.3"
+  spec.add_dependency "blingfire", ">= 0.1.7"
   spec.add_dependency "onnxruntime"
 end
