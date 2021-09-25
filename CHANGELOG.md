@@ -1,4 +1,4 @@
-## 0.1.3 (unreleased)
+## 0.1.3 (2021-09-25)
 
 - Added text generation
 - Added fill mask
