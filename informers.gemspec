@@ -16,5 +16,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.5"
 
   spec.add_dependency "blingfire", ">= 0.1.7"
-  spec.add_dependency "onnxruntime"
+  spec.add_dependency "numo-narray"
+  spec.add_dependency "onnxruntime", ">= 0.5.1"
 end

@@ -1,5 +1,6 @@
 ## 0.1.3 (unreleased)
 
+- Added text generation
 - Added fill mask
 
 ## 0.1.2 (2020-11-24)

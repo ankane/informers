@@ -16,9 +16,6 @@
 module Informers
   class QuestionAnswering
     def initialize(model_path)
-      # make sure Numo is available
-      require "numo/narray"
-
       tokenizer_path = File.expand_path("../../vendor/bert_base_cased_tok.bin", __dir__)
       @tokenizer = BlingFire.load_model(tokenizer_path)
       @model = OnnxRuntime::Model.new(model_path)

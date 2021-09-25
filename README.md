@@ -7,7 +7,7 @@ Supports:
 - Sentiment analysis
 - Question answering
 - Named-entity recognition
-- Text generation - *in development*
+- Text generation
 - Summarization - *in development*
 - Translation - *in development*
 
@@ -26,6 +26,7 @@ gem 'informers'
 - [Sentiment analysis](#sentiment-analysis)
 - [Question answering](#question-answering)
 - [Named-entity recognition](#named-entity-recognition)
+- [Text Generation](#text-generation)
 
 ### Sentiment Analysis
 
@@ -52,11 +53,7 @@ model.predict(["This is super cool", "I didn't like it"])
 
 ### Question Answering
 
-First, download the [pretrained model](https://github.com/ankane/informers/releases/download/v0.1.0/question-answering.onnx) and add Numo to your application’s Gemfile:
-
-```ruby
-gem 'numo-narray'
-```
+First, download the [pretrained model](https://github.com/ankane/informers/releases/download/v0.1.0/question-answering.onnx).
 
 Ask a question with some context
 
@@ -95,6 +92,23 @@ This returns
 ]
 ```
 
+### Text Generation
+
+First, export the [pretrained model](tools/export.md).
+
+Pass a prompt
+
+```ruby
+model = Informers::TextGeneration.new("text-generation.onnx")
+model.predict("As far as I am concerned, I will", max_length: 50)
+```
+
+This returns
+
+```text
+As far as I am concerned, I will be the first to admit that I am not a fan of the idea of a "free market." I think that the idea of a free market is a bit of a stretch. I think that the idea
+```
+
 ## Models
 
 Task | Description | Contributor | License | Link
@@ -102,8 +116,9 @@ Task | Description | Contributor | License | Link
 Sentiment analysis | DistilBERT fine-tuned on SST-2 | Hugging Face | Apache-2.0 | [Link](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english)
 Question answering | DistilBERT fine-tuned on SQuAD | Hugging Face | Apache-2.0 | [Link](https://huggingface.co/distilbert-base-cased-distilled-squad)
 Named-entity recognition | BERT fine-tuned on CoNLL03 | Bayerische Staatsbibliothek | In-progress | [Link](https://huggingface.co/dbmdz/bert-large-cased-finetuned-conll03-english)
+Text generation | GPT-2 | Hugging Face | [Custom](https://github.com/openai/gpt-2/blob/master/LICENSE) | [Link](https://huggingface.co/gpt2)
 
-Models are [quantized](https://medium.com/microsoftazure/faster-and-smaller-quantized-nlp-with-hugging-face-and-onnx-runtime-ec5525473bb7) to make them faster and smaller.
+Some models are [quantized](https://medium.com/microsoftazure/faster-and-smaller-quantized-nlp-with-hugging-face-and-onnx-runtime-ec5525473bb7) to make them faster and smaller.
 
 ## Deployment
 

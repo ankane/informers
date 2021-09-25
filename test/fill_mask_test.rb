@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 class FillMaskTest < Minitest::Test
   def setup
-    skip if ENV["CI"]
+    skip if ci?
   end
 
   def test_predict
