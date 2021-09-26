@@ -24,7 +24,7 @@ gem 'informers'
 - [Sentiment analysis](#sentiment-analysis)
 - [Question answering](#question-answering)
 - [Named-entity recognition](#named-entity-recognition)
-- [Text Generation](#text-generation)
+- [Text generation](#text-generation)
 
 ### Sentiment Analysis
 
