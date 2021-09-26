@@ -8,8 +8,6 @@ Supports:
 - Question answering
 - Named-entity recognition
 - Text generation
-- Summarization - *in development*
-- Translation - *in development*
 
 [![Build Status](https://github.com/ankane/informers/workflows/build/badge.svg?branch=master)](https://github.com/ankane/informers/actions)
 
