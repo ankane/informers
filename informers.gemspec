@@ -8,12 +8,12 @@ Gem::Specification.new do |spec|
   spec.license       = "Apache-2.0"
 
   spec.author        = "Andrew Kane"
-  spec.email         = "andrew@chartkick.com"
+  spec.email         = "andrew@ankane.org"
 
   spec.files         = Dir["*.{md,txt}", "{lib,vendor}/**/*"]
   spec.require_path  = "lib"
 
-  spec.required_ruby_version = ">= 2.5"
+  spec.required_ruby_version = ">= 2.7"
 
   spec.add_dependency "blingfire", ">= 0.1.7"
   spec.add_dependency "numo-narray"
