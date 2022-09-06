@@ -16,7 +16,7 @@ Supports:
 Add this line to your application’s Gemfile:
 
 ```ruby
-gem 'informers'
+gem "informers"
 ```
 
 ## Getting Started
