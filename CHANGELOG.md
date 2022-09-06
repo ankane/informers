@@ -1,3 +1,7 @@
+## 0.2.0 (unreleased)
+
+- Added support for `optimum` and `transformers.onnx` models
+
 ## 0.1.3 (2021-09-25)
 
 - Added text generation

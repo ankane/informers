@@ -31,11 +31,21 @@ module Informers
       input = {
         input_ids: [tokens]
       }
+      if @model.inputs.any? { |i| i[:name] == "attention_mask" }
+        input[:attention_mask] = [[1] * tokens.size]
+      end
+
+      output_name =
+        if @model.outputs.any? { |o| o[:name] == "output_0" }
+          "output_0"
+        else
+          "logits"
+        end
 
       (max_length - tokens.size).times do |i|
-        output = @model.predict(input, output_type: :numo, output_names: ["output_0"])
+        output = @model.predict(input, output_type: :numo, output_names: [output_name])
         # passed to input_ids
-        tokens << output["output_0"][0, true, true][-1, true].max_index
+        tokens << output[output_name][0, true, true][-1, true].max_index
       end
 
       @decoder.ids_to_text(tokens)

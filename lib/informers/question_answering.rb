@@ -67,8 +67,8 @@ module Informers
       }
       output = @model.predict(input)
 
-      start = output["output_0"]
-      stop = output["output_1"]
+      start = output["output_0"] || output["start_logits"]
+      stop = output["output_1"] || output["end_logits"]
 
       # transform
       answers = []

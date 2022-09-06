@@ -74,7 +74,8 @@ module Informers
         raise "More than one mask_token (<mask>) is not supported" if v.size > 1
       end
 
-      outputs = @model.predict(input)["output_0"]
+      res = @model.predict(input)
+      outputs = res["output_0"] || res["logits"]
       batch_size = outputs.size
 
       results = []

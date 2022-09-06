@@ -38,12 +38,12 @@ module Informers
           attention_mask: [[1] * tokens.size],
           token_type_ids: [[0] * tokens.size]
         }
-        output = @model.predict(input)
+        res = @model.predict(input)
 
         # transform
-        entities = output["output_0"][0]
+        output = res["output_0"] || res["logits"]
         score =
-          entities.map do |e|
+          output[0].map do |e|
             values = e.map { |v| Math.exp(v) }
             sum = values.sum
             values.map { |v| v / sum }

@@ -50,11 +50,12 @@ module Informers
         input_ids: input_ids,
         attention_mask: attention_mask
       }
-      output = @model.predict(input)
+      res = @model.predict(input)
+      output = res["output_0"] || res["logits"]
 
       # transform
       scores =
-        output["output_0"].map do |row|
+        output.map do |row|
           mapped = row.map { |v| Math.exp(v) }
           sum = mapped.sum
           mapped.map { |v| v / sum }

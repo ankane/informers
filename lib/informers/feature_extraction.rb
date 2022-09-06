@@ -51,7 +51,7 @@ module Informers
         attention_mask: attention_mask
       }
       output = @model.predict(input)
-      scores = output["output_0"]
+      scores = output["output_0"] || output["last_hidden_state"]
 
       singular ? scores.first : scores
     end
