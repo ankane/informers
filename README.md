@@ -25,6 +25,8 @@ gem "informers"
 - [Question answering](#question-answering)
 - [Named-entity recognition](#named-entity-recognition)
 - [Text generation](#text-generation)
+- [Feature extraction](#feature-extraction)
+- [Fill mask](#fill-mask)
 
 ### Sentiment Analysis
 
@@ -105,6 +107,24 @@ This returns
 
 ```text
 As far as I am concerned, I will be the first to admit that I am not a fan of the idea of a "free market." I think that the idea of a free market is a bit of a stretch. I think that the idea
+```
+
+### Feature Extraction
+
+First, export a [pretrained model](tools/export.md).
+
+```ruby
+model = Informers::FeatureExtraction.new("feature-extraction.onnx")
+model.predict("This is super cool")
+```
+
+### Fill Mask
+
+First, export a [pretrained model](tools/export.md).
+
+```ruby
+model = Informers::FillMask.new("fill-mask.onnx")
+model.predict("This is a great <mask>")
 ```
 
 ## Models

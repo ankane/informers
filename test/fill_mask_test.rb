@@ -27,6 +27,11 @@ class FillMaskTest < Minitest::Test
     assert_equal ["!", "!\"", "!!!", "!!", ":)"], result[1].map { |r| r[:token_str] }
   end
 
+  def test_example
+    result = model.predict("This is a great <mask>")
+    assert_equal ["article", "idea", "post", "review", "read"], result.map { |r| r[:token_str] }
+  end
+
   def test_no_mask_token
     error = assert_raises do
       model.predict("Hello")
