@@ -24,13 +24,13 @@ class NERTest < Minitest::Test
 
     assert_equal 1, result[1].size
     # .96 -> .86 when quantized
-    assert_entity result[1][0], "New York", "location", 0.8598015581299177, 7, 15
+    assert_entity result[1][0], "New York", "location", 0.8598015581299177, 7, 15, 0.11
   end
 
-  def assert_entity(entity, text, tag, score, start, stop)
+  def assert_entity(entity, text, tag, score, start, stop, delta = 0.03)
     assert_equal text, entity[:text]
     assert_equal tag, entity[:tag]
-    assert_in_delta score, entity[:score]
+    assert_in_delta score, entity[:score], delta
     assert_equal start, entity[:start]
     assert_equal stop, entity[:end]
   end

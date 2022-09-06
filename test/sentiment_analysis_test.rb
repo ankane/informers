@@ -14,7 +14,7 @@ class SentimentAnalysisTest < Minitest::Test
 
   def assert_sentiment(result, label, score)
     assert_equal label, result[:label]
-    assert_in_delta score, result[:score]
+    assert_in_delta score, result[:score], 0.01
   end
 
   def model
