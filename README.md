@@ -71,6 +71,8 @@ This returns
 {answer: "Matz", score: 0.9980658360049758, start: 42, end: 46}
 ```
 
+Note: The question and context combined are limited to 384 tokens
+
 ### Named-Entity Recognition
 
 First, export the [pretrained model](tools/export.md).
