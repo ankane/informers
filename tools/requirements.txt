@@ -1,4 +1,1 @@
-torch==1.7.1
-transformers==4.0.0
-onnx
-onnxruntime
+optimum[exporters,onnxruntime]

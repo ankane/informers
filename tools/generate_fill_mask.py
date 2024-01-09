@@ -1,13 +1,9 @@
+from optimum.onnxruntime import ORTModelForMaskedLM
 from pathlib import Path
 import tempfile
-from transformers.convert_graph_to_onnx import convert, quantize
 
 dest = Path(tempfile.mkdtemp(), "fill-mask.onnx")
-convert(
-  pipeline_name="fill-mask",
-  model="distilroberta-base",
-  output=dest,
-  framework="pt",
-  opset=11
-)
+model = ORTModelForMaskedLM.from_pretrained("distilroberta-base", export=True)
+model.save_pretrained(dest.parent)
+dest.parent.joinpath("model.onnx").rename(dest)
 print(dest)

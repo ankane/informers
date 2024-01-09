@@ -1,13 +1,9 @@
+from optimum.onnxruntime import ORTModelForFeatureExtraction
 from pathlib import Path
 import tempfile
-from transformers.convert_graph_to_onnx import convert, quantize
 
 dest = Path(tempfile.mkdtemp(), "feature-extraction.onnx")
-convert(
-  pipeline_name="feature-extraction",
-  model="distilbert-base-cased",
-  output=dest,
-  framework="pt",
-  opset=11
-)
-quantize(dest)
+model = ORTModelForFeatureExtraction.from_pretrained("distilbert-base-cased", export=True)
+model.save_pretrained(dest.parent)
+dest.parent.joinpath("model.onnx").rename(dest)
+print(dest)

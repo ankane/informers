@@ -1,13 +1,9 @@
+from optimum.onnxruntime import ORTModelForSequenceClassification
 from pathlib import Path
 import tempfile
-from transformers.convert_graph_to_onnx import convert, quantize
 
 dest = Path(tempfile.mkdtemp(), "sentiment-analysis.onnx")
-convert(
-  pipeline_name="sentiment-analysis",
-  model="distilbert-base-uncased-finetuned-sst-2-english",
-  output=dest,
-  framework="pt",
-  opset=11
-)
-quantize(dest)
+model = ORTModelForSequenceClassification.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english", export=True)
+model.save_pretrained(dest.parent)
+dest.parent.joinpath("model.onnx").rename(dest)
+print(dest)

@@ -1,13 +1,9 @@
+from optimum.onnxruntime import ORTModelForQuestionAnswering
 from pathlib import Path
 import tempfile
-from transformers.convert_graph_to_onnx import convert, quantize
 
 dest = Path(tempfile.mkdtemp(), "question-answering.onnx")
-convert(
-  pipeline_name="question-answering",
-  model="distilbert-base-cased-distilled-squad",
-  output=dest,
-  framework="pt",
-  opset=11
-)
-quantize(dest)
+model = ORTModelForQuestionAnswering.from_pretrained("distilbert-base-cased-distilled-squad", export=True)
+model.save_pretrained(dest.parent)
+dest.parent.joinpath("model.onnx").rename(dest)
+print(dest)
