@@ -9,7 +9,7 @@ Supports:
 - Named-entity recognition
 - Text generation
 
-[![Build Status](https://github.com/ankane/informers/workflows/build/badge.svg?branch=master)](https://github.com/ankane/informers/actions)
+[![Build Status](https://github.com/ankane/informers/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/informers/actions)
 
 ## Installation
 
