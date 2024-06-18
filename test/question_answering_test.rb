@@ -9,7 +9,7 @@ class QuestionAnsweringTest < Minitest::Test
   def test_predict_multiple
     questions = [
       {question: "Who invented Ruby?", context: "Ruby is a programming language created by Matz"},
-      {question: "Who walked on the moon?", context: "Neil Armstrong walked on the moon."},
+      {question: "Who walked on the moon?", context: "Neil Armstrong walked on the moon."}
     ]
     result = model.predict(questions)
     assert_answer result[0], "Matz", 0.9980658360049758, 42, 46
