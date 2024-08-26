@@ -1,5 +1,7 @@
 ## 1.0.0 (unreleased)
 
+- Replaced task classes with `pipeline` method
+- Added `Model` class
 - Dropped support for Ruby < 3.1
 
 ## 0.2.0 (2022-09-06)

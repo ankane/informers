@@ -11,17 +11,6 @@ jobs:
           bundler-cache: true
       - uses: actions/cache@v4
         with:
-          path: models
-          key: models-v3
-        id: cache-models
-      - name: Download models
-        if: steps.cache-models.outputs.cache-hit != 'true'
-        run: |
-          mkdir models
-          cd models
-          wget -q https://github.com/ankane/informers/releases/download/v0.1.0/sentiment-analysis.onnx
-          wget -q https://github.com/ankane/informers/releases/download/v0.1.0/question-answering.onnx
-          wget -q https://github.com/ankane/informers/releases/download/v0.1.0/feature-extraction.onnx
+          path: ~/.cache/informers
+          key: informers
       - run: bundle exec rake test
-        env:
-          MODELS_PATH: models

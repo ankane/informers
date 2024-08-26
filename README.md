@@ -1,13 +1,8 @@
 # Informers
 
-:slightly_smiling_face: State-of-the-art natural language processing for Ruby
+:fire: Fast [transformer](https://github.com/xenova/transformers.js) inference for Ruby
 
-Supports:
-
-- Sentiment analysis
-- Question answering
-- Named-entity recognition
-- Text generation
+For non-ONNX models, check out [Transformers.rb](https://github.com/ankane/transformers-ruby)
 
 [![Build Status](https://github.com/ankane/informers/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/informers/actions)
 
@@ -21,142 +16,111 @@ gem "informers"
 
 ## Getting Started
 
-- [Sentiment analysis](#sentiment-analysis)
-- [Question answering](#question-answering)
-- [Named-entity recognition](#named-entity-recognition)
-- [Text generation](#text-generation)
-- [Feature extraction](#feature-extraction)
-- [Fill mask](#fill-mask)
-
-### Sentiment Analysis
-
-First, download the [pretrained model](https://github.com/ankane/informers/releases/download/v0.1.0/sentiment-analysis.onnx).
-
-Predict sentiment
-
-```ruby
-model = Informers::SentimentAnalysis.new("sentiment-analysis.onnx")
-model.predict("This is super cool")
-```
-
-This returns
-
-```ruby
-{label: "positive", score: 0.999855186578301}
-```
-
-Predict multiple at once
-
-```ruby
-model.predict(["This is super cool", "I didn't like it"])
-```
-
-### Question Answering
-
-First, download the [pretrained model](https://github.com/ankane/informers/releases/download/v0.1.0/question-answering.onnx).
-
-Ask a question with some context
-
-```ruby
-model = Informers::QuestionAnswering.new("question-answering.onnx")
-model.predict(
-  question: "Who invented Ruby?",
-  context: "Ruby is a programming language created by Matz"
-)
-```
-
-This returns
-
-```ruby
-{answer: "Matz", score: 0.9980658360049758, start: 42, end: 46}
-```
-
-Note: The question and context combined are limited to 384 tokens
-
-### Named-Entity Recognition
-
-First, export the [pretrained model](tools/export.md).
-
-Get entities
-
-```ruby
-model = Informers::NER.new("ner.onnx")
-model.predict("Nat works at GitHub in San Francisco")
-```
-
-This returns
-
-```ruby
-[
-  {text: "Nat",           tag: "person",   score: 0.9840519576513487, start: 0,  end: 3},
-  {text: "GitHub",        tag: "org",      score: 0.9426134775785775, start: 13, end: 19},
-  {text: "San Francisco", tag: "location", score: 0.9952414982243061, start: 23, end: 36}
-]
-```
-
-### Text Generation
-
-First, export the [pretrained model](tools/export.md).
-
-Pass a prompt
-
-```ruby
-model = Informers::TextGeneration.new("text-generation.onnx")
-model.predict("As far as I am concerned, I will", max_length: 50)
-```
-
-This returns
-
-```text
-As far as I am concerned, I will be the first to admit that I am not a fan of the idea of a "free market." I think that the idea of a free market is a bit of a stretch. I think that the idea
-```
-
-### Feature Extraction
-
-First, export a [pretrained model](tools/export.md).
-
-```ruby
-model = Informers::FeatureExtraction.new("feature-extraction.onnx")
-model.predict("This is super cool")
-```
-
-### Fill Mask
-
-First, export a [pretrained model](tools/export.md).
-
-```ruby
-model = Informers::FillMask.new("fill-mask.onnx")
-model.predict("This is a great <mask>")
-```
+- [Models](#models)
+- [Pipelines](#pipelines)
 
 ## Models
 
-Task | Description | Contributor | License | Link
---- | --- | --- | --- | ---
-Sentiment analysis | DistilBERT fine-tuned on SST-2 | Hugging Face | Apache-2.0 | [Link](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english)
-Question answering | DistilBERT fine-tuned on SQuAD | Hugging Face | Apache-2.0 | [Link](https://huggingface.co/distilbert-base-cased-distilled-squad)
-Named-entity recognition | BERT fine-tuned on CoNLL03 | Bayerische Staatsbibliothek | In-progress | [Link](https://huggingface.co/dbmdz/bert-large-cased-finetuned-conll03-english)
-Text generation | GPT-2 | OpenAI | [Custom](https://github.com/openai/gpt-2/blob/master/LICENSE) | [Link](https://huggingface.co/gpt2)
+### sentence-transformers/all-MiniLM-L6-v2
 
-Some models are [quantized](https://medium.com/microsoftazure/faster-and-smaller-quantized-nlp-with-hugging-face-and-onnx-runtime-ec5525473bb7) to make them faster and smaller.
+[Docs](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 
-## Deployment
+```ruby
+sentences = ["This is an example sentence", "Each sentence is converted"]
 
-Check out [Trove](https://github.com/ankane/trove) for deploying models.
+model = Informers::Model.new("sentence-transformers/all-MiniLM-L6-v2")
+embeddings = model.embed(sentences)
+```
 
-```sh
-trove push sentiment-analysis.onnx
+For a quantized version, use:
+
+```ruby
+model = Informers::Model.new("Xenova/all-MiniLM-L6-v2", quantized: true)
+```
+
+### Xenova/multi-qa-MiniLM-L6-cos-v1
+
+[Docs](https://huggingface.co/Xenova/multi-qa-MiniLM-L6-cos-v1)
+
+```ruby
+query = "How many people live in London?"
+docs = ["Around 9 Million people live in London", "London is known for its financial district"]
+
+model = Informers::Model.new("Xenova/multi-qa-MiniLM-L6-cos-v1")
+query_embedding = model.embed(query)
+doc_embeddings = model.embed(docs)
+scores = doc_embeddings.map { |e| e.zip(query_embedding).sum { |d, q| d * q } }
+doc_score_pairs = docs.zip(scores).sort_by { |d, s| -s }
+```
+
+### mixedbread-ai/mxbai-embed-large-v1
+
+[Docs](https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1)
+
+```ruby
+def transform_query(query)
+  "Represent this sentence for searching relevant passages: #{query}"
+end
+
+docs = [
+  transform_query("puppy"),
+  "The dog is barking",
+  "The cat is purring"
+]
+
+model = Informers::Model.new("mixedbread-ai/mxbai-embed-large-v1")
+embeddings = model.embed(docs)
+```
+
+## Pipelines
+
+Named-entity recognition
+
+```ruby
+ner = Informers.pipeline("ner")
+ner.("Ruby is a programming language created by Matz")
+```
+
+Sentiment analysis
+
+```ruby
+classifier = Informers.pipeline("sentiment-analysis")
+classifier.("We are very happy to show you the 🤗 Transformers library.")
+```
+
+Question answering
+
+```ruby
+qa = Informers.pipeline("question-answering")
+qa.("Who invented Ruby?", "Ruby is a programming language created by Matz")
+```
+
+Feature extraction
+
+```ruby
+extractor = Informers.pipeline("feature-extraction")
+extractor.("We are very happy to show you the 🤗 Transformers library.")
 ```
 
 ## Credits
 
-This project uses many state-of-the-art technologies:
+This library was ported from [Transformers.js](https://github.com/xenova/transformers.js) and is available under the same license.
 
-- [Transformers](https://github.com/huggingface/transformers) for transformer models
-- [Bling Fire](https://github.com/microsoft/BlingFire) and [BERT](https://github.com/google-research/bert) for high-performance text tokenization
-- [ONNX Runtime](https://github.com/Microsoft/onnxruntime) for high-performance inference
+## Upgrading
 
-Some code was ported from Transformers and is available under the same license.
+### 1.0
+
+Task classes have been replaced with the `pipeline` method.
+
+```ruby
+# before
+model = Informers::SentimentAnalysis.new("sentiment-analysis.onnx")
+model.predict("This is super cool")
+
+# after
+model = Informers.pipeline("sentiment-analysis")
+model.("This is super cool")
+```
 
 ## History
 
@@ -177,7 +141,5 @@ To get started with development:
 git clone https://github.com/ankane/informers.git
 cd informers
 bundle install
-
-export MODELS_PATH=path/to/onnx/models
 bundle exec rake test
 ```
