@@ -1,3 +1,7 @@
+## 1.0.0 (unreleased)
+
+- Dropped support for Ruby < 3.1
+
 ## 0.2.0 (2022-09-06)
 
 - Added support for `optimum` and `transformers.onnx` models
