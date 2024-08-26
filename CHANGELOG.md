@@ -1,4 +1,4 @@
-## 1.0.0 (unreleased)
+## 1.0.0 (2024-08-26)
 
 - Replaced task classes with `pipeline` method
 - Added `Model` class
