@@ -2,7 +2,7 @@
 
 :fire: Fast [transformer](https://github.com/xenova/transformers.js) inference for Ruby
 
-For non-ONNX models, check out [Transformers.rb](https://github.com/ankane/transformers-ruby)
+For non-ONNX models, check out [Transformers.rb](https://github.com/ankane/transformers-ruby) :slightly_smiling_face:
 
 [![Build Status](https://github.com/ankane/informers/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/informers/actions)
 
