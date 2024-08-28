@@ -85,12 +85,14 @@ embeddings = model.embed(sentences)
 
 ### Other
 
-You can also use the feature extraction pipeline directly.
+You can use the feature extraction pipeline directly.
 
 ```ruby
 model = Informers.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", quantized: false)
 embeddings = model.(sentences, pooling: "mean", normalize: true)
 ```
+
+The model files must include `onnx/model.onnx` or `onnx/model_quantized.onnx` ([example](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/main/onnx)).
 
 ## Pipelines
 
