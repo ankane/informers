@@ -1,4 +1,4 @@
-## 1.0.2 (unreleased)
+## 1.0.2 (2024-08-28)
 
 - Added `embedding` pipeline
 - Added experimental `reranking` pipeline
