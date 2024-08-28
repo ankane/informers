@@ -31,7 +31,7 @@ Embedding
 - [nomic-ai/nomic-embed-text-v1](#nomic-ainomic-embed-text-v1)
 - [BAAI/bge-base-en-v1.5](#baaibge-base-en-v15)
 
-Reranking
+Reranking (experimental)
 
 - [mixedbread-ai/mxbai-rerank-base-v1](#mixedbread-ai-mxbai-rerank-base-v1)
 
@@ -176,7 +176,7 @@ embed = Informers.pipeline("embedding")
 embed.("We are very happy to show you the 🤗 Transformers library.")
 ```
 
-Reranking
+Reranking (experimental)
 
 ```ruby
 rerank = Informers.pipeline("reranking")
