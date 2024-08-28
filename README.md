@@ -74,7 +74,7 @@ embeddings = model.embed(docs)
 
 ### Supabase/gte-small
 
-[Docs](https://huggingface.co/Supabase/gte-small) [unreleased]
+[Docs](https://huggingface.co/Supabase/gte-small)
 
 ```ruby
 sentences = ["That is a happy person", "That is a very happy person"]

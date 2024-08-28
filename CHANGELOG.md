@@ -1,4 +1,4 @@
-## 1.0.1 (unreleased)
+## 1.0.1 (2024-08-27)
 
 - Added support for `Supabase/gte-small` to `Model`
 - Fixed error with downloads
