@@ -73,4 +73,18 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [-0.05316979, 0.01044252, 0.06194701], embeddings[0][..2]
     assert_elements_in_delta [-0.05246907, 0.03752426, 0.07344585], embeddings[-1][..2]
   end
+
+  # https://huggingface.co/intfloat/e5-base-v2
+  def test_intfloat
+    input = [
+      "passage: Ruby is a programming language created by Matz",
+      "query: Ruby creator"
+    ]
+
+    model = Informers.pipeline("feature-extraction", "intfloat/e5-base-v2", quantized: false)
+    embeddings = model.(input, pooling: "mean", normalize: true)
+
+    assert_elements_in_delta [-0.00596662, -0.03730119, -0.0703470], embeddings[0][..2]
+    assert_elements_in_delta [0.00298353, -0.04421991, -0.0591884], embeddings[-1][..2]
+  end
 end

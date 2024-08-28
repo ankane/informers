@@ -83,6 +83,20 @@ model = Informers::Model.new("Supabase/gte-small")
 embeddings = model.embed(sentences)
 ```
 
+### intfloat/e5-base-v2
+
+[Docs](https://huggingface.co/intfloat/e5-base-v2)
+
+```ruby
+input = [
+  "passage: Ruby is a programming language created by Matz",
+  "query: Ruby creator"
+]
+
+model = Informers.pipeline("feature-extraction", "intfloat/e5-base-v2", quantized: false)
+embeddings = model.(input, pooling: "mean", normalize: true)
+```
+
 ### Other
 
 You can use the feature extraction pipeline directly.
