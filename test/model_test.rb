@@ -120,4 +120,21 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [0.00029264, -0.0619305, -0.06199387], embeddings[0][..2]
     assert_elements_in_delta [-0.07482512, -0.0770234, 0.03398684], embeddings[-1][..2]
   end
+
+  # https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1
+  def test_mxbai_rerank
+    query = "How many people live in London?"
+    docs = ["Around 9 Million people live in London", "London is known for its financial district"]
+
+    model = Informers.pipeline("rerank", "mixedbread-ai/mxbai-rerank-base-v1", quantized: false)
+    result = model.(query, docs, return_documents: true)
+
+    assert_equal 0, result[0][:doc_id]
+    assert_in_delta 0.984, result[0][:score]
+    assert_equal docs[0], result[0][:text]
+
+    assert_equal 1, result[1][:doc_id]
+    assert_in_delta 0.139, result[1][:score]
+    assert_equal docs[1], result[1][:text]
+  end
 end

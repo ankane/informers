@@ -58,6 +58,14 @@ class PipelineTest < Minitest::Test
     assert_in_delta (-0.3130), output[-1][-1][-1]
   end
 
+  def test_rerank
+    ranker = Informers.pipeline("rerank")
+    result = ranker.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
+    assert_equal 2, result.size
+    assert_equal 0, result[0][:doc_id]
+    assert_equal 1, result[1][:doc_id]
+  end
+
   def test_progress_callback
     msgs = []
     extractor = Informers.pipeline("feature-extraction", progress_callback: ->(msg) { msgs << msg })

@@ -130,6 +130,18 @@ model = Informers.pipeline("feature-extraction", "BAAI/bge-base-en-v1.5", quanti
 embeddings = model.(input, pooling: "mean", normalize: true)
 ```
 
+### mixedbread-ai/mxbai-rerank-base-v1
+
+[Docs](https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1) [unreleased]
+
+```ruby
+query = "How many people live in London?"
+docs = ["Around 9 Million people live in London", "London is known for its financial district"]
+
+model = Informers.pipeline("rerank", "mixedbread-ai/mxbai-rerank-base-v1", quantized: false)
+result = model.(query, docs)
+```
+
 ### Other
 
 You can use the feature extraction pipeline directly.
@@ -169,6 +181,13 @@ Feature extraction
 ```ruby
 extractor = Informers.pipeline("feature-extraction")
 extractor.("We are very happy to show you the 🤗 Transformers library.")
+```
+
+Reranking [unreleased]
+
+```ruby
+ranker = Informers.pipeline("rerank")
+ranker.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
 ```
 
 ## Credits

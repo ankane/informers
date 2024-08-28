@@ -1,5 +1,6 @@
 ## 1.0.2 (unreleased)
 
+- Added `rerank` pipeline
 - Added support for `nomic-ai/nomic-embed-text-v1`
 - Added support for `intfloat/e5-base-v2` to `Model`
 - Added support for `BAAI/bge-base-en-v1.5` to `Model`

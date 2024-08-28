@@ -205,6 +205,12 @@ module Informers
   class NomicBertModel < NomicBertPreTrainedModel
   end
 
+  class DebertaV2PreTrainedModel < PreTrainedModel
+  end
+
+  class DebertaV2Model < DebertaV2PreTrainedModel
+  end
+
   class DistilBertPreTrainedModel < PreTrainedModel
   end
 
@@ -226,6 +232,7 @@ module Informers
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
+    "deberta-v2" => ["DebertaV2Model", DebertaV2Model],
     "distilbert" => ["DistilBertModel", DistilBertModel]
   }
 

@@ -83,12 +83,18 @@ module Informers
     # self.return_token_type_ids = true
   end
 
+  class DebertaV2Tokenizer < PreTrainedTokenizer
+    # TODO
+    # self.return_token_type_ids = true
+  end
+
   class DistilBertTokenizer < PreTrainedTokenizer
   end
 
   class AutoTokenizer
     TOKENIZER_CLASS_MAPPING = {
       "BertTokenizer" => BertTokenizer,
+      "DebertaV2Tokenizer" => DebertaV2Tokenizer,
       "DistilBertTokenizer" => DistilBertTokenizer
     }
 

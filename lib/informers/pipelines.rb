@@ -308,6 +308,40 @@ module Informers
     end
   end
 
+  class RerankPipeline < Pipeline
+    def initialize(**options)
+      super(**options)
+    end
+
+    def call(
+      query,
+      documents,
+      return_documents: false,
+      top_k: nil
+    )
+      model_inputs = @tokenizer.([query] * documents.size,
+        text_pair: documents,
+        padding: true,
+        truncation: true
+      )
+
+      outputs = @model.(model_inputs)
+
+      result =
+        Utils.sigmoid(outputs[0].map(&:first))
+          .map.with_index { |s, i| {doc_id: i, score: s} }
+          .sort_by { |v| -v[:score] }
+
+      if return_documents
+        result.each do |v|
+          v[:text] = documents[v[:doc_id]]
+        end
+      end
+
+      top_k ? result.first(top_k) : result
+    end
+  end
+
   SUPPORTED_TASKS = {
     "text-classification" => {
       tokenizer: AutoTokenizer,
@@ -342,6 +376,15 @@ module Informers
       model: AutoModel,
       default: {
         model: "Xenova/all-MiniLM-L6-v2"
+      },
+      type: "text"
+    },
+    "rerank" => {
+      tokenizer: AutoTokenizer,
+      pipeline: RerankPipeline,
+      model: AutoModel,
+      default: {
+        model: "mixedbread-ai/mxbai-rerank-base-v1"
       },
       type: "text"
     }
