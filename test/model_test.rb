@@ -126,7 +126,7 @@ class ModelTest < Minitest::Test
     query = "How many people live in London?"
     docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
-    model = Informers.pipeline("rerank", "mixedbread-ai/mxbai-rerank-base-v1", quantized: false)
+    model = Informers.pipeline("rerank", "mixedbread-ai/mxbai-rerank-base-v1")
     result = model.(query, docs, return_documents: true)
 
     assert_equal 0, result[0][:doc_id]

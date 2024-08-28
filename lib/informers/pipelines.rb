@@ -411,11 +411,13 @@ module Informers
     end
   end
 
+  NO_DEFAULT = Object.new
+
   class << self
     def pipeline(
       task,
       model = nil,
-      quantized: true,
+      quantized: NO_DEFAULT,
       progress_callback: DEFAULT_PROGRESS_CALLBACK,
       config: nil,
       cache_dir: nil,
@@ -423,6 +425,10 @@ module Informers
       revision: "main",
       model_file_name: nil
     )
+      if quantized == NO_DEFAULT
+        quantized = task != "rerank"
+      end
+
       # Apply aliases
       task = TASK_ALIASES[task] || task
 
