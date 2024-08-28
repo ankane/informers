@@ -3,11 +3,6 @@ module Informers
     def initialize(model_id, quantized: false)
       @model_id = model_id
       @model = Informers.pipeline("feature-extraction", model_id, quantized: quantized)
-
-      # TODO better pattern
-      if model_id == "sentence-transformers/all-MiniLM-L6-v2"
-        @model.instance_variable_get(:@model).instance_variable_set(:@output_names, ["sentence_embedding"])
-      end
     end
 
     def embed(texts)
@@ -15,9 +10,7 @@ module Informers
       texts = [texts] unless is_batched
 
       case @model_id
-      when "sentence-transformers/all-MiniLM-L6-v2"
-        output = @model.(texts)
-      when "Xenova/all-MiniLM-L6-v2", "Xenova/multi-qa-MiniLM-L6-cos-v1", "Supabase/gte-small"
+      when "sentence-transformers/all-MiniLM-L6-v2", "Xenova/all-MiniLM-L6-v2", "Xenova/multi-qa-MiniLM-L6-cos-v1", "Supabase/gte-small"
         output = @model.(texts, pooling: "mean", normalize: true)
       when "mixedbread-ai/mxbai-embed-large-v1"
         output = @model.(texts, pooling: "cls")

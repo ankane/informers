@@ -256,9 +256,17 @@ module Informers
         padding: true,
         truncation: true
       )
+      model_options = {}
+
+      # optimization for sentence-transformers/all-MiniLM-L6-v2
+      if @model.instance_variable_get(:@output_names) == ["token_embeddings"] && pooling == "mean" && normalize
+        model_options[:output_names] = ["sentence_embedding"]
+        pooling = "none"
+        normalize = false
+      end
 
       # Run model
-      outputs = @model.(model_inputs)
+      outputs = @model.(model_inputs, **model_options)
 
       # TODO improve
       result =

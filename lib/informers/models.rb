@@ -141,13 +141,13 @@ module Informers
       OnnxRuntime::InferenceSession.new(path)
     end
 
-    def call(model_inputs)
-      @forward.(model_inputs)
+    def call(model_inputs, **kwargs)
+      @forward.(model_inputs, **kwargs)
     end
 
     private
 
-    def encoder_forward(model_inputs)
+    def encoder_forward(model_inputs, output_names: nil)
       encoder_feeds = {}
       @session.inputs.each do |input|
         key = input[:name].to_sym
@@ -156,13 +156,13 @@ module Informers
       if @session.inputs.any? { |v| v[:name] == "token_type_ids" } && !encoder_feeds[:token_type_ids]
         raise Todo
       end
-      session_run(@session, encoder_feeds)
+      session_run(@session, encoder_feeds, output_names:)
     end
 
-    def session_run(session, inputs)
+    def session_run(session, inputs, output_names:)
       checked_inputs = validate_inputs(session, inputs)
       begin
-        output = session.run(@output_names, checked_inputs)
+        output = session.run(output_names || @output_names, checked_inputs)
         output = replace_tensors(output)
         output
       rescue => e
