@@ -87,4 +87,18 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [-0.00596662, -0.03730119, -0.0703470], embeddings[0][..2]
     assert_elements_in_delta [0.00298353, -0.04421991, -0.0591884], embeddings[-1][..2]
   end
+
+  # https://huggingface.co/nomic-ai/nomic-embed-text-v1
+  def test_nomic
+    input = [
+      "search_document: The dog is barking",
+      "search_query: puppy"
+    ]
+
+    model = Informers::Model.new("nomic-ai/nomic-embed-text-v1")
+    embeddings = model.embed(input)
+
+    assert_elements_in_delta [-0.00645858, 0.01145126, 0.0099767], embeddings[0][..2]
+    assert_elements_in_delta [-0.01173127, 0.04957652, -0.0176401], embeddings[-1][..2]
+  end
 end

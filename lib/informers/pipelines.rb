@@ -276,8 +276,15 @@ module Informers
       # Run model
       outputs = @model.(model_inputs)
 
-      # TODO check outputs.last_hidden_state
-      result = outputs.logits
+      # TODO improve
+      result =
+        if outputs.is_a?(Array)
+          raise Error, "unexpected outputs" if outputs.size != 1
+          outputs[0]
+        else
+          outputs.logits
+        end
+
       case pooling
       when "none"
         # Skip pooling

@@ -199,6 +199,12 @@ module Informers
     end
   end
 
+  class NomicBertPreTrainedModel < PreTrainedModel
+  end
+
+  class NomicBertModel < NomicBertPreTrainedModel
+  end
+
   class DistilBertPreTrainedModel < PreTrainedModel
   end
 
@@ -217,6 +223,12 @@ module Informers
     end
   end
 
+  MODEL_MAPPING_NAMES_ENCODER_ONLY = {
+    "bert" => ["BertModel", BertModel],
+    "nomic_bert" => ["NomicBertModel", NomicBertModel],
+    "distilbert" => ["DistilBertModel", DistilBertModel]
+  }
+
   MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES = {
     "bert" => ["BertForSequenceClassification", BertForSequenceClassification],
     "distilbert" => ["DistilBertForSequenceClassification", DistilBertForSequenceClassification]
@@ -231,6 +243,7 @@ module Informers
   }
 
   MODEL_CLASS_TYPE_MAPPING = [
+    [MODEL_MAPPING_NAMES_ENCODER_ONLY, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]

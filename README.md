@@ -97,6 +97,20 @@ model = Informers.pipeline("feature-extraction", "intfloat/e5-base-v2", quantize
 embeddings = model.(input, pooling: "mean", normalize: true)
 ```
 
+### nomic-ai/nomic-embed-text-v1
+
+[Docs](https://huggingface.co/nomic-ai/nomic-embed-text-v1) [unreleased]
+
+```ruby
+input = [
+  "search_document: The dog is barking",
+  "search_query: puppy"
+]
+
+model = Informers::Model.new("nomic-ai/nomic-embed-text-v1")
+embeddings = model.embed(input)
+```
+
 ### Other
 
 You can use the feature extraction pipeline directly.
