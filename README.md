@@ -150,7 +150,7 @@ embeddings = model.(input)
 
 ### Xenova/jina-embeddings-v2-base-en
 
-[Docs](Xenova/jina-embeddings-v2-base-en)
+[Docs](https://huggingface.co/Xenova/jina-embeddings-v2-base-en)
 
 ```ruby
 sentences = ["How is the weather today?", "What is the current weather like today?"]
