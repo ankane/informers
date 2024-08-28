@@ -120,7 +120,7 @@ def transform_query(query)
   "Represent this sentence for searching relevant passages: #{query}"
 end
 
-docs = [
+input = [
   transform_query("puppy"),
   "The dog is barking",
   "The cat is purring"
