@@ -167,4 +167,21 @@ class ModelTest < Minitest::Test
     assert_in_delta 0.0555, result[1][:score]
     assert_equal docs[1], result[1][:text]
   end
+
+  # https://huggingface.co/BAAI/bge-reranker-base
+  def test_bge_reranker
+    query = "How many people live in London?"
+    docs = ["Around 9 Million people live in London", "London is known for its financial district"]
+
+    model = Informers.pipeline("reranking", "BAAI/bge-reranker-base")
+    result = model.(query, docs, return_documents: true)
+
+    assert_equal 0, result[0][:doc_id]
+    assert_in_delta 0.996, result[0][:score]
+    assert_equal docs[0], result[0][:text]
+
+    assert_equal 1, result[1][:doc_id]
+    assert_in_delta 0.000158, result[1][:score], 0.000001
+    assert_equal docs[1], result[1][:text]
+  end
 end

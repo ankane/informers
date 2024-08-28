@@ -237,16 +237,30 @@ module Informers
     end
   end
 
+  class XLMRobertaPreTrainedModel < PreTrainedModel
+  end
+
+  class XLMRobertaModel < XLMRobertaPreTrainedModel
+  end
+
+  class XLMRobertaForSequenceClassification < XLMRobertaPreTrainedModel
+    def call(model_inputs)
+      SequenceClassifierOutput.new(*super(model_inputs))
+    end
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
     "deberta-v2" => ["DebertaV2Model", DebertaV2Model],
-    "distilbert" => ["DistilBertModel", DistilBertModel]
+    "distilbert" => ["DistilBertModel", DistilBertModel],
+    "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel]
   }
 
   MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES = {
     "bert" => ["BertForSequenceClassification", BertForSequenceClassification],
-    "distilbert" => ["DistilBertForSequenceClassification", DistilBertForSequenceClassification]
+    "distilbert" => ["DistilBertForSequenceClassification", DistilBertForSequenceClassification],
+    "xlm-roberta" => ["XLMRobertaForSequenceClassification", XLMRobertaForSequenceClassification]
   }
 
   MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES = {

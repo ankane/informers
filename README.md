@@ -36,6 +36,7 @@ Reranking (experimental)
 
 - [mixedbread-ai/mxbai-rerank-base-v1](#mixedbread-aimxbai-rerank-base-v1)
 - [jinaai/jina-reranker-v1-turbo-en](#jinaaijina-reranker-v1-turbo-en)
+- [BAAI/bge-reranker-base](#baaibge-reranker-base)
 
 ### sentence-transformers/all-MiniLM-L6-v2
 
@@ -181,6 +182,18 @@ query = "How many people live in London?"
 docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
 model = Informers.pipeline("reranking", "jinaai/jina-reranker-v1-turbo-en")
+result = model.(query, docs)
+```
+
+### BAAI/bge-reranker-base
+
+[Docs](https://huggingface.co/BAAI/bge-reranker-base)
+
+```ruby
+query = "How many people live in London?"
+docs = ["Around 9 Million people live in London", "London is known for its financial district"]
+
+model = Informers.pipeline("reranking", "BAAI/bge-reranker-base")
 result = model.(query, docs)
 ```
 
