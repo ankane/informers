@@ -92,7 +92,7 @@ model = Informers.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", quan
 embeddings = model.(sentences, pooling: "mean", normalize: true)
 ```
 
-The model files must include `onnx/model.onnx` or `onnx/model_quantized.onnx` ([example](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/main/onnx)).
+The model files must include `onnx/model.onnx` or `onnx/model_quantized.onnx` ([example](https://huggingface.co/Xenova/all-MiniLM-L6-v2/tree/main/onnx)).
 
 ## Pipelines
 
