@@ -15,7 +15,7 @@ module Informers
       when "mixedbread-ai/mxbai-embed-large-v1"
         output = @model.(texts, pooling: "cls", normalize: false)
       else
-        raise Error, "model not supported: #{@model_id}"
+        raise Error, "Use the embedding pipeline for this model: #{@model_id}"
       end
 
       is_batched ? output : output[0]
