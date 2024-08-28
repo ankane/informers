@@ -111,6 +111,25 @@ model = Informers::Model.new("nomic-ai/nomic-embed-text-v1")
 embeddings = model.embed(input)
 ```
 
+### BAAI/bge-base-en-v1.5
+
+[Docs](https://huggingface.co/BAAI/bge-base-en-v1.5)
+
+```ruby
+def transform_query(query)
+  "Represent this sentence for searching relevant passages: #{query}"
+end
+
+docs = [
+  transform_query("puppy"),
+  "The dog is barking",
+  "The cat is purring"
+]
+
+model = Informers.pipeline("feature-extraction", "BAAI/bge-base-en-v1.5", quantized: false)
+embeddings = model.(input, pooling: "mean", normalize: true)
+```
+
 ### Other
 
 You can use the feature extraction pipeline directly.

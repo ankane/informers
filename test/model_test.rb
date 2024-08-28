@@ -101,4 +101,23 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [-0.00645858, 0.01145126, 0.0099767], embeddings[0][..2]
     assert_elements_in_delta [-0.01173127, 0.04957652, -0.0176401], embeddings[-1][..2]
   end
+
+  # https://huggingface.co/BAAI/bge-base-en-v1.5
+  def test_bge_base
+    transform_query = lambda do |query|
+      "Represent this sentence for searching relevant passages: #{query}"
+    end
+
+    docs = [
+      transform_query.("puppy"),
+      "The dog is barking",
+      "The cat is purring"
+    ]
+
+    model = Informers::Model.new("BAAI/bge-base-en-v1.5")
+    embeddings = model.embed(docs)
+
+    assert_elements_in_delta [0.00029264, -0.0619305, -0.06199387], embeddings[0][..2]
+    assert_elements_in_delta [-0.07482512, -0.0770234, 0.03398684], embeddings[-1][..2]
+  end
 end
