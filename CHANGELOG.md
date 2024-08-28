@@ -1,7 +1,7 @@
 ## 1.0.2 (unreleased)
 
 - Added `embedding` pipeline
-- Added `rerank` pipeline
+- Added `reranking` pipeline
 - Added support for `nomic-ai/nomic-embed-text-v1`
 
 ## 1.0.1 (2024-08-27)

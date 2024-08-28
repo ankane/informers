@@ -66,8 +66,8 @@ class PipelineTest < Minitest::Test
     assert_elements_in_delta [0.086439, 0.10276, 0.0053946], embeddings[1][..2]
   end
 
-  def test_rerank
-    ranker = Informers.pipeline("rerank")
+  def test_reranking
+    ranker = Informers.pipeline("reranking")
     result = ranker.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
     assert_equal 2, result.size
     assert_equal 0, result[0][:doc_id]

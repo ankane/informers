@@ -138,7 +138,7 @@ embeddings = model.(input, pooling: "mean", normalize: true)
 query = "How many people live in London?"
 docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
-model = Informers.pipeline("rerank", "mixedbread-ai/mxbai-rerank-base-v1")
+model = Informers.pipeline("reranking", "mixedbread-ai/mxbai-rerank-base-v1")
 result = model.(query, docs)
 ```
 
@@ -193,7 +193,7 @@ embed.("We are very happy to show you the 🤗 Transformers library.")
 Reranking [unreleased]
 
 ```ruby
-rerank = Informers.pipeline("rerank")
+rerank = Informers.pipeline("reranking")
 rerank.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
 ```
 

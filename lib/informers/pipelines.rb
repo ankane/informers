@@ -302,7 +302,7 @@ module Informers
     end
   end
 
-  class RerankPipeline < Pipeline
+  class RerankingPipeline < Pipeline
     def call(
       query,
       documents,
@@ -378,9 +378,9 @@ module Informers
       },
       type: "text"
     },
-    "rerank" => {
+    "reranking" => {
       tokenizer: AutoTokenizer,
-      pipeline: RerankPipeline,
+      pipeline: RerankingPipeline,
       model: AutoModel,
       default: {
         model: "mixedbread-ai/mxbai-rerank-base-v1"
@@ -425,7 +425,8 @@ module Informers
       model_file_name: nil
     )
       if quantized == NO_DEFAULT
-        quantized = !["embedding", "rerank"].include?(task)
+        # TODO move default to task class
+        quantized = !["embedding", "reranking"].include?(task)
       end
 
       # Apply aliases
