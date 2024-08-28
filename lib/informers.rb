@@ -19,6 +19,7 @@ require_relative "informers/env"
 require_relative "informers/model"
 require_relative "informers/models"
 require_relative "informers/tokenizers"
+require_relative "informers/version"
 require_relative "informers/pipelines"
 
 module Informers
