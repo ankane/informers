@@ -91,11 +91,15 @@ module Informers
   class DistilBertTokenizer < PreTrainedTokenizer
   end
 
+  class RobertaTokenizer < PreTrainedTokenizer
+  end
+
   class AutoTokenizer
     TOKENIZER_CLASS_MAPPING = {
       "BertTokenizer" => BertTokenizer,
       "DebertaV2Tokenizer" => DebertaV2Tokenizer,
-      "DistilBertTokenizer" => DistilBertTokenizer
+      "DistilBertTokenizer" => DistilBertTokenizer,
+      "RobertaTokenizer" => RobertaTokenizer
     }
 
     def self.from_pretrained(

@@ -35,6 +35,7 @@ Embedding
 Reranking (experimental)
 
 - [mixedbread-ai/mxbai-rerank-base-v1](#mixedbread-aimxbai-rerank-base-v1)
+- [jinaai/jina-reranker-v1-turbo-en](#jinaaijina-reranker-v1-turbo-en)
 
 ### sentence-transformers/all-MiniLM-L6-v2
 
@@ -168,6 +169,18 @@ query = "How many people live in London?"
 docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
 model = Informers.pipeline("reranking", "mixedbread-ai/mxbai-rerank-base-v1")
+result = model.(query, docs)
+```
+
+### jinaai/jina-reranker-v1-turbo-en
+
+[Docs](https://huggingface.co/jinaai/jina-reranker-v1-turbo-en)
+
+```ruby
+query = "How many people live in London?"
+docs = ["Around 9 Million people live in London", "London is known for its financial district"]
+
+model = Informers.pipeline("reranking", "jinaai/jina-reranker-v1-turbo-en")
 result = model.(query, docs)
 ```
 

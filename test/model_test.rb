@@ -150,4 +150,21 @@ class ModelTest < Minitest::Test
     assert_in_delta 0.139, result[1][:score]
     assert_equal docs[1], result[1][:text]
   end
+
+  # https://huggingface.co/jinaai/jina-reranker-v1-turbo-en
+  def test_jina_reranker
+    query = "How many people live in London?"
+    docs = ["Around 9 Million people live in London", "London is known for its financial district"]
+
+    model = Informers.pipeline("reranking", "jinaai/jina-reranker-v1-turbo-en")
+    result = model.(query, docs, return_documents: true)
+
+    assert_equal 0, result[0][:doc_id]
+    assert_in_delta 0.912, result[0][:score]
+    assert_equal docs[0], result[0][:text]
+
+    assert_equal 1, result[1][:doc_id]
+    assert_in_delta 0.0555, result[1][:score]
+    assert_equal docs[1], result[1][:text]
+  end
 end
