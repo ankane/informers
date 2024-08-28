@@ -62,4 +62,15 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [-0.00624076, 0.12864432, 0.5248165], embeddings[0][..2]
     assert_elements_in_delta [-0.61227727, 1.4060247, -0.04079155], embeddings[-1][..2]
   end
+
+  # https://huggingface.co/Supabase/gte-small
+  def test_supabase
+    sentences = ["That is a happy person", "That is a very happy person"]
+
+    model = Informers::Model.new("Supabase/gte-small")
+    embeddings = model.embed(sentences)
+
+    assert_elements_in_delta [-0.05316979, 0.01044252, 0.06194701], embeddings[0][..2]
+    assert_elements_in_delta [-0.05246907, 0.03752426, 0.07344585], embeddings[-1][..2]
+  end
 end

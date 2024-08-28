@@ -1,3 +1,7 @@
+## 1.0.1 (unreleased)
+
+- Added support for `Supabase/gte-small` to `Model`
+
 ## 1.0.0 (2024-08-26)
 
 - Replaced task classes with `pipeline` method

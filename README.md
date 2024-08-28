@@ -72,6 +72,17 @@ model = Informers::Model.new("mixedbread-ai/mxbai-embed-large-v1")
 embeddings = model.embed(docs)
 ```
 
+### Supabase/gte-small
+
+[Docs](https://huggingface.co/Supabase/gte-small) [unreleased]
+
+```ruby
+sentences = ["That is a happy person", "That is a very happy person"]
+
+model = Informers::Model.new("Supabase/gte-small")
+embeddings = model.embed(sentences)
+```
+
 ## Pipelines
 
 Named-entity recognition
