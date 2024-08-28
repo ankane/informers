@@ -308,6 +308,16 @@ module Informers
     end
   end
 
+  class EmbeddingPipeline < FeatureExtractionPipeline
+    def call(
+      texts,
+      pooling: "mean",
+      normalize: true
+    )
+      super(texts, pooling:, normalize:)
+    end
+  end
+
   class RerankPipeline < Pipeline
     def initialize(**options)
       super(**options)
@@ -379,6 +389,15 @@ module Informers
       },
       type: "text"
     },
+    "embedding" => {
+      tokenizer: AutoTokenizer,
+      pipeline: EmbeddingPipeline,
+      model: AutoModel,
+      default: {
+        model: "sentence-transformers/all-MiniLM-L6-v2"
+      },
+      type: "text"
+    },
     "rerank" => {
       tokenizer: AutoTokenizer,
       pipeline: RerankPipeline,
@@ -426,7 +445,7 @@ module Informers
       model_file_name: nil
     )
       if quantized == NO_DEFAULT
-        quantized = task != "rerank"
+        quantized = !["embedding", "rerank"].include?(task)
       end
 
       # Apply aliases
@@ -463,6 +482,10 @@ module Informers
       # Load model, tokenizer, and processor (if they exist)
       results = load_items(classes, model, pretrained_options)
       results[:task] = task
+
+      if model == "sentence-transformers/all-MiniLM-L6-v2"
+        results[:model].instance_variable_set(:@output_names, ["token_embeddings"])
+      end
 
       Utils.dispatch_callback(progress_callback, {
         status: "ready",

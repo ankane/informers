@@ -9,8 +9,8 @@ class ModelTest < Minitest::Test
   def test_all_minilm
     sentences = ["This is an example sentence", "Each sentence is converted"]
 
-    model = Informers::Model.new("sentence-transformers/all-MiniLM-L6-v2")
-    embeddings = model.embed(sentences)
+    model = Informers.pipeline("embedding", "sentence-transformers/all-MiniLM-L6-v2")
+    embeddings = model.(sentences)
 
     assert_elements_in_delta [0.067657, 0.063496, 0.048713], embeddings[0][..2]
     assert_elements_in_delta [0.086439, 0.10276, 0.0053946], embeddings[1][..2]
@@ -20,8 +20,8 @@ class ModelTest < Minitest::Test
   def test_all_minilm_xenova
     sentences = ["This is an example sentence", "Each sentence is converted"]
 
-    model = Informers::Model.new("Xenova/all-MiniLM-L6-v2", quantized: true)
-    embeddings = model.embed(sentences)
+    model = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", quantized: true)
+    embeddings = model.(sentences)
 
     assert_elements_in_delta [0.045927, 0.07328, 0.05401], embeddings[0][..2]
     assert_elements_in_delta [0.081881, 0.1076, -0.01324], embeddings[1][..2]
@@ -32,9 +32,9 @@ class ModelTest < Minitest::Test
     query = "How many people live in London?"
     docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
-    model = Informers::Model.new("Xenova/multi-qa-MiniLM-L6-cos-v1")
-    query_embedding = model.embed(query)
-    doc_embeddings = model.embed(docs)
+    model = Informers.pipeline("embedding", "Xenova/multi-qa-MiniLM-L6-cos-v1")
+    query_embedding = model.(query)
+    doc_embeddings = model.(docs)
     scores = doc_embeddings.map { |e| e.zip(query_embedding).sum { |d, q| d * q } }
     doc_score_pairs = docs.zip(scores).sort_by { |d, s| -s }
 
@@ -56,8 +56,8 @@ class ModelTest < Minitest::Test
       "The cat is purring"
     ]
 
-    model = Informers::Model.new("mixedbread-ai/mxbai-embed-large-v1")
-    embeddings = model.embed(docs)
+    model = Informers.pipeline("embedding", "mixedbread-ai/mxbai-embed-large-v1")
+    embeddings = model.(docs, pooling: "cls", normalize: false)
 
     assert_elements_in_delta [-0.00624076, 0.12864432, 0.5248165], embeddings[0][..2]
     assert_elements_in_delta [-0.61227727, 1.4060247, -0.04079155], embeddings[-1][..2]
@@ -67,8 +67,8 @@ class ModelTest < Minitest::Test
   def test_gte_small
     sentences = ["That is a happy person", "That is a very happy person"]
 
-    model = Informers::Model.new("Supabase/gte-small")
-    embeddings = model.embed(sentences)
+    model = Informers.pipeline("embedding", "Supabase/gte-small")
+    embeddings = model.(sentences)
 
     assert_elements_in_delta [-0.05316979, 0.01044252, 0.06194701], embeddings[0][..2]
     assert_elements_in_delta [-0.05246907, 0.03752426, 0.07344585], embeddings[-1][..2]
@@ -81,8 +81,8 @@ class ModelTest < Minitest::Test
       "query: Ruby creator"
     ]
 
-    model = Informers::Model.new("intfloat/e5-base-v2")
-    embeddings = model.embed(input)
+    model = Informers.pipeline("embedding", "intfloat/e5-base-v2")
+    embeddings = model.(input)
 
     assert_elements_in_delta [-0.00596662, -0.03730119, -0.0703470], embeddings[0][..2]
     assert_elements_in_delta [0.00298353, -0.04421991, -0.0591884], embeddings[-1][..2]
@@ -95,8 +95,8 @@ class ModelTest < Minitest::Test
       "search_query: puppy"
     ]
 
-    model = Informers::Model.new("nomic-ai/nomic-embed-text-v1")
-    embeddings = model.embed(input)
+    model = Informers.pipeline("embedding", "nomic-ai/nomic-embed-text-v1")
+    embeddings = model.(input)
 
     assert_elements_in_delta [-0.00645858, 0.01145126, 0.0099767], embeddings[0][..2]
     assert_elements_in_delta [-0.01173127, 0.04957652, -0.0176401], embeddings[-1][..2]
@@ -114,8 +114,8 @@ class ModelTest < Minitest::Test
       "The cat is purring"
     ]
 
-    model = Informers::Model.new("BAAI/bge-base-en-v1.5")
-    embeddings = model.embed(docs)
+    model = Informers.pipeline("embedding", "BAAI/bge-base-en-v1.5")
+    embeddings = model.(docs)
 
     assert_elements_in_delta [0.00029264, -0.0619305, -0.06199387], embeddings[0][..2]
     assert_elements_in_delta [-0.07482512, -0.0770234, 0.03398684], embeddings[-1][..2]

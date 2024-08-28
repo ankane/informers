@@ -183,6 +183,13 @@ extractor = Informers.pipeline("feature-extraction")
 extractor.("We are very happy to show you the 🤗 Transformers library.")
 ```
 
+Embedding [unreleased]
+
+```ruby
+embed = Informers.pipeline("embedding")
+embed.("We are very happy to show you the 🤗 Transformers library.")
+```
+
 Reranking [unreleased]
 
 ```ruby
