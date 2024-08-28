@@ -72,18 +72,16 @@ doc_score_pairs = docs.zip(scores).sort_by { |d, s| -s }
 [Docs](https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1)
 
 ```ruby
-def transform_query(query)
-  "Represent this sentence for searching relevant passages: #{query}"
-end
+query_prefix = "Represent this sentence for searching relevant passages: "
 
-docs = [
-  transform_query("puppy"),
+input = [
   "The dog is barking",
-  "The cat is purring"
+  "The cat is purring",
+  query_prefix + "puppy"
 ]
 
 model = Informers.pipeline("embedding", "mixedbread-ai/mxbai-embed-large-v1")
-embeddings = model.(docs)
+embeddings = model.(input)
 ```
 
 ### Supabase/gte-small
@@ -102,9 +100,12 @@ embeddings = model.(sentences)
 [Docs](https://huggingface.co/intfloat/e5-base-v2)
 
 ```ruby
+doc_prefix = "passage: "
+query_prefix = "query: "
+
 input = [
-  "passage: Ruby is a programming language created by Matz",
-  "query: Ruby creator"
+  doc_prefix + "Ruby is a programming language created by Matz",
+  query_prefix + "Ruby creator"
 ]
 
 model = Informers.pipeline("embedding", "intfloat/e5-base-v2")
@@ -116,9 +117,13 @@ embeddings = model.(input)
 [Docs](https://huggingface.co/nomic-ai/nomic-embed-text-v1)
 
 ```ruby
+doc_prefix = "search_document: "
+query_prefix = "search_query: "
+
 input = [
-  "search_document: The dog is barking",
-  "search_query: puppy"
+  doc_prefix + "The dog is barking",
+  doc_prefix + "The cat is purring",
+  query_prefix + "puppy"
 ]
 
 model = Informers.pipeline("embedding", "nomic-ai/nomic-embed-text-v1")
@@ -130,14 +135,12 @@ embeddings = model.(input)
 [Docs](https://huggingface.co/BAAI/bge-base-en-v1.5)
 
 ```ruby
-def transform_query(query)
-  "Represent this sentence for searching relevant passages: #{query}"
-end
+query_prefix = "Represent this sentence for searching relevant passages: "
 
 input = [
-  transform_query("puppy"),
   "The dog is barking",
-  "The cat is purring"
+  "The cat is purring",
+  query_prefix + "puppy"
 ]
 
 model = Informers.pipeline("embedding", "BAAI/bge-base-en-v1.5")
