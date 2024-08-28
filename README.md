@@ -107,8 +107,8 @@ input = [
   "search_query: puppy"
 ]
 
-model = Informers::Model.new("nomic-ai/nomic-embed-text-v1")
-embeddings = model.embed(input)
+model = Informers.pipeline("embedding", "nomic-ai/nomic-embed-text-v1")
+embeddings = model.(input)
 ```
 
 ### BAAI/bge-base-en-v1.5
@@ -193,8 +193,8 @@ embed.("We are very happy to show you the 🤗 Transformers library.")
 Reranking [unreleased]
 
 ```ruby
-ranker = Informers.pipeline("rerank")
-ranker.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
+rerank = Informers.pipeline("rerank")
+rerank.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
 ```
 
 ## Credits
