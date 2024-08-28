@@ -30,6 +30,7 @@ Embedding
 - [intfloat/e5-base-v2](#intfloate5-base-v2)
 - [nomic-ai/nomic-embed-text-v1](#nomic-ainomic-embed-text-v1)
 - [BAAI/bge-base-en-v1.5](#baaibge-base-en-v15)
+- [Xenova/jina-embeddings-v2-base-en](#xenovajina-embeddings-v2-base-en)
 
 Reranking (experimental)
 
@@ -145,6 +146,17 @@ input = [
 
 model = Informers.pipeline("embedding", "BAAI/bge-base-en-v1.5")
 embeddings = model.(input)
+```
+
+### Xenova/jina-embeddings-v2-base-en
+
+[Docs](Xenova/jina-embeddings-v2-base-en)
+
+```ruby
+sentences = ["How is the weather today?", "What is the current weather like today?"]
+
+model = Informers.pipeline("embedding", "Xenova/jina-embeddings-v2-base-en")
+embeddings = model.(sentences)
 ```
 
 ### mixedbread-ai/mxbai-rerank-base-v1

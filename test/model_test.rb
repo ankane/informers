@@ -123,6 +123,17 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [0.00029264, -0.0619305, -0.06199387], embeddings[-1][..2]
   end
 
+  # https://huggingface.co/Xenova/jina-embeddings-v2-base-en
+  def test_jina_embeddings
+    sentences = ["How is the weather today?", "What is the current weather like today?"]
+
+    model = Informers.pipeline("embedding", "Xenova/jina-embeddings-v2-base-en")
+    embeddings = model.(sentences)
+
+    assert_elements_in_delta [-0.02488641, -0.0429398, 0.04303398], embeddings[0][..2]
+    assert_elements_in_delta [-0.0081194, -0.06225249, 0.03116853], embeddings[1][..2]
+  end
+
   # https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1
   def test_mxbai_rerank
     query = "How many people live in London?"
