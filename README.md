@@ -33,7 +33,7 @@ Embedding
 
 Reranking (experimental)
 
-- [mixedbread-ai/mxbai-rerank-base-v1](#mixedbread-ai-mxbai-rerank-base-v1)
+- [mixedbread-ai/mxbai-rerank-base-v1](#mixedbread-aimxbai-rerank-base-v1)
 
 ### sentence-transformers/all-MiniLM-L6-v2
 
