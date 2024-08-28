@@ -6,7 +6,7 @@ class ModelTest < Minitest::Test
   end
 
   # https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
-  def test_sentence_transformers
+  def test_all_minilm
     sentences = ["This is an example sentence", "Each sentence is converted"]
 
     model = Informers::Model.new("sentence-transformers/all-MiniLM-L6-v2")
@@ -17,7 +17,7 @@ class ModelTest < Minitest::Test
   end
 
   # https://huggingface.co/Xenova/all-MiniLM-L6-v2
-  def test_xenova
+  def test_all_minilm_xenova
     sentences = ["This is an example sentence", "Each sentence is converted"]
 
     model = Informers::Model.new("Xenova/all-MiniLM-L6-v2", quantized: true)
@@ -28,7 +28,7 @@ class ModelTest < Minitest::Test
   end
 
   # https://huggingface.co/Xenova/multi-qa-MiniLM-L6-cos-v1
-  def test_xenova2
+  def test_multi_qa_minilm
     query = "How many people live in London?"
     docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
@@ -45,7 +45,7 @@ class ModelTest < Minitest::Test
   end
 
   # https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1
-  def test_mixedbread
+  def test_mxbai_embed
     transform_query = lambda do |query|
       "Represent this sentence for searching relevant passages: #{query}"
     end
@@ -64,7 +64,7 @@ class ModelTest < Minitest::Test
   end
 
   # https://huggingface.co/Supabase/gte-small
-  def test_supabase
+  def test_gte_small
     sentences = ["That is a happy person", "That is a very happy person"]
 
     model = Informers::Model.new("Supabase/gte-small")
@@ -75,7 +75,7 @@ class ModelTest < Minitest::Test
   end
 
   # https://huggingface.co/intfloat/e5-base-v2
-  def test_intfloat
+  def test_e5_base
     input = [
       "passage: Ruby is a programming language created by Matz",
       "query: Ruby creator"
@@ -89,7 +89,7 @@ class ModelTest < Minitest::Test
   end
 
   # https://huggingface.co/nomic-ai/nomic-embed-text-v1
-  def test_nomic
+  def test_nomic_embed
     input = [
       "search_document: The dog is barking",
       "search_query: puppy"
