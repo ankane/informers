@@ -46,21 +46,19 @@ class ModelTest < Minitest::Test
 
   # https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1
   def test_mxbai_embed
-    transform_query = lambda do |query|
-      "Represent this sentence for searching relevant passages: #{query}"
-    end
+    query_prefix = "Represent this sentence for searching relevant passages: "
 
-    docs = [
-      transform_query.("puppy"),
+    input = [
       "The dog is barking",
-      "The cat is purring"
+      "The cat is purring",
+      query_prefix + "puppy"
     ]
 
     model = Informers.pipeline("embedding", "mixedbread-ai/mxbai-embed-large-v1")
-    embeddings = model.(docs, pooling: "cls", normalize: false)
+    embeddings = model.(input, pooling: "cls", normalize: false)
 
-    assert_elements_in_delta [-0.00624076, 0.12864432, 0.5248165], embeddings[0][..2]
-    assert_elements_in_delta [-0.61227727, 1.4060247, -0.04079155], embeddings[-1][..2]
+    assert_elements_in_delta [-0.61227727, 1.4060247, -0.04079155], embeddings[1][..2]
+    assert_elements_in_delta [-0.00624076, 0.12864432, 0.5248165], embeddings[-1][..2]
   end
 
   # https://huggingface.co/Supabase/gte-small
@@ -76,9 +74,12 @@ class ModelTest < Minitest::Test
 
   # https://huggingface.co/intfloat/e5-base-v2
   def test_e5_base
+    doc_prefix = "passage: "
+    query_prefix = "query: "
+
     input = [
-      "passage: Ruby is a programming language created by Matz",
-      "query: Ruby creator"
+      doc_prefix + "Ruby is a programming language created by Matz",
+      query_prefix + "Ruby creator"
     ]
 
     model = Informers.pipeline("embedding", "intfloat/e5-base-v2")
@@ -90,9 +91,12 @@ class ModelTest < Minitest::Test
 
   # https://huggingface.co/nomic-ai/nomic-embed-text-v1
   def test_nomic_embed
+    doc_prefix = "search_document: "
+    query_prefix = "search_query: "
+
     input = [
-      "search_document: The dog is barking",
-      "search_query: puppy"
+      doc_prefix + "The dog is barking",
+      query_prefix + "puppy"
     ]
 
     model = Informers.pipeline("embedding", "nomic-ai/nomic-embed-text-v1")
@@ -104,21 +108,19 @@ class ModelTest < Minitest::Test
 
   # https://huggingface.co/BAAI/bge-base-en-v1.5
   def test_bge_base
-    transform_query = lambda do |query|
-      "Represent this sentence for searching relevant passages: #{query}"
-    end
+    query_prefix = "Represent this sentence for searching relevant passages: "
 
-    docs = [
-      transform_query.("puppy"),
+    input = [
       "The dog is barking",
-      "The cat is purring"
+      "The cat is purring",
+      query_prefix + "puppy"
     ]
 
     model = Informers.pipeline("embedding", "BAAI/bge-base-en-v1.5")
-    embeddings = model.(docs)
+    embeddings = model.(input)
 
-    assert_elements_in_delta [0.00029264, -0.0619305, -0.06199387], embeddings[0][..2]
-    assert_elements_in_delta [-0.07482512, -0.0770234, 0.03398684], embeddings[-1][..2]
+    assert_elements_in_delta [-0.07482512, -0.0770234, 0.03398684], embeddings[1][..2]
+    assert_elements_in_delta [0.00029264, -0.0619305, -0.06199387], embeddings[-1][..2]
   end
 
   # https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1
