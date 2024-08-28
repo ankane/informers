@@ -21,6 +21,20 @@ gem "informers"
 
 ## Models
 
+Embedding
+
+- [sentence-transformers/all-MiniLM-L6-v2](#sentence-transformersall-MiniLM-L6-v2)
+- [Xenova/multi-qa-MiniLM-L6-cos-v1](#xenovamulti-qa-MiniLM-L6-cos-v1)
+- [mixedbread-ai/mxbai-embed-large-v1](#mixedbread-aimxbai-embed-large-v1)
+- [Supabase/gte-small](#supabasegte-small)
+- [intfloat/e5-base-v2](#intfloate5-base-v2)
+- [nomic-ai/nomic-embed-text-v1](#nomic-ainomic-embed-text-v1)
+- [BAAI/bge-base-en-v1.5](#baaibge-base-en-v15)
+
+Reranking
+
+- [mixedbread-ai/mxbai-rerank-base-v1](#mixedbread-ai-mxbai-rerank-base-v1)
+
 ### sentence-transformers/all-MiniLM-L6-v2
 
 [Docs](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
@@ -28,14 +42,14 @@ gem "informers"
 ```ruby
 sentences = ["This is an example sentence", "Each sentence is converted"]
 
-model = Informers::Model.new("sentence-transformers/all-MiniLM-L6-v2")
-embeddings = model.embed(sentences)
+model = Informers.pipeline("embedding", "sentence-transformers/all-MiniLM-L6-v2")
+embeddings = model.(sentences)
 ```
 
 For a quantized version, use:
 
 ```ruby
-model = Informers::Model.new("Xenova/all-MiniLM-L6-v2", quantized: true)
+model = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", quantized: true)
 ```
 
 ### Xenova/multi-qa-MiniLM-L6-cos-v1
@@ -46,9 +60,9 @@ model = Informers::Model.new("Xenova/all-MiniLM-L6-v2", quantized: true)
 query = "How many people live in London?"
 docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
-model = Informers::Model.new("Xenova/multi-qa-MiniLM-L6-cos-v1")
-query_embedding = model.embed(query)
-doc_embeddings = model.embed(docs)
+model = Informers.pipeline("embedding", "Xenova/multi-qa-MiniLM-L6-cos-v1")
+query_embedding = model.(query)
+doc_embeddings = model.(docs)
 scores = doc_embeddings.map { |e| e.zip(query_embedding).sum { |d, q| d * q } }
 doc_score_pairs = docs.zip(scores).sort_by { |d, s| -s }
 ```
@@ -68,8 +82,8 @@ docs = [
   "The cat is purring"
 ]
 
-model = Informers::Model.new("mixedbread-ai/mxbai-embed-large-v1")
-embeddings = model.embed(docs)
+model = Informers.pipeline("embedding", "mixedbread-ai/mxbai-embed-large-v1")
+embeddings = model.(docs)
 ```
 
 ### Supabase/gte-small
@@ -79,8 +93,8 @@ embeddings = model.embed(docs)
 ```ruby
 sentences = ["That is a happy person", "That is a very happy person"]
 
-model = Informers::Model.new("Supabase/gte-small")
-embeddings = model.embed(sentences)
+model = Informers.pipeline("embedding", "Supabase/gte-small")
+embeddings = model.(sentences)
 ```
 
 ### intfloat/e5-base-v2
@@ -93,13 +107,13 @@ input = [
   "query: Ruby creator"
 ]
 
-model = Informers.pipeline("feature-extraction", "intfloat/e5-base-v2", quantized: false)
-embeddings = model.(input, pooling: "mean", normalize: true)
+model = Informers.pipeline("embedding", "intfloat/e5-base-v2")
+embeddings = model.(input)
 ```
 
 ### nomic-ai/nomic-embed-text-v1
 
-[Docs](https://huggingface.co/nomic-ai/nomic-embed-text-v1) [unreleased]
+[Docs](https://huggingface.co/nomic-ai/nomic-embed-text-v1)
 
 ```ruby
 input = [
@@ -126,13 +140,13 @@ input = [
   "The cat is purring"
 ]
 
-model = Informers.pipeline("feature-extraction", "BAAI/bge-base-en-v1.5", quantized: false)
-embeddings = model.(input, pooling: "mean", normalize: true)
+model = Informers.pipeline("embedding", "BAAI/bge-base-en-v1.5")
+embeddings = model.(input)
 ```
 
 ### mixedbread-ai/mxbai-rerank-base-v1
 
-[Docs](https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1) [unreleased]
+[Docs](https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1)
 
 ```ruby
 query = "How many people live in London?"
@@ -155,14 +169,14 @@ The model files must include `onnx/model.onnx` or `onnx/model_quantized.onnx` ([
 
 ## Pipelines
 
-Embedding [unreleased]
+Embedding
 
 ```ruby
 embed = Informers.pipeline("embedding")
 embed.("We are very happy to show you the 🤗 Transformers library.")
 ```
 
-Reranking [unreleased]
+Reranking
 
 ```ruby
 rerank = Informers.pipeline("reranking")
