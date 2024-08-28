@@ -285,6 +285,7 @@ module Informers
       when "cls"
         result = result.map(&:first)
       else
+        # TODO raise ArgumentError in 2.0
         raise Error, "Pooling method '#{pooling}' not supported."
       end
 
