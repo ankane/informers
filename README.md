@@ -83,6 +83,15 @@ model = Informers::Model.new("Supabase/gte-small")
 embeddings = model.embed(sentences)
 ```
 
+### Other
+
+You can also use the feature extraction pipeline directly.
+
+```ruby
+model = Informers.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", quantized: false)
+embeddings = model.(sentences, pooling: "mean", normalize: true)
+```
+
 ## Pipelines
 
 Named-entity recognition
