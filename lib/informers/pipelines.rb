@@ -10,10 +10,6 @@ module Informers
   end
 
   class TextClassificationPipeline < Pipeline
-    def initialize(**options)
-      super(**options)
-    end
-
     def call(texts, top_k: 1)
       # Run tokenization
       model_inputs = @tokenizer.(texts,
@@ -56,10 +52,6 @@ module Informers
   end
 
   class TokenClassificationPipeline < Pipeline
-    def initialize(**options)
-      super(**options)
-    end
-
     def call(
       texts,
       ignore_labels: ["O"],
@@ -200,10 +192,6 @@ module Informers
   end
 
   class QuestionAnsweringPipeline < Pipeline
-    def initialize(**options)
-      super(**options)
-    end
-
     def call(question, context, top_k: 1)
       # Run tokenization
       inputs = @tokenizer.(question,
@@ -256,10 +244,6 @@ module Informers
   end
 
   class FeatureExtractionPipeline < Pipeline
-    def initialize(**options)
-      super(**options)
-    end
-
     def call(
       texts,
       pooling: "none",
@@ -319,10 +303,6 @@ module Informers
   end
 
   class RerankPipeline < Pipeline
-    def initialize(**options)
-      super(**options)
-    end
-
     def call(
       query,
       documents,
