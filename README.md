@@ -155,6 +155,20 @@ The model files must include `onnx/model.onnx` or `onnx/model_quantized.onnx` ([
 
 ## Pipelines
 
+Embedding [unreleased]
+
+```ruby
+embed = Informers.pipeline("embedding")
+embed.("We are very happy to show you the 🤗 Transformers library.")
+```
+
+Reranking [unreleased]
+
+```ruby
+rerank = Informers.pipeline("reranking")
+rerank.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
+```
+
 Named-entity recognition
 
 ```ruby
@@ -181,20 +195,6 @@ Feature extraction
 ```ruby
 extractor = Informers.pipeline("feature-extraction")
 extractor.("We are very happy to show you the 🤗 Transformers library.")
-```
-
-Embedding [unreleased]
-
-```ruby
-embed = Informers.pipeline("embedding")
-embed.("We are very happy to show you the 🤗 Transformers library.")
-```
-
-Reranking [unreleased]
-
-```ruby
-rerank = Informers.pipeline("reranking")
-rerank.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
 ```
 
 ## Credits
