@@ -17,7 +17,7 @@ module Informers
       case @model_id
       when "sentence-transformers/all-MiniLM-L6-v2"
         output = @model.(texts)
-      when "Xenova/all-MiniLM-L6-v2", "Xenova/multi-qa-MiniLM-L6-cos-v1", "Supabase/gte-small"
+      when "Xenova/all-MiniLM-L6-v2", "Xenova/multi-qa-MiniLM-L6-cos-v1", "Supabase/gte-small", "intfloat/e5-base-v2"
         output = @model.(texts, pooling: "mean", normalize: true)
       when "mixedbread-ai/mxbai-embed-large-v1"
         output = @model.(texts, pooling: "cls")

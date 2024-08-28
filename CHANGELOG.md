@@ -1,3 +1,7 @@
+## 1.0.2 (unreleased)
+
+- Added support for `intfloat/e5-base-v2` to `Model`
+
 ## 1.0.1 (2024-08-27)
 
 - Added support for `Supabase/gte-small` to `Model`
