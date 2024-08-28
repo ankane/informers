@@ -135,7 +135,15 @@ module Informers
     end
 
     def self.construct_session(pretrained_model_name_or_path, file_name, **options)
-      model_file_name = "onnx/#{file_name}#{options[:quantized] ? "_quantized" : ""}.onnx"
+      prefix = "onnx/"
+      if file_name.start_with?("../")
+        prefix = ""
+        file_name = file_name[3..]
+      elsif file_name.start_with?("/")
+        prefix = ""
+        file_name = file_name[1..]
+      end
+      model_file_name = "#{prefix}#{file_name}#{options[:quantized] ? "_quantized" : ""}.onnx"
       path = Utils::Hub.get_model_file(pretrained_model_name_or_path, model_file_name, true, **options)
 
       OnnxRuntime::InferenceSession.new(path)

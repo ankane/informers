@@ -1,3 +1,7 @@
+## 1.0.3 (unreleased)
+
+- Improved `model_file_name` option
+
 ## 1.0.2 (2024-08-28)
 
 - Added `embedding` pipeline
