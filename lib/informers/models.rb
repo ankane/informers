@@ -237,6 +237,12 @@ module Informers
     end
   end
 
+  class MPNetPreTrainedModel < PreTrainedModel
+  end
+
+  class MPNetModel < MPNetPreTrainedModel
+  end
+
   class XLMRobertaPreTrainedModel < PreTrainedModel
   end
 
@@ -253,6 +259,7 @@ module Informers
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
     "deberta-v2" => ["DebertaV2Model", DebertaV2Model],
+    "mpnet" => ["MPNetModel", MPNetModel],
     "distilbert" => ["DistilBertModel", DistilBertModel],
     "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel]
   }

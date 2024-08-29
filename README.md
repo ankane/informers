@@ -32,6 +32,7 @@ Embedding
 - [BAAI/bge-base-en-v1.5](#baaibge-base-en-v15)
 - [jinaai/jina-embeddings-v2-base-en](#jinaaijina-embeddings-v2-base-en)
 - [Snowflake/snowflake-arctic-embed-m-v1.5](#snowflakesnowflake-arctic-embed-m-v15)
+- [Xenova/all-mpnet-base-v2](#xenovaall-mpnet-base-v2)
 
 Reranking (experimental)
 
@@ -177,6 +178,17 @@ input = [
 
 model = Informers.pipeline("embedding", "Snowflake/snowflake-arctic-embed-m-v1.5")
 embeddings = model.(input, pooling: "cls", model_output: "token_embeddings")
+```
+
+### Xenova/all-mpnet-base-v2
+
+[Docs](https://huggingface.co/Xenova/all-mpnet-base-v2)
+
+```ruby
+sentences = ["This is an example sentence", "Each sentence is converted"]
+
+model = Informers.pipeline("embedding", "Xenova/all-mpnet-base-v2")
+embeddings = model.(sentences)
 ```
 
 ### mixedbread-ai/mxbai-rerank-base-v1

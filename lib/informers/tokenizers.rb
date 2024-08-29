@@ -97,13 +97,17 @@ module Informers
   class XLMRobertaTokenizer < PreTrainedTokenizer
   end
 
+  class MPNetTokenizer < PreTrainedTokenizer
+  end
+
   class AutoTokenizer
     TOKENIZER_CLASS_MAPPING = {
       "BertTokenizer" => BertTokenizer,
       "DebertaV2Tokenizer" => DebertaV2Tokenizer,
       "DistilBertTokenizer" => DistilBertTokenizer,
       "RobertaTokenizer" => RobertaTokenizer,
-      "XLMRobertaTokenizer" => XLMRobertaTokenizer
+      "XLMRobertaTokenizer" => XLMRobertaTokenizer,
+      "MPNetTokenizer" => MPNetTokenizer
     }
 
     def self.from_pretrained(
