@@ -34,7 +34,7 @@ Embedding
 - [Snowflake/snowflake-arctic-embed-m-v1.5](#snowflakesnowflake-arctic-embed-m-v15)
 - [Xenova/all-mpnet-base-v2](#xenovaall-mpnet-base-v2)
 
-Reranking (experimental)
+Reranking
 
 - [mixedbread-ai/mxbai-rerank-base-v1](#mixedbread-aimxbai-rerank-base-v1)
 - [jinaai/jina-reranker-v1-turbo-en](#jinaaijina-reranker-v1-turbo-en)
@@ -154,7 +154,7 @@ embeddings = model.(input)
 
 ### jinaai/jina-embeddings-v2-base-en
 
-[Docs](https://huggingface.co/jinaai/jina-embeddings-v2-base-en) [unreleased]
+[Docs](https://huggingface.co/jinaai/jina-embeddings-v2-base-en)
 
 ```ruby
 sentences = ["How is the weather today?", "What is the current weather like today?"]
@@ -165,7 +165,7 @@ embeddings = model.(sentences)
 
 ### Snowflake/snowflake-arctic-embed-m-v1.5
 
-[Docs](https://huggingface.co/Snowflake/snowflake-arctic-embed-m-v1.5) [unreleased]
+[Docs](https://huggingface.co/Snowflake/snowflake-arctic-embed-m-v1.5)
 
 ```ruby
 query_prefix = "Represent this sentence for searching relevant passages: "
@@ -247,7 +247,7 @@ embed = Informers.pipeline("embedding")
 embed.("We are very happy to show you the 🤗 Transformers library.")
 ```
 
-Reranking (experimental)
+Reranking
 
 ```ruby
 rerank = Informers.pipeline("reranking")
