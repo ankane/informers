@@ -145,6 +145,11 @@ class ModelTest < Minitest::Test
 
     assert_elements_in_delta [0.03239886, 0.0009998, 0.08401278], embeddings[0][..2]
     assert_elements_in_delta [-0.02530634, -0.02715422, 0.01218867], embeddings[-1][..2]
+
+    embeddings = model.(input, pooling: "none", normalize: false, model_output: "sentence_embedding")
+
+    assert_elements_in_delta [0.03239886, 0.0009998, 0.08401278], embeddings[0][..2]
+    assert_elements_in_delta [-0.02530634, -0.02715422, 0.01218867], embeddings[-1][..2]
   end
 
   # https://huggingface.co/Xenova/all-mpnet-base-v2
