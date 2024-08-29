@@ -141,7 +141,7 @@ class ModelTest < Minitest::Test
     ]
 
     model = Informers.pipeline("embedding", "Snowflake/snowflake-arctic-embed-m-v1.5")
-    embeddings = model.(input, pooling: "cls", output: "token_embeddings")
+    embeddings = model.(input, pooling: "cls", model_output: "token_embeddings")
 
     assert_elements_in_delta [0.03239886, 0.0009998, 0.08401278], embeddings[0][..2]
     assert_elements_in_delta [-0.02530634, -0.02715422, 0.01218867], embeddings[-1][..2]

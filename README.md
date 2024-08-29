@@ -176,7 +176,7 @@ input = [
 ]
 
 model = Informers.pipeline("embedding", "Snowflake/snowflake-arctic-embed-m-v1.5")
-embeddings = model.(input, pooling: "cls", output: "token_embeddings")
+embeddings = model.(input, pooling: "cls", model_output: "token_embeddings")
 ```
 
 ### mixedbread-ai/mxbai-rerank-base-v1

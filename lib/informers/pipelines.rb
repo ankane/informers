@@ -250,7 +250,7 @@ module Informers
       normalize: false,
       quantize: false,
       precision: "binary",
-      output: nil
+      model_output: nil
     )
       # Run tokenization
       model_inputs = @tokenizer.(texts,
@@ -259,8 +259,8 @@ module Informers
       )
       model_options = {}
 
-      if !output.nil?
-        model_options[:output_names] = Array(output)
+      if !model_output.nil?
+        model_options[:output_names] = Array(model_output)
       elsif @model.instance_variable_get(:@output_names) == ["token_embeddings"] && pooling == "mean" && normalize
         # optimization for sentence-transformers/all-MiniLM-L6-v2
         model_options[:output_names] = ["sentence_embedding"]
@@ -311,9 +311,9 @@ module Informers
       texts,
       pooling: "mean",
       normalize: true,
-      output: nil
+      model_output: nil
     )
-      super(texts, pooling:, normalize:, output:)
+      super(texts, pooling:, normalize:, model_output:)
     end
   end
 
