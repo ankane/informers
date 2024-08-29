@@ -271,7 +271,9 @@ module Informers
       # TODO improve
       result =
         if outputs.is_a?(Array)
-          raise Error, "unexpected outputs" if outputs.size != 1
+          # TODO show returned instead of all
+          output_names = @model.instance_variable_get(:@session).outputs.map { |v| v[:name] }
+          raise Error, "unexpected outputs: #{output_names}" if outputs.size != 1
           outputs[0]
         else
           outputs.logits
