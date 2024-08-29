@@ -1,5 +1,6 @@
 ## 1.0.3 (unreleased)
 
+- Added `output` option
 - Improved `model_file_name` option
 
 ## 1.0.2 (2024-08-28)

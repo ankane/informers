@@ -31,6 +31,7 @@ Embedding
 - [nomic-ai/nomic-embed-text-v1](#nomic-ainomic-embed-text-v1)
 - [BAAI/bge-base-en-v1.5](#baaibge-base-en-v15)
 - [jinaai/jina-embeddings-v2-base-en](#jinaaijina-embeddings-v2-base-en)
+- [Snowflake/snowflake-arctic-embed-m-v1.5](#snowflakesnowflake-arctic-embed-m-v15)
 
 Reranking (experimental)
 
@@ -159,6 +160,23 @@ sentences = ["How is the weather today?", "What is the current weather like toda
 
 model = Informers.pipeline("embedding", "jinaai/jina-embeddings-v2-base-en", model_file_name: "../model")
 embeddings = model.(sentences)
+```
+
+### Snowflake/snowflake-arctic-embed-m-v1.5
+
+[Docs](https://huggingface.co/Snowflake/snowflake-arctic-embed-m-v1.5) [unreleased]
+
+```ruby
+query_prefix = "Represent this sentence for searching relevant passages: "
+
+input = [
+  "The dog is barking",
+  "The cat is purring",
+  query_prefix + "puppy"
+]
+
+model = Informers.pipeline("embedding", "Snowflake/snowflake-arctic-embed-m-v1.5")
+embeddings = model.(input, pooling: "cls", output: "token_embeddings")
 ```
 
 ### mixedbread-ai/mxbai-rerank-base-v1

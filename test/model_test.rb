@@ -130,6 +130,23 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [-0.0081194, -0.06225249, 0.03116853], embeddings[1][..2]
   end
 
+  # https://huggingface.co/Snowflake/snowflake-arctic-embed-m-v1.5
+  def test_snowflake_arctic_embed
+    query_prefix = "Represent this sentence for searching relevant passages: "
+
+    input = [
+      "The dog is barking",
+      "The cat is purring",
+      query_prefix + "puppy"
+    ]
+
+    model = Informers.pipeline("embedding", "Snowflake/snowflake-arctic-embed-m-v1.5")
+    embeddings = model.(input, pooling: "cls", output: "token_embeddings")
+
+    assert_elements_in_delta [0.03239886, 0.0009998, 0.08401278], embeddings[0][..2]
+    assert_elements_in_delta [-0.02530634, -0.02715422, 0.01218867], embeddings[-1][..2]
+  end
+
   # https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1
   def test_mxbai_rerank
     query = "How many people live in London?"
