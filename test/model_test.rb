@@ -1,10 +1,6 @@
 require_relative "test_helper"
 
 class ModelTest < Minitest::Test
-  def setup
-    skip if ci?
-  end
-
   # https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
   def test_all_minilm
     sentences = ["This is an example sentence", "Each sentence is converted"]

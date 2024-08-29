@@ -10,8 +10,4 @@ class Minitest::Test
       assert_in_delta exp, act
     end
   end
-
-  def ci?
-    ENV["CI"]
-  end
 end
