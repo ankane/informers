@@ -177,7 +177,7 @@ input = [
 ]
 
 model = Informers.pipeline("embedding", "Snowflake/snowflake-arctic-embed-m-v1.5")
-embeddings = model.(input, pooling: "none", model_output: "sentence_embedding")
+embeddings = model.(input, model_output: "sentence_embedding", pooling: "none")
 ```
 
 ### Xenova/all-mpnet-base-v2
