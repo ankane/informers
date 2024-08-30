@@ -67,11 +67,15 @@ class PipelineTest < Minitest::Test
   end
 
   def test_reranking
-    ranker = Informers.pipeline("reranking")
-    result = ranker.("Who created Ruby?", ["Matz created Ruby", "Another doc"])
+    query = "How many people live in London?"
+    docs = ["Around 9 Million people live in London", "London is known for its financial district"]
+    rerank = Informers.pipeline("reranking")
+    result = rerank.(query, docs)
     assert_equal 2, result.size
     assert_equal 0, result[0][:doc_id]
+    assert_in_delta 0.984, result[0][:score]
     assert_equal 1, result[1][:doc_id]
+    assert_in_delta 0.139, result[1][:score]
   end
 
   def test_progress_callback
