@@ -261,6 +261,18 @@ module Informers
     end
   end
 
+  class RobertaPreTrainedModel < PreTrainedModel
+  end
+
+  class RobertaModel < RobertaPreTrainedModel
+  end
+
+  class RobertaForMaskedLM < RobertaPreTrainedModel
+    def call(model_inputs)
+      MaskedLMOutput.new(*super(model_inputs))
+    end
+  end
+
   class XLMRobertaPreTrainedModel < PreTrainedModel
   end
 
@@ -279,6 +291,7 @@ module Informers
     "deberta-v2" => ["DebertaV2Model", DebertaV2Model],
     "mpnet" => ["MPNetModel", MPNetModel],
     "distilbert" => ["DistilBertModel", DistilBertModel],
+    "roberta" => ["RobertaModel", RobertaModel],
     "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel]
   }
 
@@ -298,7 +311,8 @@ module Informers
   }
 
   MODEL_FOR_MASKED_LM_MAPPING_NAMES = {
-    "bert" => ["BertForMaskedLM", BertForMaskedLM]
+    "bert" => ["BertForMaskedLM", BertForMaskedLM],
+    "roberta" => ["RobertaForMaskedLM", RobertaForMaskedLM]
   }
 
   MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES = {
