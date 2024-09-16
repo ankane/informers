@@ -21,13 +21,13 @@ module Informers
       outputs = @model.(model_inputs)
 
       function_to_apply =
-        if @model.config.problem_type == "multi_label_classification"
+        if @model.config[:problem_type] == "multi_label_classification"
           ->(batch) { Utils.sigmoid(batch) }
         else
           ->(batch) { Utils.softmax(batch) } # single_label_classification (default)
         end
 
-      id2label = @model.config.id2label
+      id2label = @model.config[:id2label]
 
       to_return = []
       outputs.logits.each do |batch|
@@ -70,7 +70,7 @@ module Informers
       outputs = @model.(model_inputs)
 
       logits = outputs.logits
-      id2label = @model.config.id2label
+      id2label = @model.config[:id2label]
 
       to_return = []
       logits.length.times do |i|
@@ -281,7 +281,7 @@ module Informers
     def initialize(**options)
       super(**options)
 
-      @label2id = @model.config.label2id.transform_keys(&:downcase)
+      @label2id = @model.config[:label2id].transform_keys(&:downcase)
 
       @entailment_id = @label2id["entailment"]
       if @entailment_id.nil?

@@ -1,18 +1,11 @@
 module Informers
   class PretrainedConfig
-    attr_reader :model_type, :problem_type, :id2label, :label2id
-
     def initialize(config_json)
-      @is_encoder_decoder = false
-
-      @model_type = config_json["model_type"]
-      @problem_type = config_json["problem_type"]
-      @id2label = config_json["id2label"]
-      @label2id = config_json["label2id"]
+      @config_json = config_json
     end
 
     def [](key)
-      instance_variable_get("@#{key}")
+      @config_json[key.to_s]
     end
 
     def self.from_pretrained(

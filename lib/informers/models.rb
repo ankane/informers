@@ -44,7 +44,7 @@ module Informers
       end
 
       const_get(:MODEL_CLASS_MAPPINGS).each do |model_class_mapping|
-        model_info = model_class_mapping[config.model_type]
+        model_info = model_class_mapping[config[:model_type]]
         if !model_info
           next # Item not found in this mapping
         end
@@ -52,10 +52,10 @@ module Informers
       end
 
       if const_defined?(:BASE_IF_FAIL)
-        warn "Unknown model class #{config.model_type.inspect}, attempting to construct from base class."
+        warn "Unknown model class #{config[:model_type].inspect}, attempting to construct from base class."
         PreTrainedModel.from_pretrained(pretrained_model_name_or_path, **options)
       else
-        raise Error, "Unsupported model type: #{config.model_type}"
+        raise Error, "Unsupported model type: #{config[:model_type]}"
       end
     end
   end
