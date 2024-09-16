@@ -18,6 +18,15 @@ module Informers
       # Possibly convert any non-images to images
       images.map { |x| Utils::RawImage.read(x) }
     end
+
+    def get_bounding_box(box, as_integer)
+      if as_integer
+        box = box.map { |x| x.to_i }
+      end
+      xmin, ymin, xmax, ymax = box
+
+      {xmin:, ymin:, xmax:, ymax:}
+    end
   end
 
   class TextClassificationPipeline < Pipeline
@@ -475,16 +484,59 @@ module Informers
 
       is_batched ? result : result[0]
     end
+  end
 
-    private
+  class ZeroShotObjectDetectionPipeline < Pipeline
+    def call(
+      images,
+      candidate_labels,
+      threshold: 0.1,
+      top_k: nil,
+      percentage: false
+    )
+      is_batched = images.is_a?(Array)
+      prepared_images = prepare_images(images)
 
-    def get_bounding_box(box, as_integer)
-      if as_integer
-        box = box.map { |x| x.to_i }
+      # Run tokenization
+      text_inputs = @tokenizer.(candidate_labels,
+        padding: true,
+        truncation: true
+      )
+
+      # Run processor
+      model_inputs = @processor.(prepared_images)
+
+      # Since non-maximum suppression is performed for exporting, we need to
+      # process each image separately. For more information, see:
+      # https://github.com/huggingface/optimum/blob/e3b7efb1257c011db907ef40ab340e795cc5684c/optimum/exporters/onnx/model_configs.py#L1028-L1032
+      to_return = []
+      prepared_images.length.times do |i|
+        image = prepared_images[i]
+        image_size = percentage ? nil : [[image.height, image.width]]
+        pixel_values = [model_inputs[:pixel_values][i]]
+
+        # Run model with both text and pixel inputs
+        output = @model.(text_inputs.merge(pixel_values: pixel_values))
+        # TODO remove
+        output = @model.instance_variable_get(:@session).outputs.map { |v| v[:name].to_sym }.zip(output).to_h
+
+        processed = @processor.feature_extractor.post_process_object_detection(output, threshold, image_size, true)[0]
+        result =
+          processed[:boxes].map.with_index do |box, i|
+            {
+              score: processed[:scores][i],
+              label: candidate_labels[processed[:classes][i]],
+              box: get_bounding_box(box, !percentage),
+            }
+          end
+        result.sort_by! { |v| -v[:score] }
+        if !top_k.nil?
+          result = result[0...topk]
+        end
+        to_return << result
       end
-      xmin, ymin, xmax, ymax = box
 
-      {xmin:, ymin:, xmax:, ymax:}
+      is_batched ? to_return : to_return[0]
     end
   end
 
@@ -674,6 +726,16 @@ module Informers
       processor: AutoProcessor,
       default: {
         model: "Xenova/detr-resnet-50",
+      },
+      type: "multimodal"
+    },
+    "zero-shot-object-detection" => {
+      tokenizer: AutoTokenizer,
+      pipeline: ZeroShotObjectDetectionPipeline,
+      model: AutoModelForZeroShotObjectDetection,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/owlvit-base-patch32"
       },
       type: "multimodal"
     },

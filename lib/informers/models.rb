@@ -303,6 +303,15 @@ module Informers
   class CLIPModel < CLIPPreTrainedModel
   end
 
+  class OwlViTPreTrainedModel < PreTrainedModel
+  end
+
+  class OwlViTModel < OwlViTPreTrainedModel
+  end
+
+  class OwlViTForObjectDetection < OwlViTPreTrainedModel
+  end
+
   class DetrPreTrainedModel < PreTrainedModel
   end
 
@@ -325,7 +334,8 @@ module Informers
     "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel],
     "clip" => ["CLIPModel", CLIPModel],
     "detr" => ["DetrModel", DetrModel],
-    "vit" => ["ViTModel", ViTModel]
+    "vit" => ["ViTModel", ViTModel],
+    "owlvit" => ["OwlViTModel", OwlViTModel]
   }
 
   MODEL_MAPPING_NAMES_ENCODER_DECODER = {
@@ -360,6 +370,10 @@ module Informers
     "detr" => ["DetrForObjectDetection", DetrForObjectDetection]
   }
 
+  MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES = {
+    "owlvit" => ["OwlViTForObjectDetection", OwlViTForObjectDetection]
+  }
+
   MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES = {
   }
 
@@ -372,6 +386,7 @@ module Informers
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
   ]
 
@@ -412,11 +427,18 @@ module Informers
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES]
   end
 
+  class AutoModelForZeroShotObjectDetection < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES]
+  end
+
   class AutoModelForImageFeatureExtraction < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES]
   end
 
   class ModelOutput
+    def [](key)
+      instance_variable_get("@#{key}")
+    end
   end
 
   class SequenceClassifierOutput < ModelOutput

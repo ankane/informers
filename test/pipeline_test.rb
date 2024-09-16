@@ -147,6 +147,26 @@ class PipelineTest < Minitest::Test
     assert_equal 413, result[1][:box][:ymax]
   end
 
+  def test_zero_shot_object_detection
+    detector = Informers.pipeline("zero-shot-object-detection")
+    result = detector.("test/support/zero-sh-obj-detection_1.png", ["human face", "rocket", "helmet", "american flag"])
+    assert_equal 4, result.size
+
+    assert_in_delta 0.351, result[0][:score]
+    assert_equal "human face", result[0][:label]
+    assert_equal 179, result[0][:box][:xmin]
+    assert_equal 72, result[0][:box][:ymin]
+    assert_equal 270, result[0][:box][:xmax]
+    assert_equal 178, result[0][:box][:ymax]
+
+    assert_in_delta 0.211, result[1][:score]
+    assert_equal "rocket", result[1][:label]
+    assert_equal 351, result[1][:box][:xmin]
+    assert_equal 6, result[1][:box][:ymin]
+    assert_equal 468, result[1][:box][:xmax]
+    assert_equal 289, result[1][:box][:ymax]
+  end
+
   def test_image_feature_extraction
     fe = Informers.pipeline("image-feature-extraction")
     result = fe.("test/support/pipeline-cat-chonk.jpeg")

@@ -22,5 +22,6 @@ namespace :download do
     Dir.mkdir("test/support") unless Dir.exist?("test/support")
 
     download_file("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg")
+    download_file("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/zero-sh-obj-detection_1.png")
   end
 end

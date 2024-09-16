@@ -250,6 +250,12 @@ module Informers
   class ViTFeatureExtractor < ImageFeatureExtractor
   end
 
+  class OwlViTFeatureExtractor < ImageFeatureExtractor
+    def post_process_object_detection(*args)
+      Utils.post_process_object_detection(*args)
+    end
+  end
+
   class DetrFeatureExtractor < ImageFeatureExtractor
     def call(images)
       result = super(images)
@@ -270,7 +276,13 @@ module Informers
       result.merge(pixel_mask: pixel_mask)
     end
 
-    def center_to_corners_format(v)
+    def post_process_object_detection(*args)
+      Utils.post_process_object_detection(*args)
+    end
+  end
+
+  module Utils
+    def self.center_to_corners_format(v)
       centerX, centerY, width, height = v
       [
         centerX - width / 2.0,
@@ -280,9 +292,9 @@ module Informers
       ]
     end
 
-    def post_process_object_detection(outputs, threshold = 0.5, target_sizes = nil, is_zero_shot = false)
-      out_logits = outputs.logits
-      out_bbox = outputs.pred_boxes
+    def self.post_process_object_detection(outputs, threshold = 0.5, target_sizes = nil, is_zero_shot = false)
+      out_logits = outputs[:logits]
+      out_bbox = outputs[:pred_boxes]
       batch_size, num_boxes, num_classes = out_logits.size, out_logits[0].size, out_logits[0][0].size
 
       if !target_sizes.nil? && target_sizes.length != batch_size
@@ -304,7 +316,13 @@ module Informers
 
           indices = []
           if is_zero_shot
-            raise Todo
+            # Get indices of classes with high enough probability
+            probs = Utils.sigmoid(logit)
+            probs.length.times do |k|
+              if probs[k] > threshold
+                indices << k
+              end
+            end
           else
             # Get most probable class
             max_index = Utils.max(logit)[1]
@@ -354,6 +372,7 @@ module Informers
   class AutoProcessor
     FEATURE_EXTRACTOR_CLASS_MAPPING = {
       "ViTFeatureExtractor" => ViTFeatureExtractor,
+      "OwlViTFeatureExtractor" => OwlViTFeatureExtractor,
       "CLIPFeatureExtractor" => CLIPFeatureExtractor,
       "DetrFeatureExtractor" => DetrFeatureExtractor
     }
