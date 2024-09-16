@@ -98,6 +98,9 @@ module Informers
   class DistilBertTokenizer < PreTrainedTokenizer
   end
 
+  class BartTokenizer < PreTrainedTokenizer
+  end
+
   class RobertaTokenizer < PreTrainedTokenizer
   end
 
@@ -112,6 +115,7 @@ module Informers
       "BertTokenizer" => BertTokenizer,
       "DebertaV2Tokenizer" => DebertaV2Tokenizer,
       "DistilBertTokenizer" => DistilBertTokenizer,
+      "BartTokenizer" => BartTokenizer,
       "RobertaTokenizer" => RobertaTokenizer,
       "XLMRobertaTokenizer" => XLMRobertaTokenizer,
       "MPNetTokenizer" => MPNetTokenizer
