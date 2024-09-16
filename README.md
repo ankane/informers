@@ -299,7 +299,7 @@ unmasker.("Paris is the [MASK] of France.")
 Image classification [unreleased]
 
 ```ruby
-classifier = Transformers.pipeline("image-classification")
+classifier = Informers.pipeline("image-classification")
 classifier.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"))
 ```
 
