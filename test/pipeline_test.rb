@@ -110,15 +110,15 @@ class PipelineTest < Minitest::Test
     classifier = Informers.pipeline("image-classification")
     result = classifier.("test/support/pipeline-cat-chonk.jpeg", top_k: 2)
     assert_equal "lynx, catamount", result[0][:label]
-    assert_in_delta 0.433, result[0][:score], 0.01
+    assert_in_delta 0.428, result[0][:score], 0.01
     assert_equal "cougar, puma, catamount, mountain lion, painter, panther, Felis concolor", result[1][:label]
-    assert_in_delta 0.035, result[1][:score], 0.01
+    assert_in_delta 0.047, result[1][:score], 0.01
   end
 
   def test_image_feature_extraction
     fe = Informers.pipeline("image-feature-extraction")
     result = fe.("test/support/pipeline-cat-chonk.jpeg")
-    assert_in_delta 0.877, result[0][0], 0.02
+    assert_in_delta 0.877, result[0][0], 0.01
   end
 
   def test_progress_callback

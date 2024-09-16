@@ -1,6 +1,15 @@
 module Informers
   module Utils
     class RawImage
+      RESAMPLING_MAPPING = {
+        0 => "nearest",
+        1 => "lanczos",
+        2 => "bilinear",
+        3 => "bicubic",
+        4 => "box",
+        5 => "hamming",
+      }
+
       attr_reader :width, :height, :channels
 
       def initialize(image)
@@ -19,7 +28,18 @@ module Informers
       end
 
       def resize(width, height, resample: 2)
-        RawImage.new(@image.thumbnail_image(width, height: height, size: :force))
+        resample_method = RESAMPLING_MAPPING[resample] || resample
+
+        if resample_method != "bilinear"
+          raise Todo
+        end
+
+        img =
+          @image.affine(
+            [width / @width.to_f, 0, 0, height / @height.to_f],
+            interpolate: Vips::Interpolate.new(:bilinear)
+          )
+        RawImage.new(img)
       end
 
       def rgb
@@ -28,6 +48,10 @@ module Informers
         end
 
         raise Todo
+      end
+
+      def save(path)
+        @image.write_to_file(path)
       end
 
       def self.read(input)
