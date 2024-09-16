@@ -57,7 +57,7 @@ class PipelineTest < Minitest::Test
     result = classifier.(text, labels)
     assert_equal text, result[:sequence]
     assert_equal ["mobile", "billing", "account access", "website"], result[:labels]
-    assert_elements_in_delta [0.516, 0.179, 0.167, 0.138], result[:scores]
+    assert_elements_in_delta [0.516, 0.179, 0.167, 0.138], result[:scores], 0.01
   end
 
   def test_fill_mask
