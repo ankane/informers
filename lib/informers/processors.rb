@@ -47,7 +47,7 @@ module Informers
     end
 
     def get_resize_output_image_size(image, size)
-      [@size["width"], @size["height"]]
+      [size["width"], size["height"]]
     end
 
     def resize(image)
