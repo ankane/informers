@@ -1,5 +1,6 @@
 ## 1.0.4 (unreleased)
 
+- Added `zero-shot-classification` pipeline
 - Added `fill-mask` pipeline
 
 ## 1.0.3 (2024-08-29)

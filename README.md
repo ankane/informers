@@ -282,6 +282,13 @@ extractor = Informers.pipeline("feature-extraction")
 extractor.("We are very happy to show you the 🤗 Transformers library.")
 ```
 
+Zero-shot classification [unreleased]
+
+```ruby
+classifier = Informers.pipeline("zero-shot-classification")
+classifier.("text", ["label1", "label2", "label3"])
+```
+
 Fill mask [unreleased]
 
 ```ruby

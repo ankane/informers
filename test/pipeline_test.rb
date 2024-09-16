@@ -50,6 +50,16 @@ class PipelineTest < Minitest::Test
     assert_equal 46, result[:end]
   end
 
+  def test_zero_shot_classification
+    classifier = Informers.pipeline("zero-shot-classification")
+    text = "Last week I upgraded my iOS version and ever since then my phone has been overheating whenever I use your app."
+    labels = ["mobile", "billing", "website", "account access"]
+    result = classifier.(text, labels)
+    assert_equal text, result[:sequence]
+    assert_equal ["mobile", "billing", "account access", "website"], result[:labels]
+    assert_elements_in_delta [0.516, 0.179, 0.167, 0.138], result[:scores]
+  end
+
   def test_fill_mask
     unmasker = Informers.pipeline("fill-mask")
     result = unmasker.("Paris is the [MASK] of France.")
