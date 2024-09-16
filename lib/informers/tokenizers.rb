@@ -1,11 +1,14 @@
 module Informers
   class PreTrainedTokenizer
-    attr_reader :sep_token_id
+    attr_reader :mask_token, :mask_token_id, :sep_token_id
 
     def initialize(tokenizer_json, tokenizer_config)
       super()
 
       @tokenizer = Tokenizers::Tokenizer.from_file(tokenizer_json)
+
+      @mask_token = tokenizer_config["mask_token"]
+      @mask_token_id = @tokenizer.token_to_id(@mask_token)
 
       @sep_token = tokenizer_config["sep_token"]
       @sep_token_id = @tokenizer.token_to_id(@sep_token)
@@ -75,6 +78,10 @@ module Informers
 
     def convert_tokens_to_string(tokens)
       @tokenizer.decoder.decode(tokens)
+    end
+
+    def id_to_token(id)
+      @tokenizer.id_to_token(id)
     end
   end
 

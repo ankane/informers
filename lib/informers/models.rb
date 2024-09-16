@@ -195,6 +195,12 @@ module Informers
   class BertModel < BertPreTrainedModel
   end
 
+  class BertForMaskedLM < BertPreTrainedModel
+    def call(model_inputs)
+      MaskedLMOutput.new(*super(model_inputs))
+    end
+  end
+
   class BertForSequenceClassification < BertPreTrainedModel
     def call(model_inputs)
       SequenceClassifierOutput.new(*super(model_inputs))
@@ -274,6 +280,10 @@ module Informers
     "bert" => ["BertForTokenClassification", BertForTokenClassification]
   }
 
+  MODEL_FOR_MASKED_LM_MAPPING_NAMES = {
+    "bert" => ["BertForMaskedLM", BertForMaskedLM]
+  }
+
   MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES = {
     "distilbert" => ["DistilBertForQuestionAnswering", DistilBertForQuestionAnswering]
   }
@@ -282,6 +292,7 @@ module Informers
     [MODEL_MAPPING_NAMES_ENCODER_ONLY, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
   ]
 
@@ -306,6 +317,10 @@ module Informers
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES]
   end
 
+  class AutoModelForMaskedLM < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_MASKED_LM_MAPPING_NAMES]
+  end
+
   class AutoModelForQuestionAnswering < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES]
   end
@@ -323,6 +338,15 @@ module Informers
   end
 
   class TokenClassifierOutput < ModelOutput
+    attr_reader :logits
+
+    def initialize(logits)
+      super()
+      @logits = logits
+    end
+  end
+
+  class MaskedLMOutput < ModelOutput
     attr_reader :logits
 
     def initialize(logits)

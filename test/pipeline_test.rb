@@ -50,6 +50,24 @@ class PipelineTest < Minitest::Test
     assert_equal 46, result[:end]
   end
 
+  def test_fill_mask
+    unmasker = Informers.pipeline("fill-mask")
+    result = unmasker.("Paris is the [MASK] of France.")
+    assert_equal 5, result.size
+    assert_in_delta 0.981, result[0][:score]
+    assert_equal 3007, result[0][:token]
+    assert_equal "capital", result[0][:token_str]
+    assert_equal "paris is the capital of france.", result[0][:sequence]
+  end
+
+  def test_fill_mask_no_mask_token
+    unmasker = Informers.pipeline("fill-mask")
+    error = assert_raises(ArgumentError) do
+      unmasker.("Paris is the <mask> of France.")
+    end
+    assert_equal "Mask token ([MASK]) not found in text.", error.message
+  end
+
   def test_feature_extraction
     sentences = ["This is an example sentence", "Each sentence is converted"]
     extractor = Informers.pipeline("feature-extraction")

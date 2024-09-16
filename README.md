@@ -282,6 +282,13 @@ extractor = Informers.pipeline("feature-extraction")
 extractor.("We are very happy to show you the 🤗 Transformers library.")
 ```
 
+Fill mask [unreleased]
+
+```ruby
+unmasker = Informers.pipeline("fill-mask")
+unmasker.("Paris is the [MASK] of France.")
+```
+
 ## Credits
 
 This library was ported from [Transformers.js](https://github.com/xenova/transformers.js) and is available under the same license.

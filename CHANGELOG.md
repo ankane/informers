@@ -1,3 +1,7 @@
+## 1.0.4 (unreleased)
+
+- Added `fill-mask` pipeline
+
 ## 1.0.3 (2024-08-29)
 
 - Added `model_output` option

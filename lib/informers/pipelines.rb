@@ -243,6 +243,40 @@ module Informers
     end
   end
 
+  class FillMaskPipeline < Pipeline
+    def call(texts, top_k: 5)
+      model_inputs = @tokenizer.(texts, padding: true, truncation: true)
+      outputs = @model.(model_inputs)
+
+      to_return = []
+      model_inputs[:input_ids].each_with_index do |ids, i|
+        mask_token_index = ids.index(@tokenizer.mask_token_id)
+
+        if mask_token_index.nil?
+          raise ArgumentError, "Mask token (#{@tokenizer.mask_token}) not found in text."
+        end
+        logits = outputs.logits[i]
+        item_logits = logits[mask_token_index]
+
+        scores = Utils.get_top_items(Utils.softmax(item_logits), top_k)
+
+        to_return <<
+          scores.map do |x|
+            sequence = ids.dup
+            sequence[mask_token_index] = x[0]
+
+            {
+              score: x[1],
+              token: x[0],
+              token_str: @tokenizer.id_to_token(x[0]),
+              sequence: @tokenizer.decode(sequence, skip_special_tokens: true)
+            }
+          end
+      end
+      texts.is_a?(Array) ? to_return : to_return[0]
+    end
+  end
+
   class FeatureExtractionPipeline < Pipeline
     def call(
       texts,
@@ -372,6 +406,15 @@ module Informers
       model: AutoModelForQuestionAnswering,
       default: {
         model: "Xenova/distilbert-base-cased-distilled-squad"
+      },
+      type: "text"
+    },
+    "fill-mask" => {
+      tokenizer: AutoTokenizer,
+      pipeline: FillMaskPipeline,
+      model: AutoModelForMaskedLM,
+      default: {
+        model: "Xenova/bert-base-uncased"
       },
       type: "text"
     },
