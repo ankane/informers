@@ -57,14 +57,14 @@ class PipelineTest < Minitest::Test
     result = classifier.(text, labels)
     assert_equal text, result[:sequence]
     assert_equal ["mobile", "billing", "account access", "website"], result[:labels]
-    assert_elements_in_delta [0.516, 0.179, 0.167, 0.138], result[:scores], 0.01
+    assert_elements_in_delta [0.633, 0.134, 0.121, 0.111], result[:scores]
   end
 
   def test_fill_mask
     unmasker = Informers.pipeline("fill-mask")
     result = unmasker.("Paris is the [MASK] of France.")
     assert_equal 5, result.size
-    assert_in_delta 0.981, result[0][:score]
+    assert_in_delta 0.997, result[0][:score]
     assert_equal 3007, result[0][:token]
     assert_equal "capital", result[0][:token_str]
     assert_equal "paris is the capital of france.", result[0][:sequence]

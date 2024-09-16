@@ -570,13 +570,13 @@ module Informers
       revision: "main",
       model_file_name: nil
     )
-      if quantized == NO_DEFAULT
-        # TODO move default to task class
-        quantized = !["embedding", "reranking"].include?(task)
-      end
-
       # Apply aliases
       task = TASK_ALIASES[task] || task
+
+      if quantized == NO_DEFAULT
+        # TODO move default to task class
+        quantized = ["text-classification", "token-classification", "question-answering", "feature-extraction"].include?(task)
+      end
 
       # Get pipeline info
       pipeline_info = SUPPORTED_TASKS[task.split("_", 1)[0]]
