@@ -126,7 +126,7 @@ module Informers
         i = 0
         while i < pixel_data.length
           image.channels.times do |j|
-            pixel_data[i + j] = (pixel_data[i + j] - image_mean[j]) / image_std[j];
+            pixel_data[i + j] = (pixel_data[i + j] - image_mean[j]) / image_std[j]
           end
           i += image.channels
         end
@@ -168,7 +168,7 @@ module Informers
       image_data = images.map { |x| preprocess(x) }
 
       # Stack pixel values
-      pixel_values = Utils.stack(image_data.map { |x| x[:pixel_values] }, 0);
+      pixel_values = Utils.stack(image_data.map { |x| x[:pixel_values] }, 0)
 
       {
         pixel_values: pixel_values,
