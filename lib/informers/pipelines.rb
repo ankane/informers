@@ -442,6 +442,52 @@ module Informers
     end
   end
 
+  class ObjectDetectionPipeline < Pipeline
+    def call(images, threshold: 0.9, percentage: false)
+      is_batched = images.is_a?(Array)
+
+      if is_batched && images.length != 1
+        raise Error, "Object detection pipeline currently only supports a batch size of 1."
+      end
+      prepared_images = prepare_images(images)
+
+      image_sizes = percentage ? nil : prepared_images.map { |x| [x.height, x.width] }
+
+      model_inputs = @processor.(prepared_images).slice(:pixel_values, :pixel_mask)
+      output = @model.(model_inputs)
+
+      processed = @processor.feature_extractor.post_process_object_detection(output, threshold, image_sizes)
+
+      # Add labels
+      id2label = @model.config[:id2label]
+
+      # Format output
+      result =
+        processed.map do |batch|
+          batch[:boxes].map.with_index do |box, i|
+            {
+              score: batch[:scores][i],
+              label: id2label[batch[:classes][i].to_s],
+              box: get_bounding_box(box, !percentage)
+            }
+          end
+        end
+
+      is_batched ? result : result[0]
+    end
+
+    private
+
+    def get_bounding_box(box, as_integer)
+      if as_integer
+        box = box.map { |x| x.to_i }
+      end
+      xmin, ymin, xmax, ymax = box
+
+      {xmin:, ymin:, xmax:, ymax:}
+    end
+  end
+
   class FeatureExtractionPipeline < Pipeline
     def call(
       texts,
@@ -619,6 +665,15 @@ module Informers
       processor: AutoProcessor,
       default: {
         model: "Xenova/clip-vit-base-patch32"
+      },
+      type: "multimodal"
+    },
+    "object-detection" => {
+      pipeline: ObjectDetectionPipeline,
+      model: AutoModelForObjectDetection,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/detr-resnet-50",
       },
       type: "multimodal"
     },

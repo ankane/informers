@@ -127,6 +127,26 @@ class PipelineTest < Minitest::Test
     assert_in_delta 0.055, result[2][:score]
   end
 
+  def test_object_detection
+    detector = Informers.pipeline("object-detection")
+    result = detector.("test/support/pipeline-cat-chonk.jpeg")
+    assert_equal 3, result.size
+
+    assert_in_delta 0.742, result[0][:score]
+    assert_equal "cat", result[0][:label]
+    assert_equal 177, result[0][:box][:xmin]
+    assert_equal 153, result[0][:box][:ymin]
+    assert_equal 885, result[0][:box][:xmax]
+    assert_equal 600, result[0][:box][:ymax]
+
+    assert_in_delta 0.726, result[1][:score]
+    assert_equal "bicycle", result[1][:label]
+    assert_equal 0, result[1][:box][:xmin]
+    assert_equal 0, result[1][:box][:ymin]
+    assert_equal 196, result[1][:box][:xmax]
+    assert_equal 413, result[1][:box][:ymax]
+  end
+
   def test_image_feature_extraction
     fe = Informers.pipeline("image-feature-extraction")
     result = fe.("test/support/pipeline-cat-chonk.jpeg")

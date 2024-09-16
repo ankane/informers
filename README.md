@@ -310,6 +310,13 @@ classifier = Informers.pipeline("zero-shot-image-classification")
 classifier.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"), ["cat", "dog", "tiger"])
 ```
 
+Object detection [unreleased]
+
+```ruby
+detector = Informers.pipeline("object-detection")
+detector.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"))
+```
+
 Image feature extraction [unreleased]
 
 ```ruby

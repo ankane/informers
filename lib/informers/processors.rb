@@ -191,7 +191,12 @@ module Informers
 
       # do padding after rescaling/normalizing
       if !do_pad.nil? ? do_pad : @do_pad
-        raise Todo
+        if @pad_size
+          padded = pad_image(pixel_data, [image.height, image.width, image.channels], @pad_size)
+          pixel_data, img_dims = padded # Update pixel data and image dimensions
+        elsif @size_divisibility
+          raise Todo
+        end
       end
 
       if !do_flip_channel_order.nil? ? do_flip_channel_order : @do_flip_channel_order
@@ -245,7 +250,98 @@ module Informers
   class ViTFeatureExtractor < ImageFeatureExtractor
   end
 
+  class DetrFeatureExtractor < ImageFeatureExtractor
+    def call(images)
+      result = super(images)
+
+      # TODO support differently-sized images, for now assume all images are the same size.
+      # TODO support different mask sizes (not just 64x64)
+      # Currently, just fill pixel mask with 1s
+      mask_size = [result[:pixel_values].size, 64, 64]
+      pixel_mask =
+        mask_size[0].times.map do
+          mask_size[1].times.map do
+            mask_size[2].times.map do
+              1
+            end
+          end
+        end
+
+      result.merge(pixel_mask: pixel_mask)
+    end
+
+    def center_to_corners_format(v)
+      centerX, centerY, width, height = v
+      [
+        centerX - width / 2.0,
+        centerY - height / 2.0,
+        centerX + width / 2.0,
+        centerY + height / 2.0
+      ]
+    end
+
+    def post_process_object_detection(outputs, threshold = 0.5, target_sizes = nil, is_zero_shot = false)
+      out_logits = outputs.logits
+      out_bbox = outputs.pred_boxes
+      batch_size, num_boxes, num_classes = out_logits.size, out_logits[0].size, out_logits[0][0].size
+
+      if !target_sizes.nil? && target_sizes.length != batch_size
+        raise Error, "Make sure that you pass in as many target sizes as the batch dimension of the logits"
+      end
+      to_return = []
+      batch_size.times do |i|
+        target_size = !target_sizes.nil? ? target_sizes[i] : nil
+        info = {
+            boxes: [],
+            classes: [],
+            scores: []
+        }
+        logits = out_logits[i]
+        bbox = out_bbox[i]
+
+        num_boxes.times do |j|
+          logit = logits[j]
+
+          indices = []
+          if is_zero_shot
+            raise Todo
+          else
+            # Get most probable class
+            max_index = Utils.max(logit)[1]
+
+            if max_index == num_classes - 1
+              # This is the background class, skip it
+              next
+            end
+            indices << max_index
+
+            # Compute softmax over classes
+            probs = Utils.softmax(logit)
+          end
+
+          indices.each do |index|
+            box = bbox[j]
+
+            # convert to [x0, y0, x1, y1] format
+            box = center_to_corners_format(box)
+            if !target_size.nil?
+              box = box.map.with_index { |x, i| x * target_size[(i + 1) % 2] }
+            end
+
+            info[:boxes] << box
+            info[:classes] << index
+            info[:scores] << probs[index]
+          end
+        end
+        to_return << info
+      end
+      to_return
+    end
+  end
+
   class Processor
+    attr_reader :feature_extractor
+
     def initialize(feature_extractor)
       @feature_extractor = feature_extractor
     end
@@ -258,7 +354,8 @@ module Informers
   class AutoProcessor
     FEATURE_EXTRACTOR_CLASS_MAPPING = {
       "ViTFeatureExtractor" => ViTFeatureExtractor,
-      "CLIPFeatureExtractor" => CLIPFeatureExtractor
+      "CLIPFeatureExtractor" => CLIPFeatureExtractor,
+      "DetrFeatureExtractor" => DetrFeatureExtractor
     }
 
     PROCESSOR_CLASS_MAPPING = {}

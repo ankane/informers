@@ -303,6 +303,18 @@ module Informers
   class CLIPModel < CLIPPreTrainedModel
   end
 
+  class DetrPreTrainedModel < PreTrainedModel
+  end
+
+  class DetrModel < DetrPreTrainedModel
+  end
+
+  class DetrForObjectDetection < DetrPreTrainedModel
+    def call(model_inputs)
+      DetrObjectDetectionOutput.new(*super(model_inputs))
+    end
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
@@ -312,6 +324,7 @@ module Informers
     "roberta" => ["RobertaModel", RobertaModel],
     "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel],
     "clip" => ["CLIPModel", CLIPModel],
+    "detr" => ["DetrModel", DetrModel],
     "vit" => ["ViTModel", ViTModel]
   }
 
@@ -343,6 +356,10 @@ module Informers
     "vit" => ["ViTForImageClassification", ViTForImageClassification]
   }
 
+  MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES = {
+    "detr" => ["DetrForObjectDetection", DetrForObjectDetection]
+  }
+
   MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES = {
   }
 
@@ -354,6 +371,7 @@ module Informers
     [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
   ]
 
@@ -388,6 +406,10 @@ module Informers
 
   class AutoModelForImageClassification < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES]
+  end
+
+  class AutoModelForObjectDetection < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES]
   end
 
   class AutoModelForImageFeatureExtraction < PretrainedMixin
@@ -431,6 +453,16 @@ module Informers
       super()
       @start_logits = start_logits
       @end_logits = end_logits
+    end
+  end
+
+  class DetrObjectDetectionOutput < ModelOutput
+    attr_reader :logits, :pred_boxes
+
+    def initialize(logits, pred_boxes)
+      super()
+      @logits = logits
+      @pred_boxes = pred_boxes
     end
   end
 end
