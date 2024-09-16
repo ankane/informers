@@ -115,6 +115,12 @@ class PipelineTest < Minitest::Test
     assert_in_delta 0.035, result[1][:score], 0.01
   end
 
+  def test_image_feature_extraction
+    fe = Informers.pipeline("image-feature-extraction")
+    result = fe.("test/support/pipeline-cat-chonk.jpeg")
+    assert_in_delta 0.877, result[0][0], 0.02
+  end
+
   def test_progress_callback
     msgs = []
     extractor = Informers.pipeline("feature-extraction", progress_callback: ->(msg) { msgs << msg })

@@ -303,6 +303,13 @@ classifier = Informers.pipeline("image-classification")
 classifier.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"))
 ```
 
+Image feature extraction [unreleased]
+
+```ruby
+extractor = Informers.pipeline("image-feature-extraction")
+extractor.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"))
+```
+
 ## Credits
 
 This library was ported from [Transformers.js](https://github.com/xenova/transformers.js) and is available under the same license.

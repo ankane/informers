@@ -7,6 +7,17 @@ module Informers
       @tokenizer = tokenizer
       @processor = processor
     end
+
+    private
+
+    def prepare_images(images)
+      if !images.is_a?(Array)
+        images = [images]
+      end
+
+      # Possibly convert any non-images to images
+      images.map { |x| Utils::RawImage.read(x) }
+    end
   end
 
   class TextClassificationPipeline < Pipeline
@@ -385,17 +396,6 @@ module Informers
 
       is_batched || top_k == 1 ? to_return : to_return[0]
     end
-
-    private
-
-    def prepare_images(images)
-      if !images.is_a?(Array)
-        images = [images]
-      end
-
-      # Possibly convert any non-images to images
-      images.map { |x| Utils::RawImage.read(x) }
-    end
   end
 
   class FeatureExtractionPipeline < Pipeline
@@ -458,6 +458,17 @@ module Informers
       end
 
       texts.is_a?(Array) ? result : result[0]
+    end
+  end
+
+  class ImageFeatureExtractionPipeline < Pipeline
+    def call(images)
+      prepared_images = prepare_images(images)
+      pixel_values = @processor.(prepared_images)[:pixel_values]
+      outputs = @model.({pixel_values: pixel_values})
+
+      result = outputs[0]
+      result
     end
   end
 
@@ -565,6 +576,15 @@ module Informers
         model: "Xenova/all-MiniLM-L6-v2"
       },
       type: "text"
+    },
+    "image-feature-extraction" => {
+      processor: AutoProcessor,
+      pipeline: ImageFeatureExtractionPipeline,
+      model: [AutoModelForImageFeatureExtraction, AutoModel],
+      default: {
+        model: "Xenova/vit-base-patch16-224"
+      },
+      type: "image"
     },
     "embedding" => {
       tokenizer: AutoTokenizer,
@@ -684,7 +704,15 @@ module Informers
         next if !cls
 
         if cls.is_a?(Array)
-          raise Todo
+          e = nil
+          cls.each do |c|
+            begin
+              result[name] = c.from_pretrained(model, **pretrained_options)
+            rescue => err
+              e = err
+            end
+          end
+          raise e unless result[name]
         else
           result[name] = cls.from_pretrained(model, **pretrained_options)
         end

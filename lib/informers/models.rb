@@ -304,7 +304,8 @@ module Informers
     "mpnet" => ["MPNetModel", MPNetModel],
     "distilbert" => ["DistilBertModel", DistilBertModel],
     "roberta" => ["RobertaModel", RobertaModel],
-    "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel]
+    "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel],
+    "vit" => ["ViTModel", ViTModel]
   }
 
   MODEL_MAPPING_NAMES_ENCODER_DECODER = {
@@ -335,6 +336,9 @@ module Informers
     "vit" => ["ViTForImageClassification", ViTForImageClassification]
   }
 
+  MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES = {
+  }
+
   MODEL_CLASS_TYPE_MAPPING = [
     [MODEL_MAPPING_NAMES_ENCODER_ONLY, MODEL_TYPES[:EncoderOnly]],
     [MODEL_MAPPING_NAMES_ENCODER_DECODER, MODEL_TYPES[:EncoderDecoder]],
@@ -342,7 +346,8 @@ module Informers
     [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
-    [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
+    [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
   ]
 
   MODEL_CLASS_TYPE_MAPPING.each do |mappings, type|
@@ -376,6 +381,10 @@ module Informers
 
   class AutoModelForImageClassification < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES]
+  end
+
+  class AutoModelForImageFeatureExtraction < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES]
   end
 
   class ModelOutput
