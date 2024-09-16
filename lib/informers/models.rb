@@ -297,6 +297,12 @@ module Informers
     end
   end
 
+  class CLIPPreTrainedModel < PreTrainedModel
+  end
+
+  class CLIPModel < CLIPPreTrainedModel
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
@@ -305,6 +311,7 @@ module Informers
     "distilbert" => ["DistilBertModel", DistilBertModel],
     "roberta" => ["RobertaModel", RobertaModel],
     "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel],
+    "clip" => ["CLIPModel", CLIPModel],
     "vit" => ["ViTModel", ViTModel]
   }
 

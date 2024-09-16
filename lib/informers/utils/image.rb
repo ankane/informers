@@ -30,15 +30,44 @@ module Informers
       def resize(width, height, resample: 2)
         resample_method = RESAMPLING_MAPPING[resample] || resample
 
-        if resample_method != "bilinear"
+        case resample_method
+        when "bilinear", "bicubic"
+          img =
+            @image.affine(
+              [width / @width.to_f, 0, 0, height / @height.to_f],
+              interpolate: Vips::Interpolate.new(resample_method.to_sym)
+            )
+        else
           raise Todo
         end
 
-        img =
-          @image.affine(
-            [width / @width.to_f, 0, 0, height / @height.to_f],
-            interpolate: Vips::Interpolate.new(:bilinear)
+        RawImage.new(img)
+      end
+
+      def center_crop(crop_width, crop_height)
+        # If the image is already the desired size, return it
+        if @width == crop_width && @height == crop_height
+          return self
+        end
+
+        # Determine bounds of the image in the new canvas
+        width_offset = (@width - crop_width) / 2.0
+        height_offset = (@height - crop_height) / 2.0
+
+        if width_offset >= 0 && height_offset >= 0
+          # Cropped image lies entirely within the original image
+          img = @image.crop(
+            width_offset.floor,
+            height_offset.floor,
+            crop_width,
+            crop_height
           )
+        elsif width_offset <= 0 && height_offset <= 0
+          raise Todo
+        else
+          raise Todo
+        end
+
         RawImage.new(img)
       end
 

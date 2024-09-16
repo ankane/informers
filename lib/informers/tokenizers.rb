@@ -8,10 +8,10 @@ module Informers
       @tokenizer = Tokenizers::Tokenizer.from_file(tokenizer_json)
 
       @mask_token = tokenizer_config["mask_token"]
-      @mask_token_id = @tokenizer.token_to_id(@mask_token)
+      @mask_token_id = @tokenizer.token_to_id(@mask_token) if @mask_token
 
       @sep_token = tokenizer_config["sep_token"]
-      @sep_token_id = @tokenizer.token_to_id(@sep_token)
+      @sep_token_id = @tokenizer.token_to_id(@sep_token) if @sep_token
 
       @model_max_length = tokenizer_config["model_max_length"]
     end
@@ -110,6 +110,9 @@ module Informers
   class MPNetTokenizer < PreTrainedTokenizer
   end
 
+  class CLIPTokenizer < PreTrainedTokenizer
+  end
+
   class AutoTokenizer
     TOKENIZER_CLASS_MAPPING = {
       "BertTokenizer" => BertTokenizer,
@@ -118,7 +121,8 @@ module Informers
       "BartTokenizer" => BartTokenizer,
       "RobertaTokenizer" => RobertaTokenizer,
       "XLMRobertaTokenizer" => XLMRobertaTokenizer,
-      "MPNetTokenizer" => MPNetTokenizer
+      "MPNetTokenizer" => MPNetTokenizer,
+      "CLIPTokenizer" => CLIPTokenizer
     }
 
     def self.from_pretrained(

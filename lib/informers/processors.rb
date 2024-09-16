@@ -47,11 +47,61 @@ module Informers
     end
 
     def get_resize_output_image_size(image, size)
-      if @config["keep_aspect_ratio"] && @config["ensure_multiple_of"]
+      src_width, src_height = image.size
+
+      if @do_thumbnail
         raise Todo
+      elsif size.is_a?(Numeric)
+        shortest_edge = size
+        longest_edge = @config["max_size"] || shortest_edge
+      elsif !size.nil?
+        # Extract known properties from `size`
+        shortest_edge = size["shortest_edge"]
+        longest_edge = size["longest_edge"]
       end
 
-      [size["width"], size["height"]]
+      if !shortest_edge.nil? || !longest_edge.nil?
+        # http://opensourcehacker.com/2011/12/01/calculate-aspect-ratio-conserving-resize-for-images-in-javascript/
+        # Try resize so that shortest edge is `shortest_edge` (target)
+        short_resize_factor =
+          if shortest_edge.nil?
+            1 # If `shortest_edge` is not set, don't upscale
+          else
+            [shortest_edge / src_width.to_f, shortest_edge / src_height.to_f].max
+          end
+
+        new_width = src_width * short_resize_factor
+        new_height = src_height * short_resize_factor
+
+        # The new width and height might be greater than `longest_edge`, so
+        # we downscale again to ensure the largest dimension is `longest_edge`
+        long_resize_factor =
+          if longest_edge.nil?
+            1 # If `longest_edge` is not set, don't downscale
+          else
+            [longest_edge / new_width.to_f, longest_edge / new_height.to_f].min
+          end
+
+        # To avoid certain floating point precision issues, we round to 2 decimal places
+        final_width = (new_width * long_resize_factor).round(2).floor
+        final_height = (new_height * long_resize_factor).round(2).floor
+
+        if !@size_divisibility.nil?
+          raise Todo
+        end
+        [final_width, final_height]
+      elsif !size.nil? && !size["width"].nil? && !size["height"].nil?
+        new_width = size["width"]
+        new_height = size["height"]
+
+        if @config["keep_aspect_ratio"] && @config["ensure_multiple_of"]
+          raise Todo
+        end
+
+        [new_width, new_height]
+      else
+        raise Todo
+      end
     end
 
     def resize(image)
@@ -93,7 +143,14 @@ module Informers
       end
 
       if @do_center_crop
-        raise Todo
+        if @crop_size.is_a?(Integer)
+          crop_width = @crop_size
+          crop_height = @crop_size
+        else
+          crop_width = @crop_size["width"]
+          crop_height = @crop_size["height"]
+        end
+        image = image.center_crop(crop_width, crop_height)
       end
 
       reshaped_input_size = [image.height, image.width]
@@ -182,6 +239,9 @@ module Informers
     end
   end
 
+  class CLIPFeatureExtractor < ImageFeatureExtractor
+  end
+
   class ViTFeatureExtractor < ImageFeatureExtractor
   end
 
@@ -197,7 +257,8 @@ module Informers
 
   class AutoProcessor
     FEATURE_EXTRACTOR_CLASS_MAPPING = {
-      "ViTFeatureExtractor" => ViTFeatureExtractor
+      "ViTFeatureExtractor" => ViTFeatureExtractor,
+      "CLIPFeatureExtractor" => CLIPFeatureExtractor
     }
 
     PROCESSOR_CLASS_MAPPING = {}

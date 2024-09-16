@@ -115,6 +115,18 @@ class PipelineTest < Minitest::Test
     assert_in_delta 0.047, result[1][:score], 0.01
   end
 
+  def test_zero_shot_image_classification
+    classifier = Informers.pipeline("zero-shot-image-classification")
+    result = classifier.("test/support/pipeline-cat-chonk.jpeg", ["dog", "cat", "tiger"])
+    assert_equal 3, result.size
+    assert_equal "cat", result[0][:label]
+    assert_in_delta 0.756, result[0][:score]
+    assert_equal "tiger", result[1][:label]
+    assert_in_delta 0.189, result[1][:score]
+    assert_equal "dog", result[2][:label]
+    assert_in_delta 0.055, result[2][:score]
+  end
+
   def test_image_feature_extraction
     fe = Informers.pipeline("image-feature-extraction")
     result = fe.("test/support/pipeline-cat-chonk.jpeg")

@@ -1,6 +1,7 @@
 ## 1.0.4 (unreleased)
 
 - Added `zero-shot-classification` pipeline
+- Added `zero-shot-image-classification` pipeline
 - Added `fill-mask` pipeline
 - Added `image-classification` pipeline
 - Added `image-feature-extraction` pipeline

@@ -398,6 +398,50 @@ module Informers
     end
   end
 
+  class ZeroShotImageClassificationPipeline < Pipeline
+    def call(images, candidate_labels, hypothesis_template: "This is a photo of {}")
+      is_batched = images.is_a?(Array)
+      prepared_images = prepare_images(images)
+
+      # Insert label into hypothesis template
+      texts = candidate_labels.map { |x| hypothesis_template.sub("{}", x) }
+
+      #  Run tokenization
+      text_inputs = @tokenizer.(texts,
+        padding: @model.config[:model_type] == "siglip" ? "max_length" : true,
+        truncation: true
+      )
+
+      # Run processor
+      pixel_values = @processor.(prepared_images)[:pixel_values]
+
+      # Run model with both text and pixel inputs
+      output = @model.(text_inputs.merge(pixel_values: pixel_values))
+
+      function_to_apply =
+        if @model.config[:model_type] == "siglip"
+          ->(batch) { Utils.sigmoid(batch) }
+        else
+          ->(batch) { Utils.softmax(batch) }
+        end
+
+      # Compare each image with each candidate label
+      to_return = []
+      output[0].each do |batch|
+        # Compute softmax per image
+        probs = function_to_apply.(batch)
+
+        result = probs
+          .map.with_index { |x, i| {label: candidate_labels[i], score: x} }
+          .sort_by { |v| -v[:score] }
+
+        to_return << result
+      end
+
+      is_batched ? to_return : to_return[0]
+    end
+  end
+
   class FeatureExtractionPipeline < Pipeline
     def call(
       texts,
@@ -565,6 +609,16 @@ module Informers
       processor: AutoProcessor,
       default: {
         model: "Xenova/vit-base-patch16-224",
+      },
+      type: "multimodal"
+    },
+    "zero-shot-image-classification" => {
+      tokenizer: AutoTokenizer,
+      pipeline: ZeroShotImageClassificationPipeline,
+      model: AutoModel,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/clip-vit-base-patch32"
       },
       type: "multimodal"
     },
