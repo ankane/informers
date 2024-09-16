@@ -22,5 +22,9 @@ module Informers
         row.map { |v| v / norm }
       end
     end
+
+    def self.stack(tensors, dim = 0)
+      tensors
+    end
   end
 end

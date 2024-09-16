@@ -2,6 +2,7 @@
 
 - Added `zero-shot-classification` pipeline
 - Added `fill-mask` pipeline
+- Added `image-classification` pipeline
 
 ## 1.0.3 (2024-08-29)
 

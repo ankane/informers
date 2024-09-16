@@ -123,7 +123,7 @@ module Informers
 
       else
         if model_type != MODEL_TYPES[:EncoderOnly]
-          warn "Model type for '#{model_name || config&.model_type}' not found, assuming encoder-only architecture. Please report this."
+          warn "Model type for '#{model_name || config[:model_type]}' not found, assuming encoder-only architecture. Please report this."
         end
         info = [
           AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
@@ -285,6 +285,18 @@ module Informers
     end
   end
 
+  class ViTPreTrainedModel < PreTrainedModel
+  end
+
+  class ViTModel < ViTPreTrainedModel
+  end
+
+  class ViTForImageClassification < ViTPreTrainedModel
+    def call(model_inputs)
+      SequenceClassifierOutput.new(*super(model_inputs))
+    end
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
@@ -319,13 +331,18 @@ module Informers
     "distilbert" => ["DistilBertForQuestionAnswering", DistilBertForQuestionAnswering]
   }
 
+  MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES = {
+    "vit" => ["ViTForImageClassification", ViTForImageClassification]
+  }
+
   MODEL_CLASS_TYPE_MAPPING = [
     [MODEL_MAPPING_NAMES_ENCODER_ONLY, MODEL_TYPES[:EncoderOnly]],
     [MODEL_MAPPING_NAMES_ENCODER_DECODER, MODEL_TYPES[:EncoderDecoder]],
     [MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
-    [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
+    [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
   ]
 
   MODEL_CLASS_TYPE_MAPPING.each do |mappings, type|
@@ -355,6 +372,10 @@ module Informers
 
   class AutoModelForQuestionAnswering < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES]
+  end
+
+  class AutoModelForImageClassification < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES]
   end
 
   class ModelOutput

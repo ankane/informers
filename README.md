@@ -296,6 +296,13 @@ unmasker = Informers.pipeline("fill-mask")
 unmasker.("Paris is the [MASK] of France.")
 ```
 
+Image classification [unreleased]
+
+```ruby
+classifier = Transformers.pipeline("image-classification")
+classifier.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"))
+```
+
 ## Credits
 
 This library was ported from [Transformers.js](https://github.com/xenova/transformers.js) and is available under the same license.
@@ -335,5 +342,6 @@ To get started with development:
 git clone https://github.com/ankane/informers.git
 cd informers
 bundle install
+bundle exec rake download:files
 bundle exec rake test
 ```

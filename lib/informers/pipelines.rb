@@ -356,6 +356,48 @@ module Informers
     end
   end
 
+  class ImageClassificationPipeline < Pipeline
+    def call(images, top_k: 1)
+      is_batched = images.is_a?(Array)
+      prepared_images = prepare_images(images)
+
+      pixel_values = @processor.(prepared_images)[:pixel_values]
+      output = @model.({pixel_values: pixel_values})
+
+      id2label = @model.config[:id2label]
+      to_return = []
+      output.logits.each do |batch|
+        scores = Utils.get_top_items(Utils.softmax(batch), top_k)
+
+        vals =
+          scores.map do |x|
+            {
+              label: id2label[x[0].to_s],
+              score: x[1]
+            }
+          end
+        if top_k == 1
+          to_return.push(*vals)
+        else
+          to_return << vals
+        end
+      end
+
+      is_batched || top_k == 1 ? to_return : to_return[0]
+    end
+
+    private
+
+    def prepare_images(images)
+      if !images.is_a?(Array)
+        images = [images]
+      end
+
+      # Possibly convert any non-images to images
+      images.map { |x| Utils::RawImage.read(x) }
+    end
+  end
+
   class FeatureExtractionPipeline < Pipeline
     def call(
       texts,
@@ -505,6 +547,15 @@ module Informers
         model: "Xenova/distilbert-base-uncased-mnli"
       },
       type: "text"
+    },
+    "image-classification" => {
+      pipeline: ImageClassificationPipeline,
+      model: AutoModelForImageClassification,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/vit-base-patch16-224",
+      },
+      type: "multimodal"
     },
     "feature-extraction" => {
       tokenizer: AutoTokenizer,
