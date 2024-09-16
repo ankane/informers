@@ -47,6 +47,10 @@ module Informers
     end
 
     def get_resize_output_image_size(image, size)
+      if @config["keep_aspect_ratio"] && @config["ensure_multiple_of"]
+        raise Todo
+      end
+
       [size["width"], size["height"]]
     end
 
