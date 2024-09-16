@@ -76,7 +76,11 @@ module Informers
       src_width, src_height = image.size # original image size
 
       # Convert image to RGB if specified in config.
-      # TODO
+      if !do_convert_rgb.nil? ? do_convert_rgb : @do_convert_rgb
+        image = image.rgb
+      elsif do_convert_grayscale
+        image = image.grayscale
+      end
 
       # Resize all images
       if @do_resize

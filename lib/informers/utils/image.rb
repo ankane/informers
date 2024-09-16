@@ -22,6 +22,14 @@ module Informers
         RawImage.new(@image.thumbnail_image(width, height: height, size: :force))
       end
 
+      def rgb
+        if @channels == 3
+          return self
+        end
+
+        raise Todo
+      end
+
       def self.read(input)
         if input.is_a?(RawImage)
           input
