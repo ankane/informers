@@ -614,6 +614,26 @@ module Informers
     end
   end
 
+  class DepthEstimationPipeline < Pipeline
+    def call(images)
+      prepared_images = prepare_images(images)
+
+      inputs = @processor.(prepared_images)
+      predicted_depth = @model.(inputs)[0]
+
+      to_return = []
+      prepared_images.length.times do |i|
+        # prediction = interpolate(predicted_depth[i], prepared_images[i].size.reverse, "bilinear", false)
+        # formatted = prediction.mul_(255 / Utils.max(prediction)[0]).to("uint8")
+        to_return << {
+          predicted_depth: predicted_depth[i],
+          # depth: RawImage.from_tensor(formatted)
+        }
+      end
+      to_return.length > 1 ? to_return : to_return[0]
+    end
+  end
+
   class EmbeddingPipeline < FeatureExtractionPipeline
     def call(
       texts,
@@ -738,6 +758,15 @@ module Informers
         model: "Xenova/owlvit-base-patch32"
       },
       type: "multimodal"
+    },
+    "depth-estimation" => {
+      pipeline: DepthEstimationPipeline,
+      model: AutoModelForDepthEstimation,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/dpt-large"
+      },
+      type: "image"
     },
     "feature-extraction" => {
       tokenizer: AutoTokenizer,

@@ -247,6 +247,9 @@ module Informers
   class CLIPFeatureExtractor < ImageFeatureExtractor
   end
 
+  class DPTFeatureExtractor < ImageFeatureExtractor
+  end
+
   class ViTFeatureExtractor < ImageFeatureExtractor
   end
 
@@ -374,6 +377,7 @@ module Informers
       "ViTFeatureExtractor" => ViTFeatureExtractor,
       "OwlViTFeatureExtractor" => OwlViTFeatureExtractor,
       "CLIPFeatureExtractor" => CLIPFeatureExtractor,
+      "DPTFeatureExtractor" => DPTFeatureExtractor,
       "DetrFeatureExtractor" => DetrFeatureExtractor
     }
 

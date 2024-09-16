@@ -324,6 +324,15 @@ module Informers
     end
   end
 
+  class DPTPreTrainedModel < PreTrainedModel
+  end
+
+  class DPTModel < DPTPreTrainedModel
+  end
+
+  class DPTForDepthEstimation < DPTPreTrainedModel
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
@@ -374,6 +383,10 @@ module Informers
     "owlvit" => ["OwlViTForObjectDetection", OwlViTForObjectDetection]
   }
 
+  MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES = {
+    "dpt" => ["DPTForDepthEstimation", DPTForDepthEstimation]
+  }
+
   MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES = {
   }
 
@@ -385,6 +398,7 @@ module Informers
     [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
@@ -429,6 +443,10 @@ module Informers
 
   class AutoModelForZeroShotObjectDetection < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES]
+  end
+
+  class AutoModelForDepthEstimation < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES]
   end
 
   class AutoModelForImageFeatureExtraction < PretrainedMixin

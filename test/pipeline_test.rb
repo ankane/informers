@@ -167,6 +167,12 @@ class PipelineTest < Minitest::Test
     assert_equal 289, result[1][:box][:ymax]
   end
 
+  def test_depth_estimation
+    estimator = Informers.pipeline("depth-estimation")
+    result = estimator.("test/support/pipeline-cat-chonk.jpeg")
+    assert_in_delta 1.078, result[:predicted_depth][0][0]
+  end
+
   def test_image_feature_extraction
     fe = Informers.pipeline("image-feature-extraction")
     result = fe.("test/support/pipeline-cat-chonk.jpeg")

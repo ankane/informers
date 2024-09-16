@@ -7,6 +7,7 @@
 - Added `image-classification` pipeline
 - Added `image-feature-extraction` pipeline
 - Added `object-detection` pipeline
+- Added `depth-estimation` pipeline
 
 ## 1.0.3 (2024-08-29)
 
