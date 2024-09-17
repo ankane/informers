@@ -595,8 +595,8 @@ module Informers
 
         processed[:segments_info].each do |segment|
           annotation << {
-            score: segment[:score],
             label: id2label[segment[:label_id].to_s],
+            score: segment[:score]
             # TODO mask
           }
         end
