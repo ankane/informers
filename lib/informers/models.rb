@@ -113,7 +113,12 @@ module Informers
         raise Todo
 
       elsif model_type == MODEL_TYPES[:Seq2Seq] || model_type == MODEL_TYPES[:Vision2Seq]
-        raise Todo
+        info = [
+          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
+          construct_session(pretrained_model_name_or_path, "encoder_model", **options),
+          construct_session(pretrained_model_name_or_path, "decoder_model_merged", **options),
+          Utils::Hub.get_model_json(pretrained_model_name_or_path, "generation_config.json", false, **options)
+        ]
 
       elsif model_type == MODEL_TYPES[:MaskGeneration]
         raise Todo
@@ -333,6 +338,18 @@ module Informers
   class DPTForDepthEstimation < DPTPreTrainedModel
   end
 
+  class VisionEncoderDecoderModel < PreTrainedModel
+    MAIN_INPUT_NAME = "pixel_values"
+
+    def initialize(config, session, decoder_merged_session, generation_config)
+      super(config, session)
+      @decoder_merged_session = decoder_merged_session
+      @generation_config = generation_config
+
+      raise Todo
+    end
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
@@ -371,6 +388,10 @@ module Informers
     "distilbert" => ["DistilBertForQuestionAnswering", DistilBertForQuestionAnswering]
   }
 
+  MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES = {
+    "vision-encoder-decoder" => ["VisionEncoderDecoderModel", VisionEncoderDecoderModel]
+  }
+
   MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES = {
     "vit" => ["ViTForImageClassification", ViTForImageClassification]
   }
@@ -397,6 +418,7 @@ module Informers
     [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES, MODEL_TYPES[:Vision2Seq]],
     [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
@@ -431,6 +453,10 @@ module Informers
 
   class AutoModelForQuestionAnswering < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES]
+  end
+
+  class AutoModelForVision2Seq < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES]
   end
 
   class AutoModelForImageClassification < PretrainedMixin

@@ -98,6 +98,10 @@ module Informers
   class DistilBertTokenizer < PreTrainedTokenizer
   end
 
+  class GPT2Tokenizer < PreTrainedTokenizer
+    # _default_chat_template = `{% for message in messages %}" "{{ message.content }}{{ eos_token }}" "{% endfor %}`
+  end
+
   class BartTokenizer < PreTrainedTokenizer
   end
 

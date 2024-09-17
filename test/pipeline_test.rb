@@ -173,6 +173,13 @@ class PipelineTest < Minitest::Test
     assert_in_delta 1.078, result[:predicted_depth][0][0]
   end
 
+  def test_image_to_text
+    skip "TODO"
+
+    captioner = Informers.pipeline("image-to-text")
+    _result = captioner.("test/support/pipeline-cat-chonk.jpeg")
+  end
+
   def test_image_feature_extraction
     fe = Informers.pipeline("image-feature-extraction")
     result = fe.("test/support/pipeline-cat-chonk.jpeg")

@@ -376,6 +376,22 @@ module Informers
     end
   end
 
+  class ImageToTextPipeline < Pipeline
+    def call(images, **generate_kwargs)
+      is_batched = images.is_a?(Array)
+      prepared_images = prepare_images(images)
+
+      pixel_values = @processor.(prepared_images)[:pixel_values]
+
+      to_return = []
+      pixel_values.each do |batch|
+        raise Todo
+      end
+
+      is_batched ? to_return : to_return[0]
+    end
+  end
+
   class ImageClassificationPipeline < Pipeline
     def call(images, top_k: 1)
       is_batched = images.is_a?(Array)
@@ -721,6 +737,17 @@ module Informers
       },
       type: "text"
     },
+    # TODO
+    # "image-to-text" => {
+    #   tokenizer: AutoTokenizer,
+    #   pipeline: ImageToTextPipeline,
+    #   model: AutoModelForVision2Seq,
+    #   processor: AutoProcessor,
+    #   default: {
+    #     model: "Xenova/vit-gpt2-image-captioning"
+    #   },
+    #   type: "multimodal"
+    # },
     "image-classification" => {
       pipeline: ImageClassificationPipeline,
       model: AutoModelForImageClassification,
