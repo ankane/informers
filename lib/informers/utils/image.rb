@@ -10,7 +10,7 @@ module Informers
         5 => "hamming",
       }
 
-      attr_reader :width, :height, :channels
+      attr_reader :image, :width, :height, :channels
 
       def initialize(image)
         @image = image

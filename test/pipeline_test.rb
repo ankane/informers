@@ -210,7 +210,8 @@ class PipelineTest < Minitest::Test
 
     upscaler = Informers.pipeline("image-to-image")
     result = upscaler.("test/support/pipeline-cat-chonk.jpeg")
-    result.save("/tmp/output.jpeg")
+    assert_kind_of Vips::Image, result
+    result.write_to_file("/tmp/image-to-image.jpg")
   end
 
   def test_image_segmentation

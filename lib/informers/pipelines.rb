@@ -875,7 +875,7 @@ module Informers
               end
             end
           end
-        to_return << Utils::RawImage.from_array(output)
+        to_return << Utils::RawImage.from_array(output).image
       end
 
       to_return.length > 1 ? to_return : to_return[0]
