@@ -8,6 +8,10 @@ module Informers
       @config_json[key.to_s]
     end
 
+    def to_h
+      @config_json.to_h
+    end
+
     def self.from_pretrained(
       pretrained_model_name_or_path,
       progress_callback: nil,

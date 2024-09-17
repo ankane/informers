@@ -60,6 +60,13 @@ class PipelineTest < Minitest::Test
     assert_elements_in_delta [0.633, 0.134, 0.121, 0.111], result[:scores]
   end
 
+  def test_text2text_generation
+    skip "TODO"
+
+    text2text = Informers.pipeline("text2text-generation")
+    _result = text2text.("translate from English to French: I'm very happy")
+  end
+
   def test_fill_mask
     unmasker = Informers.pipeline("fill-mask")
     result = unmasker.("Paris is the [MASK] of France.")

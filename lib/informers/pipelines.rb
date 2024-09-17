@@ -297,6 +297,45 @@ module Informers
     end
   end
 
+  class Text2TextGenerationPipeline < Pipeline
+    KEY = "generated_text"
+
+    def call(texts, **generate_kwargs)
+      if !texts.is_a?(Array)
+        texts = [texts]
+      end
+
+      # Add global prefix, if present
+      if @model.config[:prefix]
+        texts = texts.map { |x| @model.config[:prefix] + x }
+      end
+
+      # Handle task specific params:
+      task_specific_params = @model.config[:task_specific_params]
+      if task_specific_params && task_specific_params[@task]
+        # Add prefixes, if present
+        if task_specific_params[@task]["prefix"]
+          texts = texts.map { |x| task_specific_params[@task]["prefix"] + x }
+        end
+
+        # TODO update generation config
+      end
+
+      tokenizer = @tokenizer
+      tokenizer_options = {
+        padding: true,
+        truncation: true
+      }
+      # TODO TranslationPipeline
+      input_ids = tokenizer.(texts, **tokenizer_options)[:input_ids]
+
+      output_token_ids = @model.generate(input_ids, **generate_kwargs)
+
+      tokenizer.batch_decode(output_token_ids, skip_special_tokens: true)
+        .map { |text| {KEY => text} }
+    end
+  end
+
   class ZeroShotClassificationPipeline < Pipeline
     def initialize(**options)
       super(**options)
@@ -804,6 +843,16 @@ module Informers
       },
       type: "text"
     },
+    # TODO
+    # "text2text-generation" => {
+    #   tokenizer: AutoTokenizer,
+    #   pipeline: Text2TextGenerationPipeline,
+    #   model: AutoModelForSeq2SeqLM,
+    #   default: {
+    #     model: "Xenova/flan-t5-small"
+    #   },
+    #   type: "text"
+    # },
     "zero-shot-classification" => {
       tokenizer: AutoTokenizer,
       pipeline: ZeroShotClassificationPipeline,

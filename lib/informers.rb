@@ -11,6 +11,7 @@ require "uri"
 
 # modules
 require_relative "informers/utils/core"
+require_relative "informers/utils/generation"
 require_relative "informers/utils/hub"
 require_relative "informers/utils/image"
 require_relative "informers/utils/math"

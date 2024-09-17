@@ -98,6 +98,9 @@ module Informers
   class DistilBertTokenizer < PreTrainedTokenizer
   end
 
+  class T5Tokenizer < PreTrainedTokenizer
+  end
+
   class GPT2Tokenizer < PreTrainedTokenizer
     # _default_chat_template = `{% for message in messages %}" "{{ message.content }}{{ eos_token }}" "{% endfor %}`
   end
@@ -119,6 +122,7 @@ module Informers
 
   class AutoTokenizer
     TOKENIZER_CLASS_MAPPING = {
+      "T5Tokenizer" => T5Tokenizer,
       "BertTokenizer" => BertTokenizer,
       "DebertaV2Tokenizer" => DebertaV2Tokenizer,
       "DistilBertTokenizer" => DistilBertTokenizer,

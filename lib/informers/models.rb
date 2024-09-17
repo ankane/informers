@@ -78,7 +78,12 @@ module Informers
       when MODEL_TYPES[:DecoderOnly]
         raise Todo
       when MODEL_TYPES[:Seq2Seq], MODEL_TYPES[:Vision2Seq]
-        raise Todo
+        @can_generate = true
+
+        @run_beam = method(:seq2seq_run_beam)
+        @get_start_beams = method(:seq2seq_start_beams)
+        @update_beam = method(:seq2seq_update_beam)
+        @forward = method(:seq2seq_forward)
       when MODEL_TYPES[:EncoderDecoder]
         raise Todo
       else
@@ -158,7 +163,146 @@ module Informers
       @forward.(model_inputs, **kwargs)
     end
 
+    def generate(inputs, generation_config = nil, logits_processor = nil, inputs_attention_mask: nil)
+      if !@can_generate
+        model_name = MODEL_CLASS_TO_NAME_MAPPING[self.class]
+        error_message = "The current model class (#{model_name}) is not compatible with `.generate()`, as it doesn't have a language model head."
+        raise Error, error_message
+      end
+
+      if !inputs.is_a?(Array)
+        raise ArgumentError, "`inputs` must be an Array, but is #{inputs.class.name}"
+      end
+
+      if @config[:is_encoder_decoder]
+        # Generating from the encoder outputs
+        input_ids_seq_length = 0
+      else
+        raise Todo
+      end
+
+      # Update generation config with defaults
+      generation_config = get_generation_config(generation_config)
+
+      logits_processor ||= Utils::LogitsProcessorList.new
+
+      # Update logits processor
+      logits_processor = get_logits_processor(
+        generation_config,
+        input_ids_seq_length,
+        logits_processor
+      )
+
+      eos_token_ids = generation_config[:eos_token_id]
+      if !eos_token_ids.nil? && !eos_token_ids.is_a?(Array)
+        eos_token_ids = [eos_token_ids]
+      end
+
+      num_output_tokens = 1
+      _max_output_tokens = num_output_tokens + (generation_config[:max_new_tokens] || Float::INFINITY)
+
+      # Only use max length if max_new_tokens is not provided
+      _use_max_length = generation_config[:max_length].is_a?(Integer) && generation_config[:max_new_tokens].nil?
+      _sampler = Utils::Sampler.get_sampler(generation_config)
+
+      _beams = get_start_beams(inputs, generation_config, num_output_tokens, inputs_attention_mask)
+
+      raise Todo
+    end
+
     private
+
+    def get_logits_processor(
+      generation_config,
+      input_ids_seq_length,
+      logits_processor = nil
+    )
+      processors = Utils::LogitsProcessorList.new
+
+      if !generation_config["repetition_penalty"].nil? && generation_config["repetition_penalty"] != 1.0
+        processors.push(RepetitionPenaltyLogitsProcessor.new(generation_config["repetition_penalty"]))
+      end
+
+      if !generation_config["no_repeat_ngram_size"].nil? && generation_config["no_repeat_ngram_size"] > 0
+        processors.push(NoRepeatNGramLogitsProcessor.new(generation_config["no_repeat_ngram_size"]))
+      end
+
+      if !generation_config["bad_words_ids"].nil?
+        processors.push(NoBadWordsLogitsProcessor.new(generation_config["bad_words_ids"], generation_config["eos_token_id"]))
+      end
+
+      if !generation_config["min_length"].nil? && !generation_config["eos_token_id"].nil? && generation_config["min_length"] > 0
+        processors.push(MinLengthLogitsProcessor.new(generation_config["min_length"], generation_config["eos_token_id"]))
+      end
+
+      if !generation_config["min_new_tokens"].nil? && !generation_config["eos_token_id"].nil? && generation_config["min_new_tokens"] > 0
+        processors.push(MinNewTokensLengthLogitsProcessor.new(
+          input_ids_seq_length,
+          generation_config["min_new_tokens"],
+          generation_config["eos_token_id"]
+        ))
+      end
+
+      if !generation_config["forced_bos_token_id"].nil?
+        processors.push(ForcedBOSTokenLogitsProcessor.new(generation_config["forced_bos_token_id"]))
+      end
+
+      if !generation_config["forced_eos_token_id"].nil?
+        processors.push(ForcedEOSTokenLogitsProcessor.new(
+          generation_config["max_length"],
+          generation_config["forced_eos_token_id"]
+        ))
+      end
+
+      if !generation_config["begin_suppress_tokens"].nil?
+        raise Todo
+      end
+
+      if !generation_config["forced_decoder_ids"].nil?
+        processors.push(ForceTokensLogitsProcessor.new(generation_config["forced_decoder_ids"]))
+      end
+
+      if !logits_processor.nil?
+        processors.concat(logits_processor)
+      end
+
+      processors
+    end
+
+    def get_generation_config(generation_config)
+      # Create empty generation config (contains defaults)
+      # We pass `@config` so that if `eos_token_id` or `bos_token_id` exist in the model's config, we will use them
+      gen_config = Utils::GenerationConfig.new(@config.to_h)
+
+      # Apply model's generation config, if it exists
+      if @generation_config
+        gen_config.merge!(@generation_config)
+      end
+
+      # Finally, use any generation config specified by the user
+      # when calling `generate`
+      if !generation_config.nil?
+        gen_config.merge!(generation_config)
+      end
+
+      gen_config
+    end
+
+    def seq2seq_forward(model_inputs)
+      raise Todo
+    end
+
+    def seq2seq_start_beams(input_token_ids, generation_config, num_output_tokens, inputs_attention_mask = nil)
+      raise Todo
+    end
+
+    def seq2seq_run_beam(beam)
+      raise Todo
+    end
+
+    def seq2seq_update_beam(beam, new_token_id)
+      raise Todo
+    end
 
     def encoder_forward(model_inputs, output_names: nil)
       encoder_feeds = {}
@@ -191,6 +335,18 @@ module Informers
     # TODO
     def validate_inputs(session, inputs)
       inputs
+    end
+
+    def get_start_beams(input_token_ids, generation_config, num_output_tokens, inputs_attention_mask)
+      @get_start_beams.(input_token_ids, generation_config, num_output_tokens, inputs_attention_mask)
+    end
+
+    def run_beam(beam)
+      @run_beam.(beam)
+    end
+
+    def update_beam(beam, new_token_id)
+      @update_beam.(beam, new_token_id)
     end
   end
 
@@ -252,6 +408,28 @@ module Informers
   end
 
   class MPNetModel < MPNetPreTrainedModel
+  end
+
+  class T5PreTrainedModel < PreTrainedModel
+  end
+
+  class T5Model < T5PreTrainedModel
+  end
+
+  class T5ForConditionalGeneration < T5PreTrainedModel
+    def initialize(config, session, decoder_merged_session, generation_config)
+      super(config, session)
+      @decoder_merged_session = decoder_merged_session
+      @generation_config = generation_config
+
+      @num_decoder_layers = @config[:num_decoder_layers]
+      @num_decoder_heads = @config[:num_heads]
+      @decoder_dim_kv = @config[:d_kv]
+
+      @num_encoder_layers = @config[:num_layers]
+      @num_encoder_heads = @config[:num_heads]
+      @encoder_dim_kv = @config[:d_kv]
+    end
   end
 
   class BartPretrainedModel < PreTrainedModel
@@ -385,6 +563,10 @@ module Informers
     "bert" => ["BertForTokenClassification", BertForTokenClassification]
   }
 
+  MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES = {
+    "t5" => ["T5ForConditionalGeneration", T5ForConditionalGeneration]
+  }
+
   MODEL_FOR_MASKED_LM_MAPPING_NAMES = {
     "bert" => ["BertForMaskedLM", BertForMaskedLM],
     "roberta" => ["RobertaForMaskedLM", RobertaForMaskedLM]
@@ -429,6 +611,7 @@ module Informers
     [MODEL_MAPPING_NAMES_ENCODER_DECODER, MODEL_TYPES[:EncoderDecoder]],
     [MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES, MODEL_TYPES[:Seq2Seq]],
     [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES, MODEL_TYPES[:Vision2Seq]],
@@ -460,6 +643,10 @@ module Informers
 
   class AutoModelForTokenClassification < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES]
+  end
+
+  class AutoModelForSeq2SeqLM < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES]
   end
 
   class AutoModelForMaskedLM < PretrainedMixin
