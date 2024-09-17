@@ -212,7 +212,95 @@ module Informers
 
       beams = get_start_beams(inputs, generation_config, num_output_tokens, inputs_attention_mask)
 
-      raise Todo
+      while beams.any? { |x| !x[:done] } && num_output_tokens < max_output_tokens
+        newest_beams = []
+        beams.each do |beam|
+          if beam[:done]
+            # Add this beam back into the pool
+            newest_beams << beam
+            next
+          end
+          if use_max_length && beam[:output_token_ids].length >= generation_config["max_length"]
+            # Set this beam to done and add it back into the pool
+            beam[:done] = true
+            newest_beams << beam
+            next
+          end
+
+          output = run_beam(beam)
+
+          # add attentions/scores to beam only if user requested
+          if generation_config["output_attentions"]
+            add_attentions_to_beam(beam, output)
+          end
+
+          # Logits are of the form [batch_size, out_seq_length, vocab_size]
+          # In most cases, this will be [batch_size, 1, vocab_size]
+          # So, we select the last token's logits:
+          # (equivalent to `logits = outputs.logits[:, -1, :]`)
+          logits =
+            output["logits"].map do |v|
+              v.map { |v2| v2[-1] }
+            end
+
+          # Apply logits processor
+          logits_processor.(beam[:output_token_ids], logits)
+
+          sampled_tokens = sampler.(logits)
+          sampled_tokens.each do |new_token_id, log_prob|
+            # use previous beam as a starting point
+            new_beam = beam.dup
+
+            # update new beam
+            update_beam(new_beam, new_token_id)
+
+            new_beam[:score] += log_prob
+
+            if eos_token_ids && eos_token_ids.include?(new_token_id)
+              new_beam[:done] = true
+            end
+
+            newest_beams << new_beam
+          end
+        end
+        num_output_tokens += 1
+
+        # Next, we get the best beams, per ID
+        newest_beams =
+          group_beams(newest_beams).map do |group|
+            group.sort_by { |v| -v[:score] }[0...generation_config["num_beams"]]
+          end
+
+        # Flatten beams
+        beams = newest_beams.flatten(1)
+
+        # Run callback
+        if generation_config["callback_function"]
+          generation_config["callback_function"].(beams)
+        end
+      end
+
+      # TODO: Ensure that we can return non-batched outputs
+
+      grouped_beams = group_beams(beams)
+
+      get_flattened = lambda do |key|
+        grouped_beams.map do |batch|
+          if generation_config["num_return_sequences"] > 1
+            raise Todo
+          else
+            [batch[0][key]]
+          end
+        end.flatten(1)
+      end
+
+      sequences = get_flattened.(:output_token_ids) # [1, seqLength]
+
+      if generation_config["return_dict_in_generate"]
+        raise Todo
+      else
+        sequences
+      end
     end
 
     private
@@ -294,7 +382,108 @@ module Informers
     end
 
     def seq2seq_forward(model_inputs)
+      encoder_outputs = model_inputs[:encoder_outputs]
+      past_key_values = model_inputs[:past_key_values]
+
+      if !encoder_outputs
+        # Encoder outputs are not given, so we must compute them.
+        encoder_outputs = encoder_forward(model_inputs)[0]
+      end
+      decoder_feeds = {
+        input_ids: model_inputs[:decoder_input_ids],
+        encoder_hidden_states: encoder_outputs
+      }
+      use_cache_branch = !!past_key_values
+
+      if @decoder_merged_session.inputs.map { |v| v[:name] }.include?("use_cache_branch")
+        decoder_feeds[:use_cache_branch] = [use_cache_branch]
+      end
+
+      if @decoder_merged_session.inputs.map { |v| v[:name] }.include?("encoder_attention_mask")
+        decoder_feeds[:encoder_attention_mask] = model_inputs[:attention_mask]
+      end
+
+      prepare_position_ids(@decoder_merged_session, decoder_feeds, use_cache_branch)
+      add_past_key_values(decoder_feeds, past_key_values)
+
+      decoder_results = session_run(@decoder_merged_session, decoder_feeds)
+      decoder_results = @decoder_merged_session.outputs.map { |v| v[:name] }.zip(decoder_results).to_h
+      logits = decoder_results["logits"]
+      past_key_values = get_past_key_values(decoder_results, past_key_values)
+
+      # Get cross attention and/or decoder attentions if they are present
+      attns = get_attentions(decoder_results)
+
+      Seq2SeqLMOutput.new(logits, past_key_values, encoder_outputs, *attns)
+    end
+
+    def prepare_position_ids(session, feeds, use_cache_branch)
+      if !session.inputs.map { |v| v[:name] }.include?("position_ids")
+        return
+      end
+
       raise Todo
+    end
+
+    def get_past_key_values(decoder_results, past_key_values)
+      pkvs = {}
+
+      decoder_results.each_key do |name|
+        if name.start_with?("present")
+          new_name = name.sub("present", "past_key_values")
+
+          if past_key_values && name.include?("encoder")
+            # Optimization introduced by optimum to reuse past key values. So, we just replace the constant
+            # outputs with the previous past key values.
+            # https://github.com/huggingface/optimum/blob/0bf2c05fb7e1182b52d21b703cfc95fd9e4ea3dc/optimum/onnxruntime/base.py#L677-L704
+            pkvs[new_name] = past_key_values[new_name]
+          else
+            pkvs[new_name] = decoder_results[name]
+          end
+        end
+      end
+      pkvs
+    end
+
+    def get_attentions(decoder_results)
+      attns = {}
+
+      ["cross_attentions", "decoder_attentions"].each do |attn_name|
+        result = []
+        decoder_results.each_key do |name|
+          if name.start_with?(attn_name)
+            index = name.split(".").pop
+            result[index] = decoder_results[name]
+          end
+        end
+        attns[attn_name] = result
+      end
+      attns
+    end
+
+    def add_past_key_values(decoder_feeds, past_key_values)
+      if past_key_values
+        decoder_feeds.merge!(past_key_values)
+      else
+        # TODO support batches (i.e., batch_size > 1)
+        batch_size = 1
+
+        if @config[:is_encoder_decoder] && (!@add_encoder_pkv.nil? ? @add_encoder_pkv : true)
+          raise Todo
+        elsif @config[:model_type] == "falcon"
+          raise Todo
+        elsif @config[:multi_query]
+          raise Todo
+        elsif @config[:model_type] == "bloom"
+          raise Todo
+        else
+          dims = [batch_size, @num_heads, 0, @dim_kv]
+          @num_layers.times do |i|
+            # decoder_feeds["past_key_values.#{i}.key"] = new Tensor('float32', [], dims)
+            # decoder_feeds["past_key_values.#{i}.value"] = new Tensor('float32', [], dims)
+          end
+        end
+      end
     end
 
     def seq2seq_start_beams(input_token_ids, generation_config, num_output_tokens, inputs_attention_mask = nil)
@@ -362,11 +551,53 @@ module Informers
     end
 
     def seq2seq_run_beam(beam)
-      raise Todo
+      # TODO use MAIN_INPUT_NAME
+      input_name = :pixel_values
+
+      decoder_input_ids = beam[:output_token_ids]
+      if beam[:prev_model_outputs]
+        # After the first step, `prev_model_outputs` won't be null.
+        # So, we cut decoder_input_ids if past is used
+        # TODO
+        # decoder_input_ids = decoder_input_ids.slice(-1)
+      end
+
+      # 1. Prepare
+      model_inputs = {
+        input_name => beam[:inputs],
+        decoder_input_ids: [decoder_input_ids],
+        encoder_outputs: beam[:encoder_outputs],
+        past_key_values: beam[:prev_model_outputs] && beam[:prev_model_outputs][:past_key_values]
+      }
+      if beam[:attention_mask]
+        model_inputs[:attention_mask] = beam[:attention_mask]
+      end
+
+      # 2. Run
+      output = @forward.(model_inputs)
+
+      # 3. Update
+      beam[:prev_model_outputs] = output
+      beam[:encoder_outputs] = output[:encoder_outputs]
+
+      output
     end
 
     def seq2seq_update_beam(beam, new_token_id)
-      raise Todo
+      beam[:output_token_ids] += [new_token_id]
+    end
+
+    def group_beams(beams)
+      # Group beams by their ids
+      groups = {}
+      beams.each do |obj|
+        if !groups[obj[:id]]
+          groups[obj[:id]] = [obj]
+        else
+          groups[obj[:id]] << obj
+        end
+      end
+      groups.values
     end
 
     def encoder_forward(model_inputs, output_names: nil)
@@ -397,7 +628,7 @@ module Informers
       raise Todo
     end
 
-    def session_run(session, inputs, output_names:)
+    def session_run(session, inputs, output_names: nil)
       checked_inputs = validate_inputs(session, inputs)
       begin
         output = session.run(output_names || @output_names, checked_inputs)
@@ -626,7 +857,7 @@ module Informers
   end
 
   class VisionEncoderDecoderModel < PreTrainedModel
-    MAIN_INPUT_NAME = "pixel_values"
+    MAIN_INPUT_NAME = :pixel_values
 
     def initialize(config, session, decoder_merged_session, generation_config)
       super(config, session)
@@ -828,6 +1059,17 @@ module Informers
   class ModelOutput
     def [](key)
       instance_variable_get("@#{key}")
+    end
+  end
+
+  class Seq2SeqLMOutput < ModelOutput
+    def initialize(logits, past_key_values, encoder_outputs, decoder_attentions = nil, cross_attentions = nil)
+      super()
+      @logits = logits
+      @past_key_values = past_key_values
+      @encoder_outputs = encoder_outputs
+      @decoder_attentions = decoder_attentions
+      @cross_attentions = cross_attentions
     end
   end
 

@@ -83,6 +83,10 @@ module Informers
     def id_to_token(id)
       @tokenizer.id_to_token(id)
     end
+
+    def batch_decode(batch, **decode_args)
+      @tokenizer.decode_batch(batch, **decode_args)
+    end
   end
 
   class BertTokenizer < PreTrainedTokenizer

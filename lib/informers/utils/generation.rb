@@ -78,6 +78,30 @@ module Informers
         @generation_config = generation_config
       end
 
+      def call(logits, index = -1)
+        # Sample from logits, of dims [batch, sequence_length, vocab_size].
+        # If index is specified, sample from [batch, index, vocab_size].
+        sample(logits, index)
+      end
+
+      def get_logits(logits, index)
+        vocab_size = Utils.dims(logits)[-1]
+
+        logs = logits
+
+        if index == -1
+          logs = logs.map { |v| v.slice(-vocab_size) }
+        else
+          raise Todo
+        end
+
+        # add temperature
+        if @generation_config["temperature"] > 0
+          logs = logs.map { |x| x / @generation_config["temperature"] }
+        end
+        logs
+      end
+
       def self.get_sampler(generation_config)
         if generation_config[:do_sample]
           MultinomialSampler.new(generation_config)
@@ -118,6 +142,17 @@ module Informers
 
       def concat(items)
         @processors.concat(items)
+      end
+
+      def call(input_ids, batched_logits)
+        # NOTE: This is different from the Python code, since vanilla Ruby does not support vectorized operations.
+        # As a result, we apply each processor to each item in the batch.
+        batched_logits.each do |logit|
+          # Modifies logits inplace
+          @processors.each do |func|
+            func.(input_ids, logits)
+          end
+        end
       end
 
       def to_ary

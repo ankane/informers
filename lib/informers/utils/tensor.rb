@@ -33,5 +33,14 @@ module Informers
       end
       tensor.map { |_| 1 }
     end
+
+    def self.dims(tensor)
+      dims = []
+      while tensor.is_a?(Array)
+        dims << tensor.size
+        tensor = tensor[0]
+      end
+      dims
+    end
   end
 end
