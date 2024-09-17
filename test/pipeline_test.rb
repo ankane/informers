@@ -61,10 +61,9 @@ class PipelineTest < Minitest::Test
   end
 
   def test_text2text_generation
-    skip "TODO"
-
     text2text = Informers.pipeline("text2text-generation")
-    _result = text2text.("translate from English to French: I'm very happy")
+    result = text2text.("translate from English to French: I'm very happy")
+    assert_equal "Je suis très heureux.", result[0][:generated_text]
   end
 
   def test_fill_mask

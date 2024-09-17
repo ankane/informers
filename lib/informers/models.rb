@@ -61,6 +61,8 @@ module Informers
   end
 
   class PreTrainedModel
+    MAIN_INPUT_NAME = :input_ids
+
     attr_reader :config
 
     def initialize(config, session)
@@ -238,10 +240,7 @@ module Informers
           # In most cases, this will be [batch_size, 1, vocab_size]
           # So, we select the last token's logits:
           # (equivalent to `logits = outputs.logits[:, -1, :]`)
-          logits =
-            output["logits"].map do |v|
-              v.map { |v2| v2[-1] }
-            end
+          logits = output["logits"].map { |v| v[-1] }
 
           # Apply logits processor
           logits_processor.(beam[:output_token_ids], logits)
@@ -414,7 +413,7 @@ module Informers
       # Get cross attention and/or decoder attentions if they are present
       attns = get_attentions(decoder_results)
 
-      Seq2SeqLMOutput.new(logits, past_key_values, encoder_outputs, *attns)
+      Seq2SeqLMOutput.new(logits, past_key_values, encoder_outputs, attns["decoder_attentions"], attns["cross_attentions"])
     end
 
     def prepare_position_ids(session, feeds, use_cache_branch)
@@ -469,7 +468,14 @@ module Informers
         batch_size = 1
 
         if @config[:is_encoder_decoder] && (!@add_encoder_pkv.nil? ? @add_encoder_pkv : true)
-          raise Todo
+          encoder_dims = [batch_size, @num_encoder_heads, 0, @encoder_dim_kv]
+          decoder_dims = [batch_size, @num_decoder_heads, 0, @decoder_dim_kv]
+          @num_decoder_layers.times do |i|
+            # decoder_feeds["past_key_values.#{i}.encoder.key"] = OnnxRuntime::OrtValue.from_shape_and_type(encoder_dims, :float)
+            # decoder_feeds["past_key_values.#{i}.encoder.value"] = OnnxRuntime::OrtValue.from_shape_and_type(encoder_dims, :float)
+            # decoder_feeds["past_key_values.#{i}.decoder.key"] = OnnxRuntime::OrtValue.from_shape_and_type(decoder_dims, :float)
+            # decoder_feeds["past_key_values.#{i}.decoder.value"] = OnnxRuntime::OrtValue.from_shape_and_type(decoder_dims, :float)
+          end
         elsif @config[:model_type] == "falcon"
           raise Todo
         elsif @config[:multi_query]
@@ -479,8 +485,8 @@ module Informers
         else
           dims = [batch_size, @num_heads, 0, @dim_kv]
           @num_layers.times do |i|
-            # decoder_feeds["past_key_values.#{i}.key"] = new Tensor('float32', [], dims)
-            # decoder_feeds["past_key_values.#{i}.value"] = new Tensor('float32', [], dims)
+            # decoder_feeds["past_key_values.#{i}.key"] = OnnxRuntime::OrtValue.from_shape_and_type(dims, :float)
+            # decoder_feeds["past_key_values.#{i}.value"] = OnnxRuntime::OrtValue.from_shape_and_type(dims, :float)
           end
         end
       end
@@ -551,15 +557,13 @@ module Informers
     end
 
     def seq2seq_run_beam(beam)
-      # TODO use MAIN_INPUT_NAME
-      input_name = :pixel_values
+      input_name = MAIN_INPUT_NAME
 
       decoder_input_ids = beam[:output_token_ids]
       if beam[:prev_model_outputs]
         # After the first step, `prev_model_outputs` won't be null.
         # So, we cut decoder_input_ids if past is used
-        # TODO
-        # decoder_input_ids = decoder_input_ids.slice(-1)
+        decoder_input_ids = [decoder_input_ids[-1]]
       end
 
       # 1. Prepare

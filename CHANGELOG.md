@@ -8,6 +8,7 @@
 - Added `image-feature-extraction` pipeline
 - Added `object-detection` pipeline
 - Added `depth-estimation` pipeline
+- Added `text2text-generation` pipeline
 
 ## 1.0.3 (2024-08-29)
 

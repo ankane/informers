@@ -87,10 +87,10 @@ module Informers
       def get_logits(logits, index)
         vocab_size = Utils.dims(logits)[-1]
 
-        logs = logits
+        logs = logits.flatten
 
         if index == -1
-          logs = logs.map { |v| v.slice(-vocab_size) }
+          logs = logs.last(vocab_size)
         else
           raise Todo
         end

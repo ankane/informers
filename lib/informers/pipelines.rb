@@ -298,7 +298,7 @@ module Informers
   end
 
   class Text2TextGenerationPipeline < Pipeline
-    KEY = "generated_text"
+    KEY = :generated_text
 
     def call(texts, **generate_kwargs)
       if !texts.is_a?(Array)
@@ -848,16 +848,15 @@ module Informers
       },
       type: "text"
     },
-    # TODO
-    # "text2text-generation" => {
-    #   tokenizer: AutoTokenizer,
-    #   pipeline: Text2TextGenerationPipeline,
-    #   model: AutoModelForSeq2SeqLM,
-    #   default: {
-    #     model: "Xenova/flan-t5-small"
-    #   },
-    #   type: "text"
-    # },
+    "text2text-generation" => {
+      tokenizer: AutoTokenizer,
+      pipeline: Text2TextGenerationPipeline,
+      model: AutoModelForSeq2SeqLM,
+      default: {
+        model: "Xenova/flan-t5-small"
+      },
+      type: "text"
+    },
     "zero-shot-classification" => {
       tokenizer: AutoTokenizer,
       pipeline: ZeroShotClassificationPipeline,
