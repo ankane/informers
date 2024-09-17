@@ -727,8 +727,8 @@ module Informers
         result =
           processed[:boxes].map.with_index do |box, i|
             {
-              score: processed[:scores][i],
               label: candidate_labels[processed[:classes][i]],
+              score: processed[:scores][i],
               box: get_bounding_box(box, !percentage),
             }
           end

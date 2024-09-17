@@ -158,15 +158,15 @@ class PipelineTest < Minitest::Test
     result = detector.("test/support/pipeline-cat-chonk.jpeg")
     assert_equal 3, result.size
 
-    assert_in_delta 0.992, result[0][:score]
     assert_equal "cat", result[0][:label]
+    assert_in_delta 0.992, result[0][:score]
     assert_equal 177, result[0][:box][:xmin]
     assert_equal 153, result[0][:box][:ymin]
     assert_equal 959, result[0][:box][:xmax]
     assert_equal 600, result[0][:box][:ymax]
 
-    assert_in_delta 0.726, result[2][:score]
     assert_equal "bicycle", result[2][:label]
+    assert_in_delta 0.726, result[2][:score]
     assert_equal 0, result[2][:box][:xmin]
     assert_equal 0, result[2][:box][:ymin]
     assert_equal 196, result[2][:box][:xmax]
@@ -178,15 +178,15 @@ class PipelineTest < Minitest::Test
     result = detector.("test/support/zero-sh-obj-detection_1.png", ["human face", "rocket", "helmet", "american flag"])
     assert_equal 4, result.size
 
-    assert_in_delta 0.351, result[0][:score]
     assert_equal "human face", result[0][:label]
+    assert_in_delta 0.351, result[0][:score]
     assert_equal 179, result[0][:box][:xmin]
     assert_equal 72, result[0][:box][:ymin]
     assert_equal 270, result[0][:box][:xmax]
     assert_equal 178, result[0][:box][:ymax]
 
-    assert_in_delta 0.211, result[1][:score]
     assert_equal "rocket", result[1][:label]
+    assert_in_delta 0.211, result[1][:score]
     assert_equal 351, result[1][:box][:xmin]
     assert_equal 6, result[1][:box][:ymin]
     assert_equal 468, result[1][:box][:xmax]
