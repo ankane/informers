@@ -858,6 +858,30 @@ module Informers
     end
   end
 
+  class MBartPreTrainedModel < PreTrainedModel
+  end
+
+  class MBartModel < MBartPreTrainedModel
+  end
+
+  class MBartForCausalLM < MBartPreTrainedModel
+    attr_reader :num_decoder_layers, :num_decoder_heads, :decoder_dim_kv,
+      :num_encoder_layers, :num_encoder_heads, :encoder_dim_kv
+
+    def initialize(config, decoder_merged_session, generation_config)
+      super(config, decoder_merged_session)
+      @generation_config = generation_config
+
+      @num_decoder_layers = @config["decoder_layers"]
+      @num_decoder_heads = @config["decoder_attention_heads"]
+      @decoder_dim_kv = @config["d_model"] / @num_decoder_heads.to_f
+
+      @num_encoder_layers = @config["encoder_layers"]
+      @num_encoder_heads = @config["encoder_attention_heads"]
+      @encoder_dim_kv = @config["d_model"] / @num_encoder_heads.to_f
+    end
+  end
+
   class RobertaPreTrainedModel < PreTrainedModel
   end
 
@@ -995,9 +1019,16 @@ module Informers
       decoder_model_class = decoder_model[1]
       decoder = decoder_model_class.new(decoder_config, decoder_merged_session, generation_config)
 
-      @add_encoder_pkv = decoder.config.include?("num_decoder_layers")
+      @add_encoder_pkv = decoder.respond_to?(:num_decoder_layers)
       if @add_encoder_pkv
-        raise Todo
+        # Decoder is part of an encoder-decoder model
+        @num_decoder_layers = decoder.num_decoder_layers
+        @num_decoder_heads = decoder.num_decoder_heads
+        @decoder_dim_kv = decoder.decoder_dim_kv
+
+        @num_encoder_layers = decoder.num_encoder_layers
+        @num_encoder_heads = decoder.num_encoder_heads
+        @encoder_dim_kv = decoder.encoder_dim_kv
       else
         # Decoder is a decoder-only model
         @num_layers = decoder.num_layers
@@ -1005,6 +1036,12 @@ module Informers
         @dim_kv = decoder.dim_kv
       end
     end
+  end
+
+  class DonutSwinPreTrainedModel < PreTrainedModel
+  end
+
+  class DonutSwinModel < DonutSwinPreTrainedModel
   end
 
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
@@ -1018,7 +1055,8 @@ module Informers
     "clip" => ["CLIPModel", CLIPModel],
     "detr" => ["DetrModel", DetrModel],
     "vit" => ["ViTModel", ViTModel],
-    "owlvit" => ["OwlViTModel", OwlViTModel]
+    "owlvit" => ["OwlViTModel", OwlViTModel],
+    "donut-swin" => ["DonutSwinModel", DonutSwinModel]
   }
 
   MODEL_MAPPING_NAMES_ENCODER_DECODER = {
@@ -1042,7 +1080,8 @@ module Informers
   }
 
   MODEL_WITH_LM_HEAD_MAPPING_NAMES = {
-    "gpt2" => ["GPT2LMHeadModel", GPT2LMHeadModel]
+    "gpt2" => ["GPT2LMHeadModel", GPT2LMHeadModel],
+    "mbart" => ["MBartForCausalLM", MBartForCausalLM]
   }
 
   MODEL_FOR_MASKED_LM_MAPPING_NAMES = {
@@ -1055,6 +1094,10 @@ module Informers
   }
 
   MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES = {
+    "vision-encoder-decoder" => ["VisionEncoderDecoderModel", VisionEncoderDecoderModel]
+  }
+
+  MODEL_FOR_DOCUMENT_QUESTION_ANSWERING_MAPPING_NAMES = {
     "vision-encoder-decoder" => ["VisionEncoderDecoderModel", VisionEncoderDecoderModel]
   }
 
@@ -1167,6 +1210,10 @@ module Informers
 
   class AutoModelForZeroShotObjectDetection < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES]
+  end
+
+  class AutoModelForDocumentQuestionAnswering < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_DOCUMENT_QUESTION_ANSWERING_MAPPING_NAMES]
   end
 
   class AutoModelForImageToImage < PretrainedMixin

@@ -736,6 +736,47 @@ module Informers
     end
   end
 
+  class DocumentQuestionAnsweringPipeline < Pipeline
+    def call(image, question, **generate_kwargs)
+      # NOTE: For now, we only support a batch size of 1
+
+      # Preprocess image
+      prepared_image = prepare_images(image)[0]
+      pixel_values = @processor.(prepared_image)[:pixel_values]
+
+      # Run tokenization
+      task_prompt = "<s_docvqa><s_question>#{question}</s_question><s_answer>"
+      decoder_input_ids =
+        @tokenizer.(
+          task_prompt,
+          add_special_tokens: false,
+          padding: true,
+          truncation: true
+        )[:input_ids]
+
+      # Run model
+      output =
+        @model.generate(
+          pixel_values,
+          generate_kwargs.merge(
+            decoder_input_ids: decoder_input_ids,
+            max_length: @model.config["decoder"]["max_position_embeddings"]
+          )
+        )
+
+      # Decode output
+      decoded = @tokenizer.batch_decode(output)[0]
+
+      # Parse answer
+      match = decoded.match(/<s_answer>(.*?)<\/s_answer>/)
+      answer = nil
+      if match && match.length >= 2
+        answer = match[1].strip
+      end
+      [{answer:}]
+    end
+  end
+
   class FeatureExtractionPipeline < Pipeline
     def call(
       texts,
@@ -1025,6 +1066,17 @@ module Informers
       },
       type: "multimodal"
     },
+    # TODO
+    # "document-question-answering" => {
+    #   tokenizer: AutoTokenizer,
+    #   pipeline: DocumentQuestionAnsweringPipeline,
+    #   model: AutoModelForDocumentQuestionAnswering,
+    #   processor: AutoProcessor,
+    #   default: {
+    #     model: "Xenova/donut-base-finetuned-docvqa"
+    #   },
+    #   type: "multimodal"
+    # },
     "image-to-image" => {
       pipeline: ImageToImagePipeline,
       model: AutoModelForImageToImage,

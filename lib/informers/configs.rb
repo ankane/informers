@@ -1,7 +1,7 @@
 module Informers
   class PretrainedConfig
     def initialize(config_json)
-      @config_json = config_json
+      @config_json = config_json.to_h
     end
 
     def [](key)

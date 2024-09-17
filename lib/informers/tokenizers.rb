@@ -17,6 +17,10 @@ module Informers
 
       @model_max_length = tokenizer_config["model_max_length"]
 
+      # for donut-base-finetuned-docvqa
+      if @model_max_length && @model_max_length > (1 << 63)
+        @model_max_length = 1 << 63
+      end
     end
 
     def get_token(*keys)

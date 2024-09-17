@@ -40,6 +40,28 @@ module Informers
       @do_flip_channel_order = @config["do_flip_channel_order"] || false
     end
 
+    def thumbnail(image, size, resample = 2)
+      input_height = image.height
+      input_width = image.width
+
+      output_height = size["height"]
+      output_width = size["width"]
+
+      # We always resize to the smallest of either the input or output size.
+      height = [input_height, output_height].min
+      width = [input_width, output_width].min
+
+      if height == input_height && width == input_width
+        return image
+      end
+      if input_height > input_width
+        width = (input_width * height / input_height).floor
+      elsif input_width > input_height
+        height = (input_height * width / input_width).floor
+      end
+      image.resize(width, height, resample:)
+    end
+
     def pad_image(
       pixel_data,
       img_dims,
@@ -54,22 +76,25 @@ module Informers
         padded_image_width = pad_size
         padded_image_height = pad_size
       else
-        padded_image_width = pad_size[:width]
-        padded_image_height = pad_size[:height]
+        padded_image_width = pad_size[:width] || pad_size["width"]
+        padded_image_height = pad_size[:height] || pad_size["height"]
       end
 
       # Only add padding if there is a difference in size
       if padded_image_width != image_width || padded_image_height != image_height
         padded_pixel_data = Array.new(padded_image_width * padded_image_height * image_channels)
         if constant_values.is_a?(Array)
-          raise Todo
+          # Fill with constant values, cycling through the array
+          padded_pixel_data.length.times do |i|
+            padded_pixel_data[i] = constant_values[i % image_channels]
+          end
         elsif constant_values != 0
           padded_pixel_data.fill(constant_values)
         end
 
         left, top =
           if center
-            raise Todo
+            [((padded_image_width - image_width) / 2.0).floor, ((padded_image_height - image_height) / 2.0).floor]
           else
             [0, 0]
           end
@@ -127,7 +152,10 @@ module Informers
       src_width, src_height = image.size
 
       if @do_thumbnail
-        raise Todo
+        # NOTE: custom logic for `Donut` models
+        height = size["height"]
+        width = size["width"]
+        shortest_edge = [height, width].min
       elsif size.is_a?(Numeric)
         shortest_edge = size
         longest_edge = @config["max_size"] || shortest_edge
@@ -352,11 +380,39 @@ module Informers
           width: image_width + (pad_size - image_width % pad_size) % pad_size,
           height: image_height + (pad_size - image_height % pad_size) % pad_size
         },
-        **{
-          mode: "symmetric",
-          center: false,
-          constant_values: -1,
-        }.merge(options)
+        mode: "symmetric",
+        center: false,
+        constant_values: -1,
+        **options
+      )
+    end
+  end
+
+  class DonutFeatureExtractor < ImageFeatureExtractor
+    def pad_image(pixel_data, img_dims, pad_size, **options)
+      _image_height, _image_width, image_channels = img_dims
+
+      image_mean = @image_mean
+      if !image_mean.is_a?(Array)
+        image_mean = new Array(image_channels, image_mean)
+      end
+
+      image_std = @image_std
+      if !image_std.is_a?(Array)
+        image_std = new Array(image_channels, image_std)
+      end
+
+      constant_values = image_mean.map.with_index { |x, i| -x / image_std[i] }
+
+      super(
+        pixel_data,
+        img_dims,
+        pad_size,
+        center: true,
+        # Since normalization is done after padding, we need to use certain constant values to ensure the same behaviour is observed.
+        # For more information, see https://github.com/huggingface/transformers/blob/main/src/transformers/models/donut/image_processing_donut.py#L433-L451
+        constant_values: constant_values,
+        **options
       )
     end
   end
@@ -619,9 +675,9 @@ module Informers
       batch_size.times do |i|
         target_size = !target_sizes.nil? ? target_sizes[i] : nil
         info = {
-            boxes: [],
-            classes: [],
-            scores: []
+          boxes: [],
+          classes: [],
+          scores: []
         }
         logits = out_logits[i]
         bbox = out_bbox[i]
@@ -691,7 +747,8 @@ module Informers
       "CLIPFeatureExtractor" => CLIPFeatureExtractor,
       "DPTFeatureExtractor" => DPTFeatureExtractor,
       "DetrFeatureExtractor" => DetrFeatureExtractor,
-      "Swin2SRImageProcessor" => Swin2SRImageProcessor
+      "Swin2SRImageProcessor" => Swin2SRImageProcessor,
+      "DonutFeatureExtractor" => DonutFeatureExtractor
     }
 
     PROCESSOR_CLASS_MAPPING = {}
