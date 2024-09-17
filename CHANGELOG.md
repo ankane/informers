@@ -1,19 +1,6 @@
 ## 1.0.4 (unreleased)
 
-- Added `zero-shot-classification` pipeline
-- Added `zero-shot-image-classification` pipeline
-- Added `zero-shot-object-detection` pipeline
-- Added `fill-mask` pipeline
-- Added `image-classification` pipeline
-- Added `image-feature-extraction` pipeline
-- Added `object-detection` pipeline
-- Added `depth-estimation` pipeline
-- Added `text2text-generation` pipeline
-- Added `image-to-text` pipeline
-- Added `image-to-image` pipeline
-- Added `image-segmentation` pipeline
-- Added `text-generation` pipeline
-- Added `summarization` pipeline
+- Added more pipelines
 
 ## 1.0.3 (2024-08-29)
 

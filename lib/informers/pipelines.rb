@@ -759,13 +759,13 @@ module Informers
         @model.generate(
           pixel_values,
           generate_kwargs.merge(
-            decoder_input_ids: decoder_input_ids,
+            decoder_input_ids: decoder_input_ids[0],
             max_length: @model.config["decoder"]["max_position_embeddings"]
-          )
+          ).transform_keys(&:to_s)
         )
 
       # Decode output
-      decoded = @tokenizer.batch_decode(output)[0]
+      decoded = @tokenizer.batch_decode(output, skip_special_tokens: false)[0]
 
       # Parse answer
       match = decoded.match(/<s_answer>(.*?)<\/s_answer>/)
@@ -1066,17 +1066,16 @@ module Informers
       },
       type: "multimodal"
     },
-    # TODO
-    # "document-question-answering" => {
-    #   tokenizer: AutoTokenizer,
-    #   pipeline: DocumentQuestionAnsweringPipeline,
-    #   model: AutoModelForDocumentQuestionAnswering,
-    #   processor: AutoProcessor,
-    #   default: {
-    #     model: "Xenova/donut-base-finetuned-docvqa"
-    #   },
-    #   type: "multimodal"
-    # },
+    "document-question-answering" => {
+      tokenizer: AutoTokenizer,
+      pipeline: DocumentQuestionAnsweringPipeline,
+      model: AutoModelForDocumentQuestionAnswering,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/donut-base-finetuned-docvqa"
+      },
+      type: "multimodal"
+    },
     "image-to-image" => {
       pipeline: ImageToImagePipeline,
       model: AutoModelForImageToImage,
