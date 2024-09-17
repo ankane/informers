@@ -130,6 +130,31 @@ module Informers
       end
     end
 
+    class BeamSearchSampler < Sampler
+      def sample(logits, index = -1)
+        k = Utils.dims(logits)[-1] # defaults to vocab size
+        if @generation_config["top_k"] > 0
+          k = [@generation_config["top_k"], k].min
+        end
+
+        # Get logits of nth token
+        logs = get_logits(logits, index)
+
+        # Get top k tokens
+        top_logits = Utils.get_top_items(logs, k)
+
+        # Compute softmax over logits
+        probabilities = Utils.softmax(top_logits.map { |x| x[1] })
+
+        Array.new(@generation_config["num_beams"]) do |i|
+          [
+            top_logits[i][0],
+            Math.log(probabilities[i])
+          ]
+        end
+      end
+    end
+
     class LogitsProcessorList
       def initialize
         super
@@ -147,7 +172,7 @@ module Informers
       def call(input_ids, batched_logits)
         # NOTE: This is different from the Python code, since vanilla Ruby does not support vectorized operations.
         # As a result, we apply each processor to each item in the batch.
-        batched_logits.each do |logit|
+        batched_logits.each do |logits|
           # Modifies logits inplace
           @processors.each do |func|
             func.(input_ids, logits)
@@ -157,6 +182,112 @@ module Informers
 
       def to_ary
         @processors
+      end
+    end
+
+    class LogitsProcessor
+    end
+
+    class NoRepeatNGramLogitsProcessor < LogitsProcessor
+      def initialize(no_repeat_ngram_size)
+        super()
+        @no_repeat_ngram_size = no_repeat_ngram_size
+      end
+
+      def get_ngrams(prev_input_ids)
+        cur_len = prev_input_ids.length
+
+        ngrams = []
+        j = 0
+        while j < cur_len + 1 - @no_repeat_ngram_size
+          ngram = []
+          @no_repeat_ngram_size.times do |k|
+            ngram << prev_input_ids[j + k]
+          end
+          ngrams << ngram
+          j += 1
+        end
+
+        generated_ngram = {}
+        ngrams.each do |ngram|
+          prev_ngram = ngram.slice(0, ngram.length - 1)
+          prev_ngram_key = JSON.generate(prev_ngram)
+          prev_ngram_value = generated_ngram[prev_ngram_key] || []
+          prev_ngram_value << ngram[ngram.length - 1]
+          generated_ngram[prev_ngram_key] = prev_ngram_value
+        end
+        generated_ngram
+      end
+
+      def get_generated_ngrams(banned_ngrams, prev_input_ids)
+        ngram_idx = prev_input_ids.slice(prev_input_ids.length + 1 - @no_repeat_ngram_size, prev_input_ids.length)
+        banned = banned_ngrams[JSON.generate(ngram_idx)] || []
+        banned
+      end
+
+      def calc_banned_ngram_tokens(prev_input_ids)
+        banned_tokens = []
+        if prev_input_ids.length + 1 < @no_repeat_ngram_size
+          # return no banned tokens if we haven't generated no_repeat_ngram_size tokens yet
+          banned_tokens
+        else
+          generated_ngrams = get_ngrams(prev_input_ids)
+          banned_tokens = get_generated_ngrams(generated_ngrams, prev_input_ids)
+          banned_tokens
+        end
+      end
+
+      def call(input_ids, logits)
+        banned_tokens = calc_banned_ngram_tokens(input_ids)
+
+        banned_tokens.each do |token|
+          logits[token] = -Float::INFINITY
+        end
+        logits
+      end
+    end
+
+    class MinLengthLogitsProcessor < LogitsProcessor
+      def initialize(min_length, eos_token_id)
+        super()
+        @min_length = min_length
+        @eos_token_id = eos_token_id.is_a?(Array) ? eos_token_id : [eos_token_id]
+      end
+
+      def call(input_ids, logits)
+        if input_ids.length < @min_length
+          @eos_token_id.each do |eos_token|
+            logits[eos_token] = -Float::INFINITY
+          end
+        end
+
+        logits
+      end
+    end
+
+    class ForcedBOSTokenLogitsProcessor < LogitsProcessor
+      def initialize(bos_token_id)
+        super()
+        @bos_token_id = bos_token_id
+      end
+
+      def call(input_ids, logits)
+        if input_ids.length == 1
+          logits.map! { -Float::INFINITY }
+          logits[@bos_token_id] = 0
+        end
+        logits
+      end
+    end
+
+    class ForcedEOSTokenLogitsProcessor < LogitsProcessor
+      def initialize(max_length, forced_eos_token_id)
+        super()
+        @max_length = max_length
+        @forced_eos_token_id = forced_eos_token_id
+      end
+
+      def call(input_ids, logits)
       end
     end
   end

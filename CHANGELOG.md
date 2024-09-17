@@ -12,6 +12,7 @@
 - Added `image-to-text` pipeline
 - Added `image-segmentation` pipeline
 - Added `text-generation` pipeline
+- Added `summarization` pipeline
 
 ## 1.0.3 (2024-08-29)
 

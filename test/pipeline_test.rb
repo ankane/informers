@@ -72,6 +72,14 @@ class PipelineTest < Minitest::Test
     assert_equal "I enjoy walking with my cute dog, but I'm not sure if I'll ever be able to", result[0][:generated_text]
   end
 
+  def test_summarization
+    skip "TODO"
+
+    summarizer = Informers.pipeline("summarization")
+    result = summarizer.("Ruby is awesome.")
+    assert_equal "Ruby is awesome. Ruby is awesome. Ruby is great. Ruby's website is great. Ruby's site is great for the first time. Ruby will be great for all the people who want to know more about the site. Click here for more information. Click HERE for", result[0][:summary_text]
+  end
+
   def test_fill_mask
     unmasker = Informers.pipeline("fill-mask")
     result = unmasker.("Paris is the [MASK] of France.")

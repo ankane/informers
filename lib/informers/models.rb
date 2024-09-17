@@ -321,23 +321,23 @@ module Informers
       processors = Utils::LogitsProcessorList.new
 
       if !generation_config["repetition_penalty"].nil? && generation_config["repetition_penalty"] != 1.0
-        processors.push(RepetitionPenaltyLogitsProcessor.new(generation_config["repetition_penalty"]))
+        processors.push(Utils::RepetitionPenaltyLogitsProcessor.new(generation_config["repetition_penalty"]))
       end
 
       if !generation_config["no_repeat_ngram_size"].nil? && generation_config["no_repeat_ngram_size"] > 0
-        processors.push(NoRepeatNGramLogitsProcessor.new(generation_config["no_repeat_ngram_size"]))
+        processors.push(Utils::NoRepeatNGramLogitsProcessor.new(generation_config["no_repeat_ngram_size"]))
       end
 
       if !generation_config["bad_words_ids"].nil?
-        processors.push(NoBadWordsLogitsProcessor.new(generation_config["bad_words_ids"], generation_config["eos_token_id"]))
+        processors.push(Utils::NoBadWordsLogitsProcessor.new(generation_config["bad_words_ids"], generation_config["eos_token_id"]))
       end
 
       if !generation_config["min_length"].nil? && !generation_config["eos_token_id"].nil? && generation_config["min_length"] > 0
-        processors.push(MinLengthLogitsProcessor.new(generation_config["min_length"], generation_config["eos_token_id"]))
+        processors.push(Utils::MinLengthLogitsProcessor.new(generation_config["min_length"], generation_config["eos_token_id"]))
       end
 
       if !generation_config["min_new_tokens"].nil? && !generation_config["eos_token_id"].nil? && generation_config["min_new_tokens"] > 0
-        processors.push(MinNewTokensLengthLogitsProcessor.new(
+        processors.push(Utils::MinNewTokensLengthLogitsProcessor.new(
           input_ids_seq_length,
           generation_config["min_new_tokens"],
           generation_config["eos_token_id"]
@@ -345,11 +345,11 @@ module Informers
       end
 
       if !generation_config["forced_bos_token_id"].nil?
-        processors.push(ForcedBOSTokenLogitsProcessor.new(generation_config["forced_bos_token_id"]))
+        processors.push(Utils::ForcedBOSTokenLogitsProcessor.new(generation_config["forced_bos_token_id"]))
       end
 
       if !generation_config["forced_eos_token_id"].nil?
-        processors.push(ForcedEOSTokenLogitsProcessor.new(
+        processors.push(Utils::ForcedEOSTokenLogitsProcessor.new(
           generation_config["max_length"],
           generation_config["forced_eos_token_id"]
         ))
@@ -360,7 +360,7 @@ module Informers
       end
 
       if !generation_config["forced_decoder_ids"].nil?
-        processors.push(ForceTokensLogitsProcessor.new(generation_config["forced_decoder_ids"]))
+        processors.push(Utils::ForceTokensLogitsProcessor.new(generation_config["forced_decoder_ids"]))
       end
 
       if !logits_processor.nil?
@@ -836,6 +836,22 @@ module Informers
   class BartModel < BartPretrainedModel
   end
 
+  class BartForConditionalGeneration < BartPretrainedModel
+    def initialize(config, session, decoder_merged_session, generation_config)
+      super(config, session)
+      @decoder_merged_session = decoder_merged_session
+      @generation_config = generation_config
+
+      @num_decoder_layers = @config["decoder_layers"]
+      @num_decoder_heads = @config["decoder_attention_heads"]
+      @decoder_dim_kv = @config["d_model"] / @num_decoder_heads.to_f
+
+      @num_encoder_layers = @config["encoder_layers"]
+      @num_encoder_heads = @config["encoder_attention_heads"]
+      @encoder_dim_kv = @config["d_model"] / @num_encoder_heads
+    end
+  end
+
   class BartForSequenceClassification < BartPretrainedModel
     def call(model_inputs)
       SequenceClassifierOutput.new(*super(model_inputs))
@@ -1012,7 +1028,8 @@ module Informers
   }
 
   MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES = {
-    "t5" => ["T5ForConditionalGeneration", T5ForConditionalGeneration]
+    "t5" => ["T5ForConditionalGeneration", T5ForConditionalGeneration],
+    "bart" => ["BartForConditionalGeneration", BartForConditionalGeneration]
   }
 
   MODEL_WITH_LM_HEAD_MAPPING_NAMES = {

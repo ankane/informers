@@ -332,8 +332,12 @@ module Informers
       output_token_ids = @model.generate(input_ids, **generate_kwargs)
 
       tokenizer.batch_decode(output_token_ids, skip_special_tokens: true)
-        .map { |text| {KEY => text} }
+        .map { |text| {self.class.const_get(:KEY) => text} }
     end
+  end
+
+  class SummarizationPipeline < Text2TextGenerationPipeline
+    KEY = :summary_text
   end
 
   class TextGenerationPipeline < Pipeline
@@ -901,6 +905,15 @@ module Informers
       model: AutoModelForMaskedLM,
       default: {
         model: "Xenova/bert-base-uncased"
+      },
+      type: "text"
+    },
+    "summarization" => {
+      tokenizer: AutoTokenizer,
+      pipeline: SummarizationPipeline,
+      model: AutoModelForSeq2SeqLM,
+      default: {
+        model: "Xenova/distilbart-cnn-6-6"
       },
       type: "text"
     },

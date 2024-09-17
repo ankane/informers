@@ -5,15 +5,37 @@ module Informers
     def initialize(tokenizer_json, tokenizer_config)
       super()
 
+      @tokenizer_config = tokenizer_config
+
       @tokenizer = Tokenizers::Tokenizer.from_file(tokenizer_json)
 
-      @mask_token = tokenizer_config["mask_token"]
+      @mask_token = get_token("mask_token")
       @mask_token_id = @tokenizer.token_to_id(@mask_token) if @mask_token
 
-      @sep_token = tokenizer_config["sep_token"]
+      @sep_token = get_token("sep_token")
       @sep_token_id = @tokenizer.token_to_id(@sep_token) if @sep_token
 
       @model_max_length = tokenizer_config["model_max_length"]
+
+    end
+
+    def get_token(*keys)
+      keys.each do |key|
+        item = @tokenizer_config[key]
+        if !item
+          next
+        end
+
+        if item.is_a?(Hash)
+          if item["__type"] == "AddedToken"
+            return item["content"]
+          else
+            raise Error, "Unknown token: #{item}"
+          end
+        else
+          return item
+        end
+      end
     end
 
     def call(
