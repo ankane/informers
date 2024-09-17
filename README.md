@@ -240,6 +240,12 @@ The model must include a `.onnx` file ([example](https://huggingface.co/Xenova/a
 
 ## Pipelines
 
+- [Text](#text)
+- [Vision](#vision)
+- [Multimodel](#multimodal)
+
+### Text
+
 Embedding
 
 ```ruby
@@ -275,18 +281,39 @@ qa = Informers.pipeline("question-answering")
 qa.("Who invented Ruby?", "Ruby is a programming language created by Matz")
 ```
 
-Feature extraction
-
-```ruby
-extractor = Informers.pipeline("feature-extraction")
-extractor.("We are very happy to show you the 🤗 Transformers library.")
-```
-
 Zero-shot classification [unreleased]
 
 ```ruby
 classifier = Informers.pipeline("zero-shot-classification")
 classifier.("text", ["label1", "label2", "label3"])
+```
+
+Text generation [unreleased]
+
+```ruby
+generator = Informers.pipeline("text-generation")
+generator.("I enjoy walking with my cute dog,")
+```
+
+Text-to-text generation [unreleased]
+
+```ruby
+text2text = Informers.pipeline("text2text-generation")
+text2text.("translate from English to French: I'm very happy")
+```
+
+Translation [unreleased]
+
+```ruby
+translator = Informers.pipeline("translation", "Xenova/nllb-200-distilled-600M")
+translator.("जीवन एक चॉकलेट बॉक्स की तरह है।", src_lang: "hin_Deva", tgt_lang: "fra_Latn")
+```
+
+Summarization [unreleased]
+
+```ruby
+summarizer = Informers.pipeline("summarization")
+summarizer.("Many paragraphs of text")
 ```
 
 Fill mask [unreleased]
@@ -296,32 +323,85 @@ unmasker = Informers.pipeline("fill-mask")
 unmasker.("Paris is the [MASK] of France.")
 ```
 
+Feature extraction
+
+```ruby
+extractor = Informers.pipeline("feature-extraction")
+extractor.("We are very happy to show you the 🤗 Transformers library.")
+```
+
+### Vision
+
 Image classification [unreleased]
 
 ```ruby
 classifier = Informers.pipeline("image-classification")
-classifier.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"))
+classifier.("image.jpg")
 ```
 
 Zero-shot image classification [unreleased]
 
 ```ruby
 classifier = Informers.pipeline("zero-shot-image-classification")
-classifier.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"), ["cat", "dog", "tiger"])
+classifier.("image.jpg", ["label1", "label2", "label3"])
+```
+
+Image segmentation [unreleased]
+
+```ruby
+segmenter = Informers.pipeline("image-segmentation")
+segmenter.("image.jpg")
 ```
 
 Object detection [unreleased]
 
 ```ruby
 detector = Informers.pipeline("object-detection")
-detector.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"))
+detector.("image.jpg")
+```
+
+Zero-shot object detection [unreleased]
+
+```ruby
+detector = Informers.pipeline("zero-shot-object-detection")
+detector.("image.jpg", ["label1", "label2", "label3"])
+```
+
+Depth estimation [unreleased]
+
+```ruby
+estimator = Informers.pipeline("depth-estimation")
+estimator.("image.jpg")
+```
+
+Image-to-image [unreleased]
+
+```ruby
+upscaler = Informers.pipeline("image-to-image")
+upscaler.("image.jpg")
 ```
 
 Image feature extraction [unreleased]
 
 ```ruby
 extractor = Informers.pipeline("image-feature-extraction")
-extractor.(URI("https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/pipeline-cat-chonk.jpeg"))
+extractor.("image.jpg")
+```
+
+### Multimodal
+
+Image captioning [unreleased]
+
+```ruby
+captioner = Informers.pipeline("image-to-text")
+captioner.("image.jpg")
+```
+
+Document question answering [unreleased]
+
+```ruby
+qa = Informers.pipeline("document-question-answering")
+qa.("image.jpg", "What is the invoice number?")
 ```
 
 ## Credits
