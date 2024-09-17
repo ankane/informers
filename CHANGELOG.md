@@ -10,6 +10,7 @@
 - Added `depth-estimation` pipeline
 - Added `text2text-generation` pipeline
 - Added `image-to-text` pipeline
+- Added `image-segmentation` pipeline
 
 ## 1.0.3 (2024-08-29)
 

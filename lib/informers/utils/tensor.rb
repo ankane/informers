@@ -42,5 +42,31 @@ module Informers
       end
       dims
     end
+
+    def self.interpolate(input, shape, mode = "bilinear", align_corners = false)
+      out_height, out_width = shape
+
+      # Input image dimensions
+      in_channels = dims(input)[-3] || 1
+      in_height = dims(input)[-2]
+      in_width = dims(input)[-1]
+
+      output = interpolate_data(
+        input.flatten,
+        [in_channels, in_height, in_width],
+        [out_height, out_width],
+        mode,
+        align_corners
+      )
+      reshape(output, [in_channels, out_height, out_width])
+    end
+
+    def self.reshape(arr, dims)
+      arr = arr.flatten
+      dims[1..-1].reverse.each do |dim|
+        arr = arr.each_slice(dim)
+      end
+      arr.to_a
+    end
   end
 end

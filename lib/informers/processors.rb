@@ -310,6 +310,43 @@ module Informers
       [mask_probs_item, pred_scores_item, pred_labels_item]
     end
 
+    def check_segment_validity(
+      mask_labels,
+      mask_probs,
+      k,
+      mask_threshold = 0.5,
+      overlap_mask_area_threshold = 0.8
+    )
+      # mask_k is a 1D array of indices, indicating where the mask is equal to k
+      mask_k = []
+      mask_k_area = 0
+      original_area = 0
+
+      mask_probs_k_data = mask_probs[k].flatten
+
+      # Compute the area of all the stuff in query k
+      mask_labels.length.times do |i|
+        if mask_labels[i] == k
+          mask_k << i
+          mask_k_area += 1
+        end
+
+        if mask_probs_k_data[i] >= mask_threshold
+          original_area += 1
+        end
+      end
+      mask_exists = mask_k_area > 0 && original_area > 0
+
+      # Eliminate disconnected tiny segments
+      if mask_exists
+        # Perform additional check
+        area_ratio = mask_k_area / original_area
+        mask_exists = area_ratio > overlap_mask_area_threshold
+      end
+
+      [mask_exists, mask_k]
+    end
+
     def compute_segments(
       mask_probs,
       pred_scores,
@@ -319,7 +356,83 @@ module Informers
       label_ids_to_fuse = nil,
       target_size = nil
     )
-      raise Todo
+      height, width = target_size || Utils.dims(mask_probs[0])
+
+      segmentation = Array.new(height * width)
+      segments = []
+
+      # 1. If target_size is not null, we need to resize the masks to the target size
+      if !target_size.nil?
+        # resize the masks to the target size
+        mask_probs.length.times do |i|
+          mask_probs[i] = Utils.interpolate(mask_probs[i], target_size, "bilinear", false)
+        end
+      end
+
+      # 2. Weigh each mask by its prediction score
+      # NOTE: `mask_probs` is updated in-place
+      #
+      # Temporary storage for the best label/scores for each pixel ([height, width]):
+      mask_labels = Array.new(mask_probs[0].flatten.length)
+      best_scores = Array.new(mask_probs[0].flatten.length) { 0 }
+
+      mask_probs.length.times do |i|
+        score = pred_scores[i]
+
+        mask_probs_i_data = mask_probs[i].flatten
+        mask_probs_i_dims = Utils.dims(mask_probs[i])
+
+        mask_probs_i_data.length.times do |j|
+          mask_probs_i_data[j] *= score
+          if mask_probs_i_data[j] > best_scores[j]
+            mask_labels[j] = i
+            best_scores[j] = mask_probs_i_data[j]
+          end
+        end
+
+        mask_probs[i] = Utils.reshape(mask_probs_i_data, mask_probs_i_dims)
+      end
+
+      current_segment_id = 0
+
+      stuff_memory_list = {}
+      pred_labels.length.times do |k|
+        pred_class = pred_labels[k]
+
+        # TODO add `should_fuse`
+        should_fuse = label_ids_to_fuse.include?(pred_class)
+
+        # Check if mask exists and large enough to be a segment
+        mask_exists, mask_k = check_segment_validity(
+          mask_labels,
+          mask_probs,
+          k,
+          mask_threshold,
+          overlap_mask_area_threshold
+        )
+
+        if !mask_exists
+          # Nothing to see here
+          next
+        end
+
+        current_segment_id += 1
+
+        # Add current object segment to final segmentation map
+        mask_k.each do |index|
+          segmentation[index] = current_segment_id
+        end
+
+        segments << {
+          id: current_segment_id,
+          label_id: pred_class,
+          score: pred_scores[k]
+        }
+      end
+
+      segmentation = Utils.reshape(segmentation, [height, width])
+
+      [segmentation, segments]
     end
 
     def post_process_panoptic_segmentation(

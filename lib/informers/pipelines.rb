@@ -885,16 +885,15 @@ module Informers
       },
       type: "multimodal"
     },
-    # TODO
-    # "image-segmentation" => {
-    #   pipeline: ImageSegmentationPipeline,
-    #   model: [AutoModelForImageSegmentation, AutoModelForSemanticSegmentation],
-    #   processor: AutoProcessor,
-    #   default: {
-    #     model: "Xenova/detr-resnet-50-panoptic",
-    #   },
-    #   type: "multimodal"
-    # },
+    "image-segmentation" => {
+      pipeline: ImageSegmentationPipeline,
+      model: [AutoModelForImageSegmentation, AutoModelForSemanticSegmentation],
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/detr-resnet-50-panoptic",
+      },
+      type: "multimodal"
+    },
     "zero-shot-image-classification" => {
       tokenizer: AutoTokenizer,
       pipeline: ZeroShotImageClassificationPipeline,

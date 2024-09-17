@@ -186,10 +186,16 @@ class PipelineTest < Minitest::Test
   end
 
   def test_image_segmentation
-    skip "TODO"
-
     segmenter = Informers.pipeline("image-segmentation")
-    _result = segmenter.("test/support/pipeline-cat-chonk.jpeg")
+    result = segmenter.("test/support/pipeline-cat-chonk.jpeg")
+    assert_equal 3, result.size
+
+    assert_equal "snow", result[0][:label]
+    assert_in_delta 0.997, result[0][:score]
+    assert_equal "LABEL_184", result[1][:label]
+    assert_in_delta 0.993, result[1][:score]
+    assert_equal "cat", result[2][:label]
+    assert_in_delta 0.998, result[2][:score]
   end
 
   def test_image_feature_extraction
