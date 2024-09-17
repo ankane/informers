@@ -9,6 +9,13 @@ module Informers
 
       @tokenizer = Tokenizers::Tokenizer.from_file(tokenizer_json)
 
+      # Add added_tokens to model
+      @special_tokens = []
+
+      # Update additional_special_tokens
+      @additional_special_tokens = tokenizer_config["additional_special_tokens"] || []
+      @special_tokens.concat(@additional_special_tokens)
+
       @mask_token = get_token("mask_token")
       @mask_token_id = @tokenizer.token_to_id(@mask_token) if @mask_token
 
@@ -108,6 +115,10 @@ module Informers
       @tokenizer.decoder.decode(tokens)
     end
 
+    def convert_tokens_to_ids(tokens)
+      tokens.map { |t| @tokenizer.token_to_id(t) }
+    end
+
     def id_to_token(id)
       @tokenizer.id_to_token(id)
     end
@@ -156,6 +167,52 @@ module Informers
   class CLIPTokenizer < PreTrainedTokenizer
   end
 
+  class NllbTokenizer < PreTrainedTokenizer
+    attr_reader :lang_to_token
+
+    def initialize(tokenizer_json, tokenizer_config)
+      super(tokenizer_json, tokenizer_config)
+
+      @language_regex = /^[a-z]{3}_[A-Z][a-z]{3}$/
+      @language_codes = @special_tokens.filter { |x| @language_regex.match?(x) }
+      @lang_to_token = ->(x) { x } # Identity function
+    end
+
+    def _build_translation_inputs(raw_inputs, tokenizer_options, generate_kwargs)
+      Utils._build_translation_inputs(self, raw_inputs, tokenizer_options, generate_kwargs)
+    end
+  end
+
+  class M2M100Tokenizer < PreTrainedTokenizer
+    attr_reader :lang_to_token
+
+    def initialize(tokenizer_json, tokenizer_config)
+      super(tokenizer_json, tokenizer_config)
+
+      @language_regex = /^__[a-z]{2,3}__$/
+      @language_codes = @special_tokens
+        .filter { |x| @language_regex.match?(x) }
+        .map { |x| x.slice(2, -2) }
+      @lang_to_token = ->(x) { "__#{x}__" }
+    end
+
+    def _build_translation_inputs(raw_inputs, tokenizer_options, generate_kwargs)
+      Utils._build_translation_inputs(self, raw_inputs, tokenizer_options, generate_kwargs)
+    end
+  end
+
+  module Utils
+    def self._build_translation_inputs(slf, raw_inputs, tokenizer_options, generate_kwargs)
+      src_lang_token = generate_kwargs[:src_lang]
+      tgt_lang_token = generate_kwargs[:tgt_lang]
+
+      # Override the `forced_bos_token_id` to force the correct language
+      generate_kwargs["forced_bos_token_id"] = slf.convert_tokens_to_ids([slf.lang_to_token.(tgt_lang_token)])[0]
+
+      slf.(raw_inputs, **tokenizer_options)
+    end
+  end
+
   class AutoTokenizer
     TOKENIZER_CLASS_MAPPING = {
       "T5Tokenizer" => T5Tokenizer,
@@ -167,7 +224,9 @@ module Informers
       "XLMRobertaTokenizer" => XLMRobertaTokenizer,
       "MPNetTokenizer" => MPNetTokenizer,
       "CLIPTokenizer" => CLIPTokenizer,
-      "GPT2Tokenizer" => GPT2Tokenizer
+      "GPT2Tokenizer" => GPT2Tokenizer,
+      "NllbTokenizer" => NllbTokenizer,
+      "M2M100Tokenizer" => M2M100Tokenizer
     }
 
     def self.from_pretrained(

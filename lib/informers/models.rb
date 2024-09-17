@@ -882,6 +882,28 @@ module Informers
     end
   end
 
+  class M2M100PreTrainedModel < PreTrainedModel
+  end
+
+  class M2M100Model < M2M100PreTrainedModel
+  end
+
+  class M2M100ForConditionalGeneration < M2M100PreTrainedModel
+    def initialize(config, session, decoder_merged_session, generation_config)
+      super(config, session)
+      @decoder_merged_session = decoder_merged_session
+      @generation_config = generation_config
+
+      @num_decoder_layers = @config["decoder_layers"]
+      @num_decoder_heads = @config["decoder_attention_heads"]
+      @decoder_dim_kv = @config["d_model"] / @num_decoder_heads.to_f
+
+      @num_encoder_layers = @config["encoder_layers"]
+      @num_encoder_heads = @config["encoder_attention_heads"]
+      @encoder_dim_kv = @config["d_model"] / @num_encoder_heads.to_f
+    end
+  end
+
   class RobertaPreTrainedModel < PreTrainedModel
   end
 
@@ -1076,7 +1098,8 @@ module Informers
 
   MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES = {
     "t5" => ["T5ForConditionalGeneration", T5ForConditionalGeneration],
-    "bart" => ["BartForConditionalGeneration", BartForConditionalGeneration]
+    "bart" => ["BartForConditionalGeneration", BartForConditionalGeneration],
+    "m2m_100" => ["M2M100ForConditionalGeneration", M2M100ForConditionalGeneration]
   }
 
   MODEL_WITH_LM_HEAD_MAPPING_NAMES = {

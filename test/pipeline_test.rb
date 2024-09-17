@@ -66,6 +66,12 @@ class PipelineTest < Minitest::Test
     assert_equal "Je suis très heureux.", result[0][:generated_text]
   end
 
+  def test_translation
+    translator = Informers.pipeline("translation", "Xenova/nllb-200-distilled-600M")
+    result = translator.("जीवन एक चॉकलेट बॉक्स की तरह है।", src_lang: "hin_Deva", tgt_lang: "fra_Latn")
+    assert_equal "La vie est comme une boîte à chocolat.", result[0][:translation_text]
+  end
+
   def test_text_generation
     generator = Informers.pipeline("text-generation")
     result = generator.("I enjoy walking with my cute dog,")

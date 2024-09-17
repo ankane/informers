@@ -326,10 +326,13 @@ module Informers
         padding: true,
         truncation: true
       }
-      # TODO TranslationPipeline
-      input_ids = tokenizer.(texts, **tokenizer_options)[:input_ids]
+      if is_a?(TranslationPipeline) && tokenizer.respond_to?(:_build_translation_inputs)
+        input_ids = tokenizer._build_translation_inputs(texts, tokenizer_options, generate_kwargs)[:input_ids]
+      else
+        input_ids = tokenizer.(texts, **tokenizer_options)[:input_ids]
+      end
 
-      output_token_ids = @model.generate(input_ids, **generate_kwargs)
+      output_token_ids = @model.generate(input_ids, generate_kwargs)
 
       tokenizer.batch_decode(output_token_ids, skip_special_tokens: true)
         .map { |text| {self.class.const_get(:KEY) => text} }
@@ -338,6 +341,10 @@ module Informers
 
   class SummarizationPipeline < Text2TextGenerationPipeline
     KEY = :summary_text
+  end
+
+  class TranslationPipeline < Text2TextGenerationPipeline
+    KEY = :translation_text
   end
 
   class TextGenerationPipeline < Pipeline
@@ -979,6 +986,15 @@ module Informers
       model: AutoModelForSeq2SeqLM,
       default: {
         model: "Xenova/distilbart-cnn-6-6"
+      },
+      type: "text"
+    },
+    "translation" => {
+      tokenizer: AutoTokenizer,
+      pipeline: TranslationPipeline,
+      model: AutoModelForSeq2SeqLM,
+      default: {
+        model: "Xenova/t5-small"
       },
       type: "text"
     },
