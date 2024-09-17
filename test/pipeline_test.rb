@@ -197,6 +197,8 @@ class PipelineTest < Minitest::Test
     estimator = Informers.pipeline("depth-estimation")
     result = estimator.("test/support/pipeline-cat-chonk.jpeg")
     assert_in_delta 1.078, result[:predicted_depth][0][0]
+    assert_kind_of Vips::Image, result[:depth]
+    # result[:depth].write_to_file("/tmp/depth-estimation.jpg")
   end
 
   def test_image_to_text

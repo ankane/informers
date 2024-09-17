@@ -891,11 +891,19 @@ module Informers
 
       to_return = []
       prepared_images.length.times do |i|
-        # prediction = interpolate(predicted_depth[i], prepared_images[i].size.reverse, "bilinear", false)
-        # formatted = prediction.mul_(255 / Utils.max(prediction)[0]).to("uint8")
+        prediction = Utils.interpolate(predicted_depth[i], prepared_images[i].size.reverse, "bilinear", false)
+        max_prediction = Utils.max(prediction.flatten)[0]
+        formatted =
+          prediction.map do |v|
+            v.map do |v2|
+              v2.map do |v3|
+                (v3 * 255 / max_prediction).round
+              end
+            end
+          end
         to_return << {
           predicted_depth: predicted_depth[i],
-          # depth: RawImage.from_tensor(formatted)
+          depth: Utils::RawImage.from_array(formatted).image
         }
       end
       to_return.length > 1 ? to_return : to_return[0]
