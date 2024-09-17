@@ -180,6 +180,13 @@ class PipelineTest < Minitest::Test
     _result = captioner.("test/support/pipeline-cat-chonk.jpeg")
   end
 
+  def test_image_segmentation
+    skip "TODO"
+
+    segmenter = Informers.pipeline("image-segmentation")
+    _result = segmenter.("test/support/pipeline-cat-chonk.jpeg")
+  end
+
   def test_image_feature_extraction
     fe = Informers.pipeline("image-feature-extraction")
     result = fe.("test/support/pipeline-cat-chonk.jpeg")

@@ -329,6 +329,12 @@ module Informers
     end
   end
 
+  class DetrForSegmentation < DetrPreTrainedModel
+    def call(model_inputs)
+      DetrSegmentationOutput.new(*super(model_inputs))
+    end
+  end
+
   class DPTPreTrainedModel < PreTrainedModel
   end
 
@@ -404,6 +410,13 @@ module Informers
     "owlvit" => ["OwlViTForObjectDetection", OwlViTForObjectDetection]
   }
 
+  MODEL_FOR_IMAGE_SEGMENTATION_MAPPING_NAMES = {
+    "detr" => ["DetrForSegmentation", DetrForSegmentation]
+  }
+
+  MODEL_FOR_SEMANTIC_SEGMENTATION_MAPPING_NAMES = {
+  }
+
   MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES = {
     "dpt" => ["DPTForDepthEstimation", DPTForDepthEstimation]
   }
@@ -420,6 +433,8 @@ module Informers
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES, MODEL_TYPES[:Vision2Seq]],
     [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_IMAGE_SEGMENTATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_SEMANTIC_SEGMENTATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
@@ -461,6 +476,14 @@ module Informers
 
   class AutoModelForImageClassification < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES]
+  end
+
+  class AutoModelForImageSegmentation < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_IMAGE_SEGMENTATION_MAPPING_NAMES]
+  end
+
+  class AutoModelForSemanticSegmentation < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_SEMANTIC_SEGMENTATION_MAPPING_NAMES]
   end
 
   class AutoModelForObjectDetection < PretrainedMixin
@@ -529,6 +552,17 @@ module Informers
       super()
       @logits = logits
       @pred_boxes = pred_boxes
+    end
+  end
+
+  class DetrSegmentationOutput < ModelOutput
+    attr_reader :logits, :pred_boxes, :pred_masks
+
+    def initialize(logits, pred_boxes, pred_masks)
+      super()
+      @logits = logits
+      @pred_boxes = pred_boxes
+      @pred_masks = pred_masks
     end
   end
 end

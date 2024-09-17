@@ -423,6 +423,82 @@ module Informers
     end
   end
 
+  class ImageSegmentationPipeline < Pipeline
+    def initialize(**options)
+      super(**options)
+
+      @subtasks_mapping = {
+        "panoptic" => "post_process_panoptic_segmentation",
+        "instance" => "post_process_instance_segmentation",
+        "semantic" => "post_process_semantic_segmentation"
+      }
+    end
+
+    def call(
+      images,
+      threshold: 0.5,
+      mask_threshold: 0.5,
+      overlap_mask_area_threshold: 0.8,
+      label_ids_to_fuse: nil,
+      target_sizes: nil,
+      subtask: nil
+    )
+      is_batched = images.is_a?(Array)
+
+      if is_batched && images.length != 1
+        raise Error, "Image segmentation pipeline currently only supports a batch size of 1."
+      end
+
+      prepared_images = prepare_images(images)
+      image_sizes = prepared_images.map { |x| [x.height, x.width] }
+
+      model_inputs = @processor.(prepared_images).slice(:pixel_values, :pixel_mask)
+      output = @model.(model_inputs)
+
+      if !subtask.nil?
+        fn = @subtasks_mapping[subtask]
+      else
+        @subtasks_mapping.each do |task, func|
+          if @processor.feature_extractor.respond_to?(func)
+            fn = @processor.feature_extractor.method(func)
+            subtask = task
+            break
+          end
+        end
+      end
+
+      id2label = @model.config[:id2label]
+
+      annotation = []
+      if subtask == "panoptic" || subtask == "instance"
+        processed = fn.(
+          output,
+          threshold:,
+          mask_threshold:,
+          overlap_mask_area_threshold:,
+          label_ids_to_fuse:,
+          target_sizes: target_sizes || image_sizes, # TODO FIX?
+        )[0]
+
+        _segmentation = processed[:segmentation]
+
+        processed[:segments_info].each do |segment|
+          annotation << {
+            score: segment[:score],
+            label: id2label[segment[:label_id].to_s],
+            # TODO mask
+          }
+        end
+      elsif subtask == "semantic"
+        raise Todo
+      else
+        raise Error, "Subtask #{subtask} not supported."
+      end
+
+      annotation
+    end
+  end
+
   class ZeroShotImageClassificationPipeline < Pipeline
     def call(images, candidate_labels, hypothesis_template: "This is a photo of {}")
       is_batched = images.is_a?(Array)
@@ -757,6 +833,16 @@ module Informers
       },
       type: "multimodal"
     },
+    # TODO
+    # "image-segmentation" => {
+    #   pipeline: ImageSegmentationPipeline,
+    #   model: [AutoModelForImageSegmentation, AutoModelForSemanticSegmentation],
+    #   processor: AutoProcessor,
+    #   default: {
+    #     model: "Xenova/detr-resnet-50-panoptic",
+    #   },
+    #   type: "multimodal"
+    # },
     "zero-shot-image-classification" => {
       tokenizer: AutoTokenizer,
       pipeline: ZeroShotImageClassificationPipeline,

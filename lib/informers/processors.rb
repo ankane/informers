@@ -282,6 +282,103 @@ module Informers
     def post_process_object_detection(*args)
       Utils.post_process_object_detection(*args)
     end
+
+    def remove_low_and_no_objects(class_logits, mask_logits, object_mask_threshold, num_labels)
+      mask_probs_item = []
+      pred_scores_item = []
+      pred_labels_item = []
+
+      class_logits.size.times do |j|
+        cls = class_logits[j]
+        mask = mask_logits[j]
+
+        pred_label = Utils.max(cls)[1]
+        if pred_label == num_labels
+          # Is the background, so we ignore it
+          next
+        end
+
+        scores = Utils.softmax(cls)
+        pred_score = scores[pred_label]
+        if pred_score > object_mask_threshold
+          mask_probs_item << mask
+          pred_scores_item << pred_score
+          pred_labels_item << pred_label
+        end
+      end
+
+      [mask_probs_item, pred_scores_item, pred_labels_item]
+    end
+
+    def compute_segments(
+      mask_probs,
+      pred_scores,
+      pred_labels,
+      mask_threshold,
+      overlap_mask_area_threshold,
+      label_ids_to_fuse = nil,
+      target_size = nil
+    )
+      raise Todo
+    end
+
+    def post_process_panoptic_segmentation(
+      outputs,
+      threshold: 0.5,
+      mask_threshold: 0.5,
+      overlap_mask_area_threshold: 0.8,
+      label_ids_to_fuse: nil,
+      target_sizes: nil
+    )
+      if label_ids_to_fuse.nil?
+        warn "`label_ids_to_fuse` unset. No instance will be fused."
+        label_ids_to_fuse = Set.new
+      end
+
+      class_queries_logits = outputs[:logits] # [batch_size, num_queries, num_classes+1]
+      masks_queries_logits = outputs[:pred_masks] # [batch_size, num_queries, height, width]
+
+      mask_probs = Utils.sigmoid(masks_queries_logits) # [batch_size, num_queries, height, width]
+
+      batch_size, _num_queries, num_labels = class_queries_logits.size, class_queries_logits[0].size, class_queries_logits[0][0].size
+      num_labels -= 1 # Remove last class (background)
+
+      if !target_sizes.nil? && target_sizes.length != batch_size
+        raise Error, "Make sure that you pass in as many target sizes as the batch dimension of the logits"
+      end
+
+      to_return = []
+      batch_size.times do |i|
+        target_size = !target_sizes.nil? ? target_sizes[i] : nil
+
+        class_logits = class_queries_logits[i]
+        mask_logits = mask_probs[i]
+
+        mask_probs_item, pred_scores_item, pred_labels_item = remove_low_and_no_objects(class_logits, mask_logits, threshold, num_labels)
+
+        if pred_labels_item.length == 0
+          raise Todo
+        end
+
+        # Get segmentation map and segment information of batch item
+        segmentation, segments = compute_segments(
+          mask_probs_item,
+          pred_scores_item,
+          pred_labels_item,
+          mask_threshold,
+          overlap_mask_area_threshold,
+          label_ids_to_fuse,
+          target_size
+        )
+
+        to_return << {
+          segmentation: segmentation,
+          segments_info: segments
+        }
+      end
+
+      to_return
+    end
   end
 
   module Utils

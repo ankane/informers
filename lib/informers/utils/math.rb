@@ -17,6 +17,9 @@ module Informers
     end
 
     def self.sigmoid(arr)
+      if arr[0].is_a?(Array)
+        return arr.map { |a| sigmoid(a) }
+      end
       arr.map { |v| 1 / (1 + Math.exp(-v)) }
     end
 
