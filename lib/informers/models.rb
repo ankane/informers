@@ -468,8 +468,8 @@ module Informers
         batch_size = 1
 
         if @config[:is_encoder_decoder] && (!@add_encoder_pkv.nil? ? @add_encoder_pkv : true)
-          encoder_dims = [batch_size, @num_encoder_heads, 0, @encoder_dim_kv]
-          decoder_dims = [batch_size, @num_decoder_heads, 0, @decoder_dim_kv]
+          _encoder_dims = [batch_size, @num_encoder_heads, 0, @encoder_dim_kv]
+          _decoder_dims = [batch_size, @num_decoder_heads, 0, @decoder_dim_kv]
           @num_decoder_layers.times do |i|
             # decoder_feeds["past_key_values.#{i}.encoder.key"] = OnnxRuntime::OrtValue.from_shape_and_type(encoder_dims, :float)
             # decoder_feeds["past_key_values.#{i}.encoder.value"] = OnnxRuntime::OrtValue.from_shape_and_type(encoder_dims, :float)
@@ -483,7 +483,7 @@ module Informers
         elsif @config[:model_type] == "bloom"
           raise Todo
         else
-          dims = [batch_size, @num_heads, 0, @dim_kv]
+          _dims = [batch_size, @num_heads, 0, @dim_kv]
           @num_layers.times do |i|
             # decoder_feeds["past_key_values.#{i}.key"] = OnnxRuntime::OrtValue.from_shape_and_type(dims, :float)
             # decoder_feeds["past_key_values.#{i}.value"] = OnnxRuntime::OrtValue.from_shape_and_type(dims, :float)
