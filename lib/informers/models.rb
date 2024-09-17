@@ -949,6 +949,15 @@ module Informers
     end
   end
 
+  class Swin2SRPreTrainedModel < PreTrainedModel
+  end
+
+  class Swin2SRModel < Swin2SRPreTrainedModel
+  end
+
+  class Swin2SRForImageSuperResolution < Swin2SRPreTrainedModel
+  end
+
   class DPTPreTrainedModel < PreTrainedModel
   end
 
@@ -1068,6 +1077,10 @@ module Informers
   MODEL_FOR_SEMANTIC_SEGMENTATION_MAPPING_NAMES = {
   }
 
+  MODEL_FOR_IMAGE_TO_IMAGE_MAPPING_NAMES = {
+    "swin2sr" => ["Swin2SRForImageSuperResolution", Swin2SRForImageSuperResolution]
+  }
+
   MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES = {
     "dpt" => ["DPTForDepthEstimation", DPTForDepthEstimation]
   }
@@ -1088,6 +1101,7 @@ module Informers
     [MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_SEGMENTATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_SEMANTIC_SEGMENTATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_IMAGE_TO_IMAGE_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
@@ -1153,6 +1167,10 @@ module Informers
 
   class AutoModelForZeroShotObjectDetection < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES]
+  end
+
+  class AutoModelForImageToImage < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_IMAGE_TO_IMAGE_MAPPING_NAMES]
   end
 
   class AutoModelForDepthEstimation < PretrainedMixin

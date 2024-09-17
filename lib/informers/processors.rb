@@ -40,6 +40,83 @@ module Informers
       @do_flip_channel_order = @config["do_flip_channel_order"] || false
     end
 
+    def pad_image(
+      pixel_data,
+      img_dims,
+      pad_size,
+      mode: "constant",
+      center: false,
+      constant_values: 0
+    )
+      image_height, image_width, image_channels = img_dims
+
+      if pad_size.is_a?(Numeric)
+        padded_image_width = pad_size
+        padded_image_height = pad_size
+      else
+        padded_image_width = pad_size[:width]
+        padded_image_height = pad_size[:height]
+      end
+
+      # Only add padding if there is a difference in size
+      if padded_image_width != image_width || padded_image_height != image_height
+        padded_pixel_data = Array.new(padded_image_width * padded_image_height * image_channels)
+        if constant_values.is_a?(Array)
+          raise Todo
+        elsif constant_values != 0
+          padded_pixel_data.fill(constant_values)
+        end
+
+        left, top =
+          if center
+            raise Todo
+          else
+            [0, 0]
+          end
+
+        # Copy the original image into the padded image
+        image_height.times do |i|
+          a = (i + top) * padded_image_width
+          b = i * image_width
+          image_width.times do |j|
+            c = (a + j + left) * image_channels
+            d = (b + j) * image_channels
+            image_channels.times do |k|
+              padded_pixel_data[c + k] = pixel_data[d + k]
+            end
+          end
+        end
+
+        if mode == "symmetric"
+          if center
+            raise Error, "`center` padding is not supported when `mode` is set to `symmetric`."
+          end
+          h1 = image_height - 1
+          w1 = image_width - 1
+          padded_image_height.times do |i|
+            a = i * padded_image_width
+            b = Utils.calculate_reflect_offset(i, h1) * image_width
+
+            padded_image_width.times do |j|
+              next if i < image_height && j < image_width # Do not overwrite original image
+              c = (a + j) * image_channels
+              d = (b + Utils.calculate_reflect_offset(j, w1)) * image_channels
+
+              # Copy channel-wise
+              image_channels.times do |k|
+                padded_pixel_data[c + k] = pixel_data[d + k]
+              end
+            end
+          end
+        end
+
+        # Update pixel data and image dimensions
+        pixel_data = padded_pixel_data
+        img_dims = [padded_image_height, padded_image_width, image_channels]
+      end
+      [pixel_data, img_dims]
+    end
+
     def rescale(pixel_data)
       pixel_data.length.times do |i|
         pixel_data[i] *= @rescale_factor
@@ -256,6 +333,31 @@ module Informers
   class OwlViTFeatureExtractor < ImageFeatureExtractor
     def post_process_object_detection(*args)
       Utils.post_process_object_detection(*args)
+    end
+  end
+
+  class Swin2SRImageProcessor < ImageFeatureExtractor
+    def pad_image(pixel_data, img_dims, pad_size, **options)
+      # NOTE: In this case, `padSize` represents the size of the sliding window for the local attention.
+      # In other words, the image is padded so that its width and height are multiples of `padSize`.
+      image_height, image_width, _image_channels = img_dims
+
+      super(
+        pixel_data,
+        img_dims,
+        {
+          # NOTE: For Swin2SR models, the original python implementation adds padding even when the image's width/height is already
+          # a multiple of `pad_size`. However, this is most likely a bug (PR: https://github.com/mv-lab/swin2sr/pull/19).
+          # For this reason, we only add padding when the image's width/height is not a multiple of `pad_size`.
+          width: image_width + (pad_size - image_width % pad_size) % pad_size,
+          height: image_height + (pad_size - image_height % pad_size) % pad_size
+        },
+        **{
+          mode: "symmetric",
+          center: false,
+          constant_values: -1,
+        }.merge(options)
+      )
     end
   end
 
@@ -588,7 +690,8 @@ module Informers
       "OwlViTFeatureExtractor" => OwlViTFeatureExtractor,
       "CLIPFeatureExtractor" => CLIPFeatureExtractor,
       "DPTFeatureExtractor" => DPTFeatureExtractor,
-      "DetrFeatureExtractor" => DetrFeatureExtractor
+      "DetrFeatureExtractor" => DetrFeatureExtractor,
+      "Swin2SRImageProcessor" => Swin2SRImageProcessor
     }
 
     PROCESSOR_CLASS_MAPPING = {}

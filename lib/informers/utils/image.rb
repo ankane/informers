@@ -96,6 +96,21 @@ module Informers
           raise ArgumentError, "Unsupported input type: #{input.class.name}"
         end
       end
+
+      def self.from_array(input)
+        c, h, w = Utils.dims(input)
+        pixel_data = Array.new(w * h * c)
+
+        input.each_with_index do |cv, ci|
+          cv.each_with_index do |hv, hi|
+            hv.each_with_index do |v, wi|
+              pixel_data[(hi * w * c) + (wi * c) + ci] = v
+            end
+          end
+        end
+
+        RawImage.new(Vips::Image.new_from_memory_copy(pixel_data.pack("C*"), w, h, c, :uchar))
+      end
     end
   end
 end

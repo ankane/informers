@@ -10,6 +10,7 @@
 - Added `depth-estimation` pipeline
 - Added `text2text-generation` pipeline
 - Added `image-to-text` pipeline
+- Added `image-to-image` pipeline
 - Added `image-segmentation` pipeline
 - Added `text-generation` pipeline
 - Added `summarization` pipeline

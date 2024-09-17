@@ -199,6 +199,14 @@ class PipelineTest < Minitest::Test
     assert_equal "a cat is standing in the snow", result[0][:generated_text]
   end
 
+  def test_image_to_image
+    skip "Expensive"
+
+    upscaler = Informers.pipeline("image-to-image")
+    result = upscaler.("test/support/pipeline-cat-chonk.jpeg")
+    result.save("/tmp/output.jpeg")
+  end
+
   def test_image_segmentation
     segmenter = Informers.pipeline("image-segmentation")
     result = segmenter.("test/support/pipeline-cat-chonk.jpeg")

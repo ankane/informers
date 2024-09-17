@@ -36,6 +36,8 @@ module Informers
           return item
         end
       end
+
+      nil
     end
 
     def call(

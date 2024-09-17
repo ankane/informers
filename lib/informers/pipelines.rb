@@ -810,6 +810,30 @@ module Informers
     end
   end
 
+  class ImageToImagePipeline < Pipeline
+    def call(images)
+      prepared_images = prepare_images(images)
+      inputs = @processor.(prepared_images)
+      outputs = @model.(inputs);
+
+      to_return = []
+      outputs[0].each do |batch|
+        # TODO flatten first
+        output =
+          batch.map do |v|
+            v.map do |v2|
+              v2.map do |v3|
+                (v3.clamp(0, 1) * 255).round
+              end
+            end
+          end
+        to_return << Utils::RawImage.from_array(output)
+      end
+
+      to_return.length > 1 ? to_return : to_return[0]
+    end
+  end
+
   class DepthEstimationPipeline < Pipeline
     def call(images)
       prepared_images = prepare_images(images)
@@ -1000,6 +1024,15 @@ module Informers
         model: "Xenova/owlvit-base-patch32"
       },
       type: "multimodal"
+    },
+    "image-to-image" => {
+      pipeline: ImageToImagePipeline,
+      model: AutoModelForImageToImage,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/swin2SR-classical-sr-x2-64"
+      },
+      type: "image"
     },
     "depth-estimation" => {
       pipeline: DepthEstimationPipeline,
