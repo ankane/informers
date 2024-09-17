@@ -111,6 +111,18 @@ module Informers
         super
         @processors = []
       end
+
+      def push(item)
+        @processors << item
+      end
+
+      def concat(items)
+        @processors.concat(items)
+      end
+
+      def to_ary
+        @processors
+      end
     end
   end
 end

@@ -424,7 +424,12 @@ module Informers
 
       to_return = []
       pixel_values.each do |batch|
-        raise Todo
+        batch = [batch]
+        output = @model.generate(batch, **generate_kwargs)
+        decoded = @tokenizer
+          .batch_decode(output, skip_special_tokens: true)
+          .map { |x| {generated_text: x.strip} }
+        to_return << decoded
       end
 
       is_batched ? to_return : to_return[0]

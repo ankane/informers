@@ -76,7 +76,12 @@ module Informers
 
       case model_type
       when MODEL_TYPES[:DecoderOnly]
-        raise Todo
+        @can_generate = true
+
+        @run_beam = method(:decoder_run_beam)
+        @get_start_beams = method(:decoder_start_beams)
+        @update_beam = method(:decoder_update_beam)
+        @forward = method(:decoder_forward)
       when MODEL_TYPES[:Seq2Seq], MODEL_TYPES[:Vision2Seq]
         @can_generate = true
 
@@ -316,6 +321,22 @@ module Informers
       session_run(@session, encoder_feeds, output_names:)
     end
 
+    def decoder_forward(model_inputs)
+      raise Todo
+    end
+
+    def decoder_start_beams(input_token_ids, generation_config, num_output_tokens, inputs_attention_mask)
+      raise Todo
+    end
+
+    def decoder_run_beam(beam)
+      raise Todo
+    end
+
+    def decoder_update_beam(beam, new_token_id)
+      raise Todo
+    end
+
     def session_run(session, inputs, output_names:)
       checked_inputs = validate_inputs(session, inputs)
       begin
@@ -486,6 +507,28 @@ module Informers
   class CLIPModel < CLIPPreTrainedModel
   end
 
+  class GPT2PreTrainedModel < PreTrainedModel
+    attr_reader :num_heads, :num_layers, :dim_kv
+
+    def initialize(config, session, generation_config)
+      super(config, session)
+      @generation_config = generation_config
+
+      # config doesn't contain pad_token_id, so we assume it is the eos_token_id
+      @config["pad_token_id"] = @config["eos_token_id"]
+
+      @num_heads = @config["n_head"]
+      @num_layers = @config["n_layer"]
+      @dim_kv = @config["n_embd"] / @num_heads.to_f
+    end
+  end
+
+  class GPT2Model < GPT2PreTrainedModel
+  end
+
+  class GPT2LMHeadModel < GPT2PreTrainedModel
+  end
+
   class OwlViTPreTrainedModel < PreTrainedModel
   end
 
@@ -530,7 +573,35 @@ module Informers
       @decoder_merged_session = decoder_merged_session
       @generation_config = generation_config
 
-      raise Todo
+      # Extract configs
+      encoder_config = @config["encoder"]
+      decoder_config = @config["decoder"]
+
+      # Validate encoder
+      encoder_model_type = encoder_config["model_type"]
+      encoder_model = MODEL_MAPPING_NAMES_ENCODER_ONLY[encoder_model_type] || MODEL_MAPPING_NAMES_ENCODER_DECODER[encoder_model_type]
+      if !encoder_model
+        warn "Model type for encoder '#{encoder_model_type}' not found, assuming encoder-only architecture. Please report this."
+      end
+
+      # Validate decoder
+      decoder_model = MODEL_WITH_LM_HEAD_MAPPING_NAMES[decoder_config["model_type"]]
+      if !decoder_model
+        raise Error, "Unable to construct `VisionEncoderDecoder` due to unsupported decoder: \"#{decoder_config["model_type"]}\""
+      end
+
+      decoder_model_class = decoder_model[1]
+      decoder = decoder_model_class.new(decoder_config, decoder_merged_session, generation_config)
+
+      @add_encoder_pkv = decoder.config.include?("num_decoder_layers")
+      if @add_encoder_pkv
+        raise Todo
+      else
+        # Decoder is a decoder-only model
+        @num_layers = decoder.num_layers
+        @num_heads = decoder.num_heads
+        @dim_kv = decoder.dim_kv
+      end
     end
   end
 
@@ -565,6 +636,10 @@ module Informers
 
   MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES = {
     "t5" => ["T5ForConditionalGeneration", T5ForConditionalGeneration]
+  }
+
+  MODEL_WITH_LM_HEAD_MAPPING_NAMES = {
+    "gpt2" => ["GPT2LMHeadModel", GPT2LMHeadModel]
   }
 
   MODEL_FOR_MASKED_LM_MAPPING_NAMES = {
@@ -612,6 +687,7 @@ module Informers
     [MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES, MODEL_TYPES[:Seq2Seq]],
+    [MODEL_WITH_LM_HEAD_MAPPING_NAMES, MODEL_TYPES[:DecoderOnly]],
     [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES, MODEL_TYPES[:Vision2Seq]],

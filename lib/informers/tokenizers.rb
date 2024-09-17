@@ -130,7 +130,8 @@ module Informers
       "RobertaTokenizer" => RobertaTokenizer,
       "XLMRobertaTokenizer" => XLMRobertaTokenizer,
       "MPNetTokenizer" => MPNetTokenizer,
-      "CLIPTokenizer" => CLIPTokenizer
+      "CLIPTokenizer" => CLIPTokenizer,
+      "GPT2Tokenizer" => GPT2Tokenizer
     }
 
     def self.from_pretrained(
