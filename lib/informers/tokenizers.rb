@@ -11,6 +11,17 @@ module Informers
 
       # Add added_tokens to model
       @special_tokens = []
+      @all_special_ids = []
+
+      @added_tokens = []
+      @tokenizer.added_tokens_decoder.each do |id, token|
+        @added_tokens << token
+
+        if token.special
+          @special_tokens << token.content
+          @all_special_ids << id
+        end
+      end
 
       # Update additional_special_tokens
       @additional_special_tokens = tokenizer_config["additional_special_tokens"] || []
@@ -212,19 +223,19 @@ module Informers
       if !slf.respond_to?(:lang_to_token) || !slf.lang_to_token.respond_to?(:call)
         raise Error, "Tokenizer must have `lang_to_token` attribute set and it should be a function."
       end
-      _src_lang_token = generate_kwargs[:src_lang]
+      src_lang_token = generate_kwargs[:src_lang]
       tgt_lang_token = generate_kwargs[:tgt_lang]
 
-      # if !slf.language_codes.include?(tgt_lang_token)
-      #   raise Error, "Target language code #{tgt_lang_token.inspect} is not valid. Must be one of: #{slf.language_codes.join(", ")}"
-      # end
+      if !slf.language_codes.include?(tgt_lang_token)
+        raise Error, "Target language code #{tgt_lang_token.inspect} is not valid. Must be one of: #{slf.language_codes.join(", ")}"
+      end
 
-      # if !src_lang_token.nil?
-      #   # Check that the source language is valid:
-      #   if !slf.language_codes.include?(src_lang_token)
-      #     raise Error, "Source language code #{src_lang_token.inspect} is not valid. Must be one of: #{slf.language_codes.join(", ")}"
-      #   end
-      # end
+      if !src_lang_token.nil?
+        # Check that the source language is valid:
+        if !slf.language_codes.include?(src_lang_token)
+          raise Error, "Source language code #{src_lang_token.inspect} is not valid. Must be one of: #{slf.language_codes.join(", ")}"
+        end
+      end
 
       # Override the `forced_bos_token_id` to force the correct language
       generate_kwargs["forced_bos_token_id"] = slf.convert_tokens_to_ids([slf.lang_to_token.(tgt_lang_token)])[0]
