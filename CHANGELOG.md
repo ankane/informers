@@ -9,6 +9,7 @@
 - Added `object-detection` pipeline
 - Added `depth-estimation` pipeline
 - Added `text2text-generation` pipeline
+- Added `image-to-text` pipeline
 
 ## 1.0.3 (2024-08-29)
 

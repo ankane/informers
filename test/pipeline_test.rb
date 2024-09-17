@@ -180,10 +180,9 @@ class PipelineTest < Minitest::Test
   end
 
   def test_image_to_text
-    skip "TODO"
-
     captioner = Informers.pipeline("image-to-text")
-    _result = captioner.("test/support/pipeline-cat-chonk.jpeg")
+    result = captioner.("test/support/pipeline-cat-chonk.jpeg")
+    assert_equal "a cat is standing in the snow", result[0][:generated_text]
   end
 
   def test_image_segmentation

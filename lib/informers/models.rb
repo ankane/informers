@@ -557,7 +557,7 @@ module Informers
     end
 
     def seq2seq_run_beam(beam)
-      input_name = MAIN_INPUT_NAME
+      input_name = self.class.const_get(:MAIN_INPUT_NAME)
 
       decoder_input_ids = beam[:output_token_ids]
       if beam[:prev_model_outputs]

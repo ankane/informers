@@ -866,17 +866,16 @@ module Informers
       },
       type: "text"
     },
-    # TODO
-    # "image-to-text" => {
-    #   tokenizer: AutoTokenizer,
-    #   pipeline: ImageToTextPipeline,
-    #   model: AutoModelForVision2Seq,
-    #   processor: AutoProcessor,
-    #   default: {
-    #     model: "Xenova/vit-gpt2-image-captioning"
-    #   },
-    #   type: "multimodal"
-    # },
+    "image-to-text" => {
+      tokenizer: AutoTokenizer,
+      pipeline: ImageToTextPipeline,
+      model: AutoModelForVision2Seq,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/vit-gpt2-image-captioning"
+      },
+      type: "multimodal"
+    },
     "image-classification" => {
       pipeline: ImageClassificationPipeline,
       model: AutoModelForImageClassification,
