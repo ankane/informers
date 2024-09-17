@@ -168,7 +168,7 @@ module Informers
   end
 
   class NllbTokenizer < PreTrainedTokenizer
-    attr_reader :lang_to_token
+    attr_reader :language_regex, :language_codes, :lang_to_token
 
     def initialize(tokenizer_json, tokenizer_config)
       super(tokenizer_json, tokenizer_config)
@@ -184,7 +184,7 @@ module Informers
   end
 
   class M2M100Tokenizer < PreTrainedTokenizer
-    attr_reader :lang_to_token
+    attr_reader :language_regex, :language_codes, :lang_to_token
 
     def initialize(tokenizer_json, tokenizer_config)
       super(tokenizer_json, tokenizer_config)
@@ -203,8 +203,28 @@ module Informers
 
   module Utils
     def self._build_translation_inputs(slf, raw_inputs, tokenizer_options, generate_kwargs)
-      src_lang_token = generate_kwargs[:src_lang]
+      if !slf.respond_to?(:language_codes) || !slf.language_codes.is_a?(Array)
+        raise Error, "Tokenizer must have `language_codes` attribute set and it should be an array of language ids."
+      end
+      if !slf.respond_to?(:language_regex) || !slf.language_regex.is_a?(Regexp)
+        raise Error, "Tokenizer must have `language_regex` attribute set and it should be a regular expression."
+      end
+      if !slf.respond_to?(:lang_to_token) || !slf.lang_to_token.respond_to?(:call)
+        raise Error, "Tokenizer must have `lang_to_token` attribute set and it should be a function."
+      end
+      _src_lang_token = generate_kwargs[:src_lang]
       tgt_lang_token = generate_kwargs[:tgt_lang]
+
+      # if !slf.language_codes.include?(tgt_lang_token)
+      #   raise Error, "Target language code #{tgt_lang_token.inspect} is not valid. Must be one of: #{slf.language_codes.join(", ")}"
+      # end
+
+      # if !src_lang_token.nil?
+      #   # Check that the source language is valid:
+      #   if !slf.language_codes.include?(src_lang_token)
+      #     raise Error, "Source language code #{src_lang_token.inspect} is not valid. Must be one of: #{slf.language_codes.join(", ")}"
+      #   end
+      # end
 
       # Override the `forced_bos_token_id` to force the correct language
       generate_kwargs["forced_bos_token_id"] = slf.convert_tokens_to_ids([slf.lang_to_token.(tgt_lang_token)])[0]
