@@ -11,6 +11,7 @@
 - Added `text2text-generation` pipeline
 - Added `image-to-text` pipeline
 - Added `image-segmentation` pipeline
+- Added `text-generation` pipeline
 
 ## 1.0.3 (2024-08-29)
 

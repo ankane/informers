@@ -374,7 +374,7 @@ module Informers
       #
       # Temporary storage for the best label/scores for each pixel ([height, width]):
       mask_labels = Array.new(mask_probs[0].flatten.length)
-      best_scores = Array.new(mask_probs[0].flatten.length) { 0 }
+      best_scores = Array.new(mask_probs[0].flatten.length, 0)
 
       mask_probs.length.times do |i|
         score = pred_scores[i]
@@ -395,12 +395,12 @@ module Informers
 
       current_segment_id = 0
 
-      stuff_memory_list = {}
+      # stuff_memory_list = {}
       pred_labels.length.times do |k|
         pred_class = pred_labels[k]
 
         # TODO add `should_fuse`
-        should_fuse = label_ids_to_fuse.include?(pred_class)
+        # should_fuse = label_ids_to_fuse.include?(pred_class)
 
         # Check if mask exists and large enough to be a segment
         mask_exists, mask_k = check_segment_validity(

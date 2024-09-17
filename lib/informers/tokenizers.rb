@@ -87,6 +87,10 @@ module Informers
     def batch_decode(batch, **decode_args)
       @tokenizer.decode_batch(batch, **decode_args)
     end
+
+    def padding_side=(side)
+      @tokenizer.enable_padding(direction: side)
+    end
   end
 
   class BertTokenizer < PreTrainedTokenizer

@@ -8,6 +8,10 @@ module Informers
       @config_json[key.to_s]
     end
 
+    def []=(key, value)
+      @config_json[key.to_s] = value
+    end
+
     def to_h
       @config_json.to_h
     end

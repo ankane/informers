@@ -66,6 +66,12 @@ class PipelineTest < Minitest::Test
     assert_equal "Je suis très heureux.", result[0][:generated_text]
   end
 
+  def test_text_generation
+    generator = Informers.pipeline("text-generation")
+    result = generator.("I enjoy walking with my cute dog,")
+    assert_equal "I enjoy walking with my cute dog, but I'm not sure if I'll ever be able to", result[0][:generated_text]
+  end
+
   def test_fill_mask
     unmasker = Informers.pipeline("fill-mask")
     result = unmasker.("Paris is the [MASK] of France.")

@@ -122,7 +122,11 @@ module Informers
       model_type = MODEL_TYPE_MAPPING[model_name]
 
       if model_type == MODEL_TYPES[:DecoderOnly]
-        raise Todo
+        info = [
+          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
+          construct_session(pretrained_model_name_or_path, options[:model_file_name] || "decoder_model_merged", **options),
+          Utils::Hub.get_model_json(pretrained_model_name_or_path, "generation_config.json", false, **options)
+        ]
 
       elsif model_type == MODEL_TYPES[:Seq2Seq] || model_type == MODEL_TYPES[:Vision2Seq]
         info = [
@@ -185,7 +189,12 @@ module Informers
         # Generating from the encoder outputs
         input_ids_seq_length = 0
       else
-        raise Todo
+        input_ids_seq_length = inputs.length
+
+        # decoder-only
+        if input_ids_seq_length == 0
+          raise Error, "Must supply a non-empty array of input token ids."
+        end
       end
 
       # Update generation config with defaults
@@ -617,19 +626,92 @@ module Informers
     end
 
     def decoder_forward(model_inputs)
-      raise Todo
+      input_ids, past_key_values, attention_mask =
+        model_inputs.values_at(:input_ids, :past_key_values, :attention_mask)
+      decoder_feeds = {
+        input_ids: input_ids,
+        attention_mask: attention_mask || prepare_attention_mask(input_ids)
+      }
+      use_cache_branch = !!past_key_values
+
+      if @session.inputs.map { |v| v[:name] }.include?("use_cache_branch")
+        decoder_feeds[:use_cache_branch] = [use_cache_branch]
+      end
+
+      prepare_position_ids(@session, decoder_feeds, use_cache_branch)
+
+      add_past_key_values(decoder_feeds, past_key_values)
+
+      decoder_results = session_run(@session, decoder_feeds)
+      decoder_results = @session.outputs.map { |v| v[:name] }.zip(decoder_results).to_h
+
+      logits = decoder_results["logits"]
+
+      past_key_values = get_past_key_values(decoder_results, past_key_values)
+      {"logits" => logits, past_key_values: past_key_values}
     end
 
     def decoder_start_beams(input_token_ids, generation_config, num_output_tokens, inputs_attention_mask)
-      raise Todo
+      beams = []
+
+      beam_id = 0
+      input_token_ids.each do |tokens|
+        output_token_ids = tokens.dup
+
+        # TODO: Improve
+        # Currently, just add back batch dimension.
+        # In future, allow for true parallel execution
+        tokens = [tokens]
+
+        if inputs_attention_mask
+          attn_mask = inputs_attention_mask[beam_id]
+          attn_mask = [attn_mask]
+        else
+          attn_mask = prepare_attention_mask(tokens)
+        end
+
+        start = {
+          input: tokens,
+          model_input_ids: tokens,
+          attention_mask: attn_mask,
+          prev_model_outputs: nil,
+
+          output_token_ids: output_token_ids,
+          num_output_tokens: num_output_tokens,
+
+          done: false,
+          score: 0,
+          id: beam_id # assign unique id to beams
+        }
+        beam_id += 1
+
+        beams << start
+      end
+      beams
     end
 
     def decoder_run_beam(beam)
-      raise Todo
+      attn_mask_data = Array.new(beam[:output_token_ids].length, 1)
+
+      # 1. Prepare
+      model_inputs = {
+        input_ids: beam[:model_input_ids],
+        attention_mask: [attn_mask_data],
+        past_key_values: beam[:prev_model_outputs] && beam[:prev_model_outputs][:past_key_values]
+      }
+
+      # 2. Run
+      output = @forward.(model_inputs)
+
+      # 3. Update
+      beam[:prev_model_outputs] = output
+
+      output
     end
 
     def decoder_update_beam(beam, new_token_id)
-      raise Todo
+      beam[:output_token_ids] += [new_token_id]
+      beam[:model_input_ids] = [[new_token_id]]
     end
 
     def session_run(session, inputs, output_names: nil)
@@ -1018,6 +1100,10 @@ module Informers
 
   class AutoModelForSeq2SeqLM < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES]
+  end
+
+  class AutoModelForCausalLM < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_WITH_LM_HEAD_MAPPING_NAMES]
   end
 
   class AutoModelForMaskedLM < PretrainedMixin
