@@ -26,5 +26,12 @@ module Informers
     def self.stack(tensors, dim = 0)
       tensors
     end
+
+    def self.ones_like(tensor)
+      if tensor[0].is_a?(Array)
+        return tensor.map { |v| ones_like(v) }
+      end
+      tensor.map { |_| 1 }
+    end
   end
 end

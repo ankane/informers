@@ -204,13 +204,13 @@ module Informers
       end
 
       num_output_tokens = 1
-      _max_output_tokens = num_output_tokens + (generation_config[:max_new_tokens] || Float::INFINITY)
+      max_output_tokens = num_output_tokens + (generation_config[:max_new_tokens] || Float::INFINITY)
 
       # Only use max length if max_new_tokens is not provided
-      _use_max_length = generation_config[:max_length].is_a?(Integer) && generation_config[:max_new_tokens].nil?
-      _sampler = Utils::Sampler.get_sampler(generation_config)
+      use_max_length = generation_config[:max_length].is_a?(Integer) && generation_config[:max_new_tokens].nil?
+      sampler = Utils::Sampler.get_sampler(generation_config)
 
-      _beams = get_start_beams(inputs, generation_config, num_output_tokens, inputs_attention_mask)
+      beams = get_start_beams(inputs, generation_config, num_output_tokens, inputs_attention_mask)
 
       raise Todo
     end
@@ -298,7 +298,67 @@ module Informers
     end
 
     def seq2seq_start_beams(input_token_ids, generation_config, num_output_tokens, inputs_attention_mask = nil)
-      raise Todo
+      beams = []
+      beam_id = 0
+
+      requires_attention_mask = !@requires_attention_mask.nil? ? @requires_attention_mask : true
+
+      # decoder_input_ids == output_token_ids
+      decoder_input_ids =
+        generation_config["decoder_input_ids"] ||
+        generation_config["decoder_start_token_id"] ||
+        generation_config["bos_token_id"] ||
+        generation_config["eos_token_id"]
+
+      if !decoder_input_ids.is_a?(Array)
+        decoder_input_ids = [decoder_input_ids]
+      end
+
+      input_token_ids.each do |tokens|
+        # TODO: Improve
+        # Currently, just add back batch dimension.
+        # In future, allow for true parallel execution
+        tokens = [tokens]
+
+        # Create beam
+        start = {
+          inputs: tokens,
+          encoder_outputs: nil,
+          prev_model_outputs: nil,
+
+          output_token_ids: decoder_input_ids,
+          done: false,
+          score: 0,
+          id: beam_id # assign unique id to beams
+        }
+        beam_id += 1
+
+        if requires_attention_mask
+          start[:attention_mask] = prepare_attention_mask(tokens)
+        end
+
+        beams << start
+      end
+
+      beams
+    end
+
+    def prepare_attention_mask(tokens)
+      # Prepare attention mask
+      pad_token_id = @config["pad_token_id"]
+      eos_token_id = @config["eos_token_id"]
+      if eos_token_id.is_a?(Integer)
+        eos_token_id = [eos_token_id]
+      end
+
+      is_pad_token_in_inputs = !tokens.index(pad_token_id).nil?
+      is_pad_token_not_equal_to_eos_token_id = eos_token_id.nil? || !eos_token_id.include?(pad_token_id)
+
+      if is_pad_token_in_inputs && is_pad_token_not_equal_to_eos_token_id
+        raise Todo
+      else
+        Utils.ones_like(tokens)
+      end
     end
 
     def seq2seq_run_beam(beam)
