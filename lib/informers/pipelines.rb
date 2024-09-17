@@ -678,11 +678,11 @@ module Informers
         processed.map do |batch|
           batch[:boxes].map.with_index do |box, i|
             {
-              score: batch[:scores][i],
               label: id2label[batch[:classes][i].to_s],
+              score: batch[:scores][i],
               box: get_bounding_box(box, !percentage)
             }
-          end
+          end.sort_by { |v| -v[:score] }
         end
 
       is_batched ? result : result[0]
