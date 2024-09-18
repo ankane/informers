@@ -1107,6 +1107,27 @@ module Informers
     end
   end
 
+  class VitsPreTrainedModel < PreTrainedModel
+  end
+
+  class VitsModel < VitsPreTrainedModel
+    def call(model_inputs)
+      VitsModelOutput.new(*super(model_inputs))
+    end
+  end
+
+  class SpeechT5PreTrainedModel < PreTrainedModel
+  end
+
+  class SpeechT5Model < SpeechT5PreTrainedModel
+  end
+
+  class SpeechT5ForSpeechToText < SpeechT5PreTrainedModel
+  end
+
+  class SpeechT5ForTextToSpeech < SpeechT5PreTrainedModel
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
@@ -1128,6 +1149,14 @@ module Informers
 
   MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES = {
     "whisper" => ["WhisperForConditionalGeneration", WhisperForConditionalGeneration]
+  }
+
+  MODEL_FOR_TEXT_TO_SPECTROGRAM_MAPPING_NAMES = {
+    "speecht5" => ["SpeechT5ForTextToSpeech", SpeechT5ForTextToSpeech]
+  }
+
+  MODEL_FOR_TEXT_TO_WAVEFORM_MAPPING_NAMES = {
+    "vits" => ["VitsModel", VitsModel]
   }
 
   MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES = {
@@ -1225,6 +1254,8 @@ module Informers
     [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_AUDIO_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_TEXT_TO_SPECTROGRAM_MAPPING_NAMES, MODEL_TYPES[:Seq2Seq]],
+    [MODEL_FOR_TEXT_TO_WAVEFORM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
   ]
 
@@ -1255,6 +1286,14 @@ module Informers
 
   class AutoModelForSpeechSeq2Seq < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES]
+  end
+
+  class AutoModelForTextToSpectrogram < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_TEXT_TO_SPECTROGRAM_MAPPING_NAMES]
+  end
+
+  class AutoModelForTextToWaveform < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_TEXT_TO_WAVEFORM_MAPPING_NAMES]
   end
 
   class AutoModelForCausalLM < PretrainedMixin

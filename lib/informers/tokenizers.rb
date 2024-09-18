@@ -244,6 +244,9 @@ module Informers
     end
   end
 
+  class SpeechT5Tokenizer < PreTrainedTokenizer
+  end
+
   class AutoTokenizer
     TOKENIZER_CLASS_MAPPING = {
       "T5Tokenizer" => T5Tokenizer,
@@ -257,7 +260,8 @@ module Informers
       "CLIPTokenizer" => CLIPTokenizer,
       "GPT2Tokenizer" => GPT2Tokenizer,
       "NllbTokenizer" => NllbTokenizer,
-      "M2M100Tokenizer" => M2M100Tokenizer
+      "M2M100Tokenizer" => M2M100Tokenizer,
+      "SpeechT5Tokenizer" => SpeechT5Tokenizer
     }
 
     def self.from_pretrained(

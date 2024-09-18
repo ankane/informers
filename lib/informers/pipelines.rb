@@ -798,6 +798,26 @@ module Informers
     end
   end
 
+  class TextToAudioPipeline < Pipeline
+    DEFAULT_VOCODER_ID = "Xenova/speecht5_hifigan"
+
+    def initialize(**options)
+      super(**options)
+
+      # TODO: Find a better way for `pipeline` to set the default vocoder
+      @vocoder = options[:vocoder]
+    end
+
+    def call(text_inputs, speaker_embeddings: nil)
+      # If this.processor is not set, we are using a `AutoModelForTextToWaveform` model
+      if @processor
+        call_text_to_spectrogram(text_inputs, speaker_embeddings:)
+      else
+        call_text_to_waveform(text_inputs)
+      end
+    end
+  end
+
   class FeatureExtractionPipeline < Pipeline
     def call(
       texts,
@@ -1119,6 +1139,16 @@ module Informers
     #   },
     #   type: "multimodal"
     # },
+    "text-to-audio" => {
+      tokenizer: AutoTokenizer,
+      pipeline: TextToAudioPipeline,
+      model: [AutoModelForTextToWaveform, AutoModelForTextToSpectrogram],
+      processor: [AutoProcessor, nil],
+      default: {
+        model: "Xenova/speecht5_tts"
+      },
+      type: "text"
+    },
     "image-to-text" => {
       tokenizer: AutoTokenizer,
       pipeline: ImageToTextPipeline,
@@ -1244,7 +1274,8 @@ module Informers
 
   TASK_ALIASES = {
     "sentiment-analysis" => "text-classification",
-    "ner" => "token-classification"
+    "ner" => "token-classification",
+    "text-to-speech" => "text-to-audio"
   }
 
   DEFAULT_PROGRESS_CALLBACK = lambda do |msg|
