@@ -1078,6 +1078,35 @@ module Informers
   class DonutSwinModel < DonutSwinPreTrainedModel
   end
 
+  class WhisperPreTrainedModel < PreTrainedModel
+  end
+
+  class WhisperModel < WhisperPreTrainedModel
+  end
+
+  class WhisperForConditionalGeneration < WhisperPreTrainedModel
+    REQUIRES_ATTENTION_MASK = false
+    MAIN_INPUT_NAME = :input_features
+
+    def initialize(config, session, decoder_merged_session, generation_config)
+      super(config, session)
+      @decoder_merged_session = decoder_merged_session
+      @generation_config = generation_config
+
+      @num_decoder_layers = @config["decoder_layers"]
+      @num_decoder_heads = @config["decoder_attention_heads"]
+      @decoder_dim_kv = @config["d_model"] / @num_decoder_heads.to_f
+
+      @num_encoder_layers = @config["encoder_layers"]
+      @num_encoder_heads = @config["encoder_attention_heads"]
+      @encoder_dim_kv = @config["d_model"] / @num_encoder_heads.to_f
+    end
+
+    def generate(inputs, generation_config = nil, logits_processor = nil)
+      raise Todo
+    end
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
@@ -1095,6 +1124,10 @@ module Informers
 
   MODEL_MAPPING_NAMES_ENCODER_DECODER = {
     "bart" => ["BartModel", BartModel]
+  }
+
+  MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES = {
+    "whisper" => ["WhisperForConditionalGeneration", WhisperForConditionalGeneration]
   }
 
   MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES = {
@@ -1155,6 +1188,9 @@ module Informers
   MODEL_FOR_SEMANTIC_SEGMENTATION_MAPPING_NAMES = {
   }
 
+  MODEL_FOR_CTC_MAPPING_NAMES = {
+  }
+
   MODEL_FOR_AUDIO_CLASSIFICATION_MAPPING_NAMES = {
     "wav2vec2" => ["Wav2Vec2ForSequenceClassification", Wav2Vec2ForSequenceClassification]
   }
@@ -1176,6 +1212,7 @@ module Informers
     [MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES, MODEL_TYPES[:Seq2Seq]],
+    [MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES, MODEL_TYPES[:Seq2Seq]],
     [MODEL_WITH_LM_HEAD_MAPPING_NAMES, MODEL_TYPES[:DecoderOnly]],
     [MODEL_FOR_MASKED_LM_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
@@ -1216,6 +1253,10 @@ module Informers
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES]
   end
 
+  class AutoModelForSpeechSeq2Seq < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES]
+  end
+
   class AutoModelForCausalLM < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_WITH_LM_HEAD_MAPPING_NAMES]
   end
@@ -1250,6 +1291,10 @@ module Informers
 
   class AutoModelForZeroShotObjectDetection < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES]
+  end
+
+  class AutoModelForCTC < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_CTC_MAPPING_NAMES]
   end
 
   class AutoModelForAudioClassification < PretrainedMixin

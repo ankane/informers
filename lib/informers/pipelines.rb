@@ -907,6 +907,23 @@ module Informers
     end
   end
 
+  class AutomaticSpeechRecognitionPipeline < Pipeline
+    def call(audio, **kwargs)
+      case @model.config["model_type"]
+      when "whisper"
+        call_whisper(audio, **kwargs)
+      else
+        raise Error, "AutomaticSpeechRecognitionPipeline does not support model type '#{@model.config["model_type"]}'."
+      end
+    end
+
+    private
+
+    def call_whisper(audio, **kwargs)
+      raise Todo
+    end
+  end
+
   class ImageToImagePipeline < Pipeline
     def call(images)
       prepared_images = prepare_images(images)
@@ -1091,6 +1108,17 @@ module Informers
       },
       type: "audio"
     },
+    # TODO
+    # "automatic-speech-recognition" => {
+    #   tokenizer: AutoTokenizer,
+    #   pipeline: AutomaticSpeechRecognitionPipeline,
+    #   model: [AutoModelForSpeechSeq2Seq, AutoModelForCTC],
+    #   processor: AutoProcessor,
+    #   default: {
+    #     model: "Xenova/whisper-tiny.en"
+    #   },
+    #   type: "multimodal"
+    # },
     "image-to-text" => {
       tokenizer: AutoTokenizer,
       pipeline: ImageToTextPipeline,

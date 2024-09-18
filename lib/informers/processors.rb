@@ -730,6 +730,22 @@ module Informers
     end
   end
 
+  class WhisperFeatureExtractor < FeatureExtractor
+    def initialize(config)
+      super(config)
+
+      raise Todo
+    end
+
+    def _extract_fbank_features(waveform)
+      raise Todo
+    end
+
+    def call(audio)
+      raise Todo
+    end
+  end
+
   class Wav2Vec2FeatureExtractor < FeatureExtractor
     def _zero_mean_unit_var_norm(input_values)
       sum = input_values.sum
@@ -778,6 +794,7 @@ module Informers
       "DetrFeatureExtractor" => DetrFeatureExtractor,
       "Swin2SRImageProcessor" => Swin2SRImageProcessor,
       "DonutFeatureExtractor" => DonutFeatureExtractor,
+      "WhisperFeatureExtractor" => WhisperFeatureExtractor,
       "Wav2Vec2FeatureExtractor" => Wav2Vec2FeatureExtractor
     }
 
