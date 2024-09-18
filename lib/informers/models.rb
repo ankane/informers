@@ -904,6 +904,18 @@ module Informers
     end
   end
 
+  class Wav2Vec2PreTrainedModel < PreTrainedModel
+  end
+
+  class Wav2Vec2Model < Wav2Vec2PreTrainedModel
+  end
+
+  class Wav2Vec2ForSequenceClassification < Wav2Vec2PreTrainedModel
+    def call(model_inputs)
+      SequenceClassifierOutput.new(*super(model_inputs))
+    end
+  end
+
   class RobertaPreTrainedModel < PreTrainedModel
   end
 
@@ -1143,6 +1155,10 @@ module Informers
   MODEL_FOR_SEMANTIC_SEGMENTATION_MAPPING_NAMES = {
   }
 
+  MODEL_FOR_AUDIO_CLASSIFICATION_MAPPING_NAMES = {
+    "wav2vec2" => ["Wav2Vec2ForSequenceClassification", Wav2Vec2ForSequenceClassification]
+  }
+
   MODEL_FOR_IMAGE_TO_IMAGE_MAPPING_NAMES = {
     "swin2sr" => ["Swin2SRForImageSuperResolution", Swin2SRForImageSuperResolution]
   }
@@ -1171,6 +1187,7 @@ module Informers
     [MODEL_FOR_DEPTH_ESTIMATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
+    [MODEL_FOR_AUDIO_CLASSIFICATION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]],
     [MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES, MODEL_TYPES[:EncoderOnly]]
   ]
 
@@ -1233,6 +1250,10 @@ module Informers
 
   class AutoModelForZeroShotObjectDetection < PretrainedMixin
     MODEL_CLASS_MAPPINGS = [MODEL_FOR_ZERO_SHOT_OBJECT_DETECTION_MAPPING_NAMES]
+  end
+
+  class AutoModelForAudioClassification < PretrainedMixin
+    MODEL_CLASS_MAPPINGS = [MODEL_FOR_AUDIO_CLASSIFICATION_MAPPING_NAMES]
   end
 
   class AutoModelForDocumentQuestionAnswering < PretrainedMixin

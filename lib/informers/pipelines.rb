@@ -19,6 +19,20 @@ module Informers
       images.map { |x| Utils::RawImage.read(x) }
     end
 
+    def prepare_audios(audios, sampling_rate)
+      if !audios.is_a?(Array)
+        audios = [audios]
+      end
+
+      audios.map do |x|
+        if x.is_a?(String) || x.is_a?(URI)
+          Utils.read_audio(x, sampling_rate)
+        else
+          x
+        end
+      end
+    end
+
     def get_bounding_box(box, as_integer)
       if as_integer
         box = box.map { |x| x.to_i }
@@ -858,6 +872,41 @@ module Informers
     end
   end
 
+  class AudioClassificationPipeline < Pipeline
+    def call(audio, top_k: nil)
+      single = !audio.is_a?(Array)
+
+      sampling_rate = @processor.feature_extractor.config["sampling_rate"]
+      prepared_audios = prepare_audios(audio, sampling_rate)
+
+      id2label = @model.config[:id2label]
+
+      to_return = []
+      prepared_audios.each do |aud|
+        inputs = @processor.(aud)
+        output = @model.(inputs)
+        logits = output.logits[0]
+
+        scores = Utils.get_top_items(Utils.softmax(logits), top_k)
+
+        vals =
+          scores.map do |x|
+            {
+              label: id2label[x[0].to_s],
+              score: x[1]
+            }
+          end
+
+        if top_k == 1
+          to_return.concat(vals)
+        else
+          to_return << vals
+        end
+      end
+      !single || top_k == 1 ? to_return : to_return[0]
+    end
+  end
+
   class ImageToImagePipeline < Pipeline
     def call(images)
       prepared_images = prepare_images(images)
@@ -1032,6 +1081,15 @@ module Informers
         model: "Xenova/distilbert-base-uncased-mnli"
       },
       type: "text"
+    },
+    "audio-classification" => {
+      pipeline: AudioClassificationPipeline,
+      model: AutoModelForAudioClassification,
+      processor: AutoProcessor,
+      default: {
+        model: "Xenova/wav2vec2-base-superb-ks"
+      },
+      type: "audio"
     },
     "image-to-text" => {
       tokenizer: AutoTokenizer,

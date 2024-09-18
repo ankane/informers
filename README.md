@@ -242,6 +242,7 @@ The model must include a `.onnx` file ([example](https://huggingface.co/Xenova/a
 
 - [Text](#text)
 - [Vision](#vision)
+- [Audio](#audio)
 - [Multimodel](#multimodal)
 
 ### Text
@@ -386,6 +387,15 @@ Image feature extraction
 ```ruby
 extractor = Informers.pipeline("image-feature-extraction")
 extractor.("image.jpg")
+```
+
+### Audio
+
+Audio classification [unreleased]
+
+```ruby
+classifier = Informers.pipeline("audio-classification")
+classifier.("audio.wav")
 ```
 
 ### Multimodal

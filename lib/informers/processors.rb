@@ -1,5 +1,7 @@
 module Informers
   class FeatureExtractor
+    attr_reader :config
+
     def initialize(config)
       super()
       @config = config
@@ -728,6 +730,33 @@ module Informers
     end
   end
 
+  class Wav2Vec2FeatureExtractor < FeatureExtractor
+    def _zero_mean_unit_var_norm(input_values)
+      sum = input_values.sum
+      mean = sum / input_values.length.to_f
+      variance = input_values.sum { |b| (b - mean) ** 2 } / input_values.length.to_f
+      input_values.map { |x| (x - mean) / Math.sqrt(variance + 1e-7) }
+    end
+
+    def call(audio)
+      # TODO
+      # validate_audio_inputs(audio, 'Wav2Vec2FeatureExtractor');
+
+      input_values = audio;
+
+      # zero-mean and unit-variance normalization
+      if @config["do_normalize"]
+        input_values = _zero_mean_unit_var_norm(input_values)
+      end
+
+      # TODO: allow user to pass in attention mask
+      {
+        input_values: [input_values],
+        attention_mask: [Array.new(input_values.length, 1)]
+      }
+    end
+  end
+
   class Processor
     attr_reader :feature_extractor
 
@@ -748,7 +777,8 @@ module Informers
       "DPTFeatureExtractor" => DPTFeatureExtractor,
       "DetrFeatureExtractor" => DetrFeatureExtractor,
       "Swin2SRImageProcessor" => Swin2SRImageProcessor,
-      "DonutFeatureExtractor" => DonutFeatureExtractor
+      "DonutFeatureExtractor" => DonutFeatureExtractor,
+      "Wav2Vec2FeatureExtractor" => Wav2Vec2FeatureExtractor
     }
 
     PROCESSOR_CLASS_MAPPING = {}

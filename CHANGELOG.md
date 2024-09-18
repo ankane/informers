@@ -1,3 +1,7 @@
+## 1.1.1 (unreleased)
+
+- Added `audio-classification` pipeline
+
 ## 1.1.0 (2024-09-17)
 
 - Added more pipelines
