@@ -39,7 +39,7 @@ module Informers
       if !status.success?
         raise Error, "ffmpeg was not found but is required to load audio files from filename"
       end
-      stdout.unpack("f*")
+      stdout.unpack("e*")
     end
   end
 end
