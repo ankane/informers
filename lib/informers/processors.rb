@@ -773,6 +773,18 @@ module Informers
     end
   end
 
+  class ClapFeatureExtractor < FeatureExtractor
+    def initialize(config)
+      super(config)
+
+      # TODO
+    end
+
+    def call(audio, max_length: nil)
+      raise Todo
+    end
+  end
+
   class Processor
     attr_reader :feature_extractor
 
@@ -795,7 +807,8 @@ module Informers
       "Swin2SRImageProcessor" => Swin2SRImageProcessor,
       "DonutFeatureExtractor" => DonutFeatureExtractor,
       "WhisperFeatureExtractor" => WhisperFeatureExtractor,
-      "Wav2Vec2FeatureExtractor" => Wav2Vec2FeatureExtractor
+      "Wav2Vec2FeatureExtractor" => Wav2Vec2FeatureExtractor,
+      "ClapFeatureExtractor" => ClapFeatureExtractor
     }
 
     PROCESSOR_CLASS_MAPPING = {}

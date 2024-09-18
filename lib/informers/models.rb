@@ -1128,6 +1128,12 @@ module Informers
   class SpeechT5ForTextToSpeech < SpeechT5PreTrainedModel
   end
 
+  class ClapPreTrainedModel < PreTrainedModel
+  end
+
+  class ClapModel < ClapPreTrainedModel
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
@@ -1136,6 +1142,7 @@ module Informers
     "distilbert" => ["DistilBertModel", DistilBertModel],
     "roberta" => ["RobertaModel", RobertaModel],
     "xlm-roberta" => ["XLMRobertaModel", XLMRobertaModel],
+    "clap" => ["ClapModel", ClapModel],
     "clip" => ["CLIPModel", CLIPModel],
     "detr" => ["DetrModel", DetrModel],
     "vit" => ["ViTModel", ViTModel],

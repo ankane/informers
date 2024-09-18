@@ -927,6 +927,49 @@ module Informers
     end
   end
 
+  class ZeroShotAudioClassificationPipeline < Pipeline
+    def call(audio, candidate_labels, hypothesis_template: "This is a sound of {}.")
+      single = !audio.is_a?(Array)
+      if single
+        audio = [audio]
+      end
+
+      # Insert label into hypothesis template
+      texts = candidate_labels.map { |x| hypothesis_template.sub("{}", x) }
+
+      # Run tokenization
+      text_inputs =
+        @tokenizer.(
+          texts,
+          padding: true,
+          truncation: true
+        )
+
+      sampling_rate = @processor.feature_extractor.config["sampling_rate"]
+      prepared_audios = prepare_audios(audio, sampling_rate)
+
+      to_return = []
+      prepared_audios.each do |aud|
+        audio_inputs = @processor.(aud)
+
+        # Run model with both text and audio inputs
+        output = @model.(text_inputs.merge(audio_inputs))
+
+        # Compute softmax per audio
+        probs = Utils.softmax(output.logits_per_audio.data)
+
+        to_return <<
+          probs.map.with_index do |x, i|
+            {
+              label: candidate_labels[i],
+              score: x
+            }
+          end
+      end
+      single ? to_return[0] : to_return
+    end
+  end
+
   class AutomaticSpeechRecognitionPipeline < Pipeline
     def call(audio, **kwargs)
       case @model.config["model_type"]
@@ -1128,6 +1171,17 @@ module Informers
       },
       type: "audio"
     },
+    # TODO
+    # "zero-shot-audio-classification" => {
+    #   tokenizer: AutoTokenizer,
+    #   pipeline: ZeroShotAudioClassificationPipeline,
+    #   model: AutoModel,
+    #   processor: AutoProcessor,
+    #   default: {
+    #      model: "Xenova/clap-htsat-unfused"
+    #   },
+    #   type: "multimodal"
+    # },
     # TODO
     # "automatic-speech-recognition" => {
     #   tokenizer: AutoTokenizer,
