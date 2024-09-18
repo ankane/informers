@@ -740,9 +740,9 @@ module Informers
 
     def call(audio)
       # TODO
-      # validate_audio_inputs(audio, 'Wav2Vec2FeatureExtractor');
+      # validate_audio_inputs(audio, 'Wav2Vec2FeatureExtractor')
 
-      input_values = audio;
+      input_values = audio
 
       # zero-mean and unit-variance normalization
       if @config["do_normalize"]

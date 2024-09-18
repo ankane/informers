@@ -911,7 +911,7 @@ module Informers
     def call(images)
       prepared_images = prepare_images(images)
       inputs = @processor.(prepared_images)
-      outputs = @model.(inputs);
+      outputs = @model.(inputs)
 
       to_return = []
       outputs[0].each do |batch|

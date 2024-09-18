@@ -14,8 +14,8 @@ module Informers
       out_img = Array.new(out_height * out_width * in_channels)
 
       # Pre-calculate strides
-      in_stride = in_height * in_width;
-      out_stride = out_height * out_width;
+      in_stride = in_height * in_width
+      out_stride = out_height * out_width
 
       out_height.times do |i|
         out_width.times do |j|
