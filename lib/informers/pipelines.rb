@@ -743,7 +743,7 @@ module Informers
             {
               label: candidate_labels[processed[:classes][i]],
               score: processed[:scores][i],
-              box: get_bounding_box(box, !percentage),
+              box: get_bounding_box(box, !percentage)
             }
           end
         result.sort_by! { |v| -v[:score] }
@@ -1218,7 +1218,7 @@ module Informers
       model: AutoModelForImageClassification,
       processor: AutoProcessor,
       default: {
-        model: "Xenova/vit-base-patch16-224",
+        model: "Xenova/vit-base-patch16-224"
       },
       type: "multimodal"
     },
@@ -1227,7 +1227,7 @@ module Informers
       model: [AutoModelForImageSegmentation, AutoModelForSemanticSegmentation],
       processor: AutoProcessor,
       default: {
-        model: "Xenova/detr-resnet-50-panoptic",
+        model: "Xenova/detr-resnet-50-panoptic"
       },
       type: "multimodal"
     },
@@ -1246,7 +1246,7 @@ module Informers
       model: AutoModelForObjectDetection,
       processor: AutoProcessor,
       default: {
-        model: "Xenova/detr-resnet-50",
+        model: "Xenova/detr-resnet-50"
       },
       type: "multimodal"
     },

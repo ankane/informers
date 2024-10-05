@@ -300,7 +300,7 @@ module Informers
     def self.load_tokenizer(pretrained_model_name_or_path, **options)
       info = [
         Utils::Hub.get_model_file(pretrained_model_name_or_path, "tokenizer.json", true, **options),
-        Utils::Hub.get_model_json(pretrained_model_name_or_path, "tokenizer_config.json", true, **options),
+        Utils::Hub.get_model_json(pretrained_model_name_or_path, "tokenizer_config.json", true, **options)
       ]
 
       # Override legacy option if `options.legacy` is not null

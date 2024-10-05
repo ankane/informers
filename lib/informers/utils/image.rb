@@ -7,7 +7,7 @@ module Informers
         2 => "bilinear",
         3 => "bicubic",
         4 => "box",
-        5 => "hamming",
+        5 => "hamming"
       }
 
       attr_reader :image, :width, :height, :channels

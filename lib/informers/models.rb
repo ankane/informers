@@ -293,13 +293,13 @@ module Informers
       grouped_beams = group_beams(beams)
 
       get_flattened = lambda do |key|
-        grouped_beams.map do |batch|
+        grouped_beams.flat_map do |batch|
           if generation_config["num_return_sequences"] > 1
             raise Todo
           else
             [batch[0][key]]
           end
-        end.flatten(1)
+        end
       end
 
       sequences = get_flattened.(:output_token_ids) # [1, seqLength]

@@ -822,7 +822,7 @@ module Informers
       revision: "main",
       **kwargs
     )
-      preprocessor_config = config || Utils::Hub::get_model_json(pretrained_model_name_or_path, "preprocessor_config.json", true,
+      preprocessor_config = config || Utils::Hub.get_model_json(pretrained_model_name_or_path, "preprocessor_config.json", true,
         progress_callback:,
         config:,
         cache_dir:,
