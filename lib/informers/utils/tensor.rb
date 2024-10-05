@@ -63,7 +63,7 @@ module Informers
 
     def self.reshape(arr, dims)
       arr = arr.flatten
-      dims[1..-1].reverse.each do |dim|
+      dims[1..-1].reverse_each do |dim|
         arr = arr.each_slice(dim)
       end
       arr.to_a
