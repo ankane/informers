@@ -229,13 +229,6 @@ result = model.(query, docs)
 
 ### Other
 
-You can use the feature extraction pipeline directly.
-
-```ruby
-model = Informers.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", quantized: false)
-embeddings = model.(sentences, pooling: "mean", normalize: true)
-```
-
 The model must include a `.onnx` file ([example](https://huggingface.co/Xenova/all-MiniLM-L6-v2/tree/main/onnx)). If the file is not at `onnx/model.onnx` or `onnx/model_quantized.onnx`, use the `model_file_name` option to specify the location.
 
 ## Pipelines
