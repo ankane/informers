@@ -84,6 +84,7 @@ module Informers
         @get_start_beams = method(:decoder_start_beams)
         @update_beam = method(:decoder_update_beam)
         @forward = method(:decoder_forward)
+
       when MODEL_TYPES[:Seq2Seq], MODEL_TYPES[:Vision2Seq]
         @can_generate = true
 
@@ -91,8 +92,10 @@ module Informers
         @get_start_beams = method(:seq2seq_start_beams)
         @update_beam = method(:seq2seq_update_beam)
         @forward = method(:seq2seq_forward)
+
       when MODEL_TYPES[:EncoderDecoder]
-        raise Todo
+        @forward = method(:encoder_forward)
+
       else
         @forward = method(:encoder_forward)
       end
