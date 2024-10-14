@@ -137,10 +137,18 @@ module Informers
         ]
 
       elsif model_type == MODEL_TYPES[:MaskGeneration]
-        raise Todo
+        info = [
+          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
+          construct_session(pretrained_model_name_or_path, "vision_encoder", **options),
+          construct_session(pretrained_model_name_or_path, "prompt_encoder_mask_decoder", **options)
+        ]
 
       elsif model_type == MODEL_TYPES[:EncoderDecoder]
-        raise Todo
+        info = [
+          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
+          construct_session(pretrained_model_name_or_path, "encoder_model", **options),
+          construct_session(pretrained_model_name_or_path, "decoder_model_merged", **options)
+        ]
 
       else
         if model_type != MODEL_TYPES[:EncoderOnly]
