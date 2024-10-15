@@ -326,6 +326,8 @@ extractor.("We are very happy to show you the 🤗 Transformers library.")
 
 ### Vision
 
+Note: [ruby-vips](https://github.com/libvips/ruby-vips) is required to load images
+
 Image classification
 
 ```ruby
@@ -383,6 +385,8 @@ extractor.("image.jpg")
 ```
 
 ### Audio
+
+Note: [ffmpeg](https://www.ffmpeg.org/) is required to load audio files
 
 Audio classification [unreleased]
 
