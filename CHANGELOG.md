@@ -1,6 +1,7 @@
 ## 1.1.1 (unreleased)
 
 - Added `audio-classification` pipeline
+- Fixed error with `sentence-transformers/all-MiniLM-L6-v2`
 
 ## 1.1.0 (2024-09-17)
 

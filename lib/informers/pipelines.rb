@@ -837,7 +837,7 @@ module Informers
       if !model_output.nil?
         model_options[:output_names] = Array(model_output)
       elsif @model.instance_variable_get(:@output_names) == ["token_embeddings"] && pooling == "mean" && normalize
-        # optimization for sentence-transformers/all-MiniLM-L6-v2
+        # optimization for previous revision of sentence-transformers/all-MiniLM-L6-v2
         model_options[:output_names] = ["sentence_embedding"]
         pooling = "none"
         normalize = false
@@ -1402,7 +1402,8 @@ module Informers
       results = load_items(classes, model, pretrained_options)
       results[:task] = task
 
-      if model == "sentence-transformers/all-MiniLM-L6-v2"
+      # for previous revision of sentence-transformers/all-MiniLM-L6-v2
+      if model == "sentence-transformers/all-MiniLM-L6-v2" && results[:model].instance_variable_get(:@session).outputs.any? { |v| v[:name] == "token_embeddings" }
         results[:model].instance_variable_set(:@output_names, ["token_embeddings"])
       end
 
