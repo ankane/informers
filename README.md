@@ -388,7 +388,7 @@ extractor.("image.jpg")
 
 Note: [ffmpeg](https://www.ffmpeg.org/) is required to load audio files
 
-Audio classification [unreleased]
+Audio classification
 
 ```ruby
 classifier = Informers.pipeline("audio-classification")
