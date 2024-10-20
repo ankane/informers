@@ -23,12 +23,12 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [0.081881, 0.1076, -0.01324], embeddings[1][..2]
   end
 
-  # https://huggingface.co/Xenova/multi-qa-MiniLM-L6-cos-v1
+  # https://huggingface.co/sentence-transformers/multi-qa-MiniLM-L6-cos-v1
   def test_multi_qa_minilm
     query = "How many people live in London?"
     docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
-    model = Informers.pipeline("embedding", "Xenova/multi-qa-MiniLM-L6-cos-v1")
+    model = Informers.pipeline("embedding", "sentence-transformers/multi-qa-MiniLM-L6-cos-v1")
     query_embedding = model.(query)
     doc_embeddings = model.(docs)
     scores = doc_embeddings.map { |e| e.zip(query_embedding).sum { |d, q| d * q } }
@@ -152,11 +152,11 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [-0.02530634, -0.02715422, 0.01218867], embeddings[-1][..2]
   end
 
-  # https://huggingface.co/Xenova/all-mpnet-base-v2
+  # https://huggingface.co/sentence-transformers/all-mpnet-base-v2
   def test_all_mpnet
     sentences = ["This is an example sentence", "Each sentence is converted"]
 
-    model = Informers.pipeline("embedding", "Xenova/all-mpnet-base-v2")
+    model = Informers.pipeline("embedding", "sentence-transformers/all-mpnet-base-v2")
     embeddings = model.(sentences)
 
     assert_elements_in_delta [0.02250263, -0.07829167, -0.02303071], embeddings[0][..2]

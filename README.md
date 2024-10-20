@@ -24,7 +24,7 @@ gem "informers"
 Embedding
 
 - [sentence-transformers/all-MiniLM-L6-v2](#sentence-transformersall-MiniLM-L6-v2)
-- [Xenova/multi-qa-MiniLM-L6-cos-v1](#xenovamulti-qa-MiniLM-L6-cos-v1)
+- [sentence-transformers/multi-qa-MiniLM-L6-cos-v1](#sentence-transformersmulti-qa-MiniLM-L6-cos-v1)
 - [mixedbread-ai/mxbai-embed-large-v1](#mixedbread-aimxbai-embed-large-v1)
 - [Supabase/gte-small](#supabasegte-small)
 - [intfloat/e5-base-v2](#intfloate5-base-v2)
@@ -32,7 +32,7 @@ Embedding
 - [BAAI/bge-base-en-v1.5](#baaibge-base-en-v15)
 - [jinaai/jina-embeddings-v2-base-en](#jinaaijina-embeddings-v2-base-en)
 - [Snowflake/snowflake-arctic-embed-m-v1.5](#snowflakesnowflake-arctic-embed-m-v15)
-- [Xenova/all-mpnet-base-v2](#xenovaall-mpnet-base-v2)
+- [sentence-transformers/all-mpnet-base-v2](#sentence-transformersall-mpnet-base-v2)
 
 Reranking
 
@@ -58,7 +58,7 @@ For a quantized version, use:
 model = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", quantized: true)
 ```
 
-### Xenova/multi-qa-MiniLM-L6-cos-v1
+### sentence-transformers/multi-qa-MiniLM-L6-cos-v1
 
 [Docs](https://huggingface.co/Xenova/multi-qa-MiniLM-L6-cos-v1)
 
@@ -66,7 +66,7 @@ model = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", quantized: tr
 query = "How many people live in London?"
 docs = ["Around 9 Million people live in London", "London is known for its financial district"]
 
-model = Informers.pipeline("embedding", "Xenova/multi-qa-MiniLM-L6-cos-v1")
+model = Informers.pipeline("embedding", "sentence-transformers/multi-qa-MiniLM-L6-cos-v1")
 query_embedding = model.(query)
 doc_embeddings = model.(docs)
 scores = doc_embeddings.map { |e| e.zip(query_embedding).sum { |d, q| d * q } }
@@ -181,14 +181,14 @@ model = Informers.pipeline("embedding", "Snowflake/snowflake-arctic-embed-m-v1.5
 embeddings = model.(input, model_output: "sentence_embedding", pooling: "none")
 ```
 
-### Xenova/all-mpnet-base-v2
+### sentence-transformers/all-mpnet-base-v2
 
-[Docs](https://huggingface.co/Xenova/all-mpnet-base-v2)
+[Docs](https://huggingface.co/sentence-transformers/all-mpnet-base-v2)
 
 ```ruby
 sentences = ["This is an example sentence", "Each sentence is converted"]
 
-model = Informers.pipeline("embedding", "Xenova/all-mpnet-base-v2")
+model = Informers.pipeline("embedding", "sentence-transformers/all-mpnet-base-v2")
 embeddings = model.(sentences)
 ```
 
