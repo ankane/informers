@@ -25,6 +25,7 @@ Embedding
 
 - [sentence-transformers/all-MiniLM-L6-v2](#sentence-transformersall-MiniLM-L6-v2)
 - [sentence-transformers/multi-qa-MiniLM-L6-cos-v1](#sentence-transformersmulti-qa-MiniLM-L6-cos-v1)
+- [sentence-transformers/all-mpnet-base-v2](#sentence-transformersall-mpnet-base-v2)
 - [sentence-transformers/paraphrase-MiniLM-L6-v2](#sentence-transformersparaphrase-minilm-l6-v2)
 - [mixedbread-ai/mxbai-embed-large-v1](#mixedbread-aimxbai-embed-large-v1)
 - [Supabase/gte-small](#supabasegte-small)
@@ -33,7 +34,6 @@ Embedding
 - [BAAI/bge-base-en-v1.5](#baaibge-base-en-v15)
 - [jinaai/jina-embeddings-v2-base-en](#jinaaijina-embeddings-v2-base-en)
 - [Snowflake/snowflake-arctic-embed-m-v1.5](#snowflakesnowflake-arctic-embed-m-v15)
-- [sentence-transformers/all-mpnet-base-v2](#sentence-transformersall-mpnet-base-v2)
 
 Reranking
 
@@ -72,6 +72,28 @@ query_embedding = model.(query)
 doc_embeddings = model.(docs)
 scores = doc_embeddings.map { |e| e.zip(query_embedding).sum { |d, q| d * q } }
 doc_score_pairs = docs.zip(scores).sort_by { |d, s| -s }
+```
+
+### sentence-transformers/all-mpnet-base-v2
+
+[Docs](https://huggingface.co/sentence-transformers/all-mpnet-base-v2)
+
+```ruby
+sentences = ["This is an example sentence", "Each sentence is converted"]
+
+model = Informers.pipeline("embedding", "sentence-transformers/all-mpnet-base-v2")
+embeddings = model.(sentences)
+```
+
+### sentence-transformers/paraphrase-MiniLM-L6-v2
+
+[Docs](https://huggingface.co/sentence-transformers/paraphrase-MiniLM-L6-v2)
+
+```ruby
+sentences = ["This is an example sentence", "Each sentence is converted"]
+
+model = Informers.pipeline("embedding", "sentence-transformers/paraphrase-MiniLM-L6-v2")
+embeddings = model.(sentences, normalize: false)
 ```
 
 ### mixedbread-ai/mxbai-embed-large-v1
@@ -180,28 +202,6 @@ input = [
 
 model = Informers.pipeline("embedding", "Snowflake/snowflake-arctic-embed-m-v1.5")
 embeddings = model.(input, model_output: "sentence_embedding", pooling: "none")
-```
-
-### sentence-transformers/all-mpnet-base-v2
-
-[Docs](https://huggingface.co/sentence-transformers/all-mpnet-base-v2)
-
-```ruby
-sentences = ["This is an example sentence", "Each sentence is converted"]
-
-model = Informers.pipeline("embedding", "sentence-transformers/all-mpnet-base-v2")
-embeddings = model.(sentences)
-```
-
-### sentence-transformers/paraphrase-MiniLM-L6-v2
-
-[Docs](https://huggingface.co/sentence-transformers/paraphrase-MiniLM-L6-v2)
-
-```ruby
-sentences = ["This is an example sentence", "Each sentence is converted"]
-
-model = Informers.pipeline("embedding", "sentence-transformers/paraphrase-MiniLM-L6-v2")
-embeddings = model.(sentences, normalize: false)
 ```
 
 ### mixedbread-ai/mxbai-rerank-base-v1
