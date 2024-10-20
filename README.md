@@ -25,6 +25,7 @@ Embedding
 
 - [sentence-transformers/all-MiniLM-L6-v2](#sentence-transformersall-MiniLM-L6-v2)
 - [sentence-transformers/multi-qa-MiniLM-L6-cos-v1](#sentence-transformersmulti-qa-MiniLM-L6-cos-v1)
+- [sentence-transformers/paraphrase-MiniLM-L6-v2](#sentence-transformersparaphrase-minilm-l6-v2)
 - [mixedbread-ai/mxbai-embed-large-v1](#mixedbread-aimxbai-embed-large-v1)
 - [Supabase/gte-small](#supabasegte-small)
 - [intfloat/e5-base-v2](#intfloate5-base-v2)
@@ -190,6 +191,17 @@ sentences = ["This is an example sentence", "Each sentence is converted"]
 
 model = Informers.pipeline("embedding", "sentence-transformers/all-mpnet-base-v2")
 embeddings = model.(sentences)
+```
+
+### sentence-transformers/paraphrase-MiniLM-L6-v2
+
+[Docs](https://huggingface.co/sentence-transformers/paraphrase-MiniLM-L6-v2)
+
+```ruby
+sentences = ["This is an example sentence", "Each sentence is converted"]
+
+model = Informers.pipeline("embedding", "sentence-transformers/paraphrase-MiniLM-L6-v2")
+embeddings = model.(sentences, normalize: false)
 ```
 
 ### mixedbread-ai/mxbai-rerank-base-v1

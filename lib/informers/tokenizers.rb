@@ -261,7 +261,8 @@ module Informers
       "GPT2Tokenizer" => GPT2Tokenizer,
       "NllbTokenizer" => NllbTokenizer,
       "M2M100Tokenizer" => M2M100Tokenizer,
-      "SpeechT5Tokenizer" => SpeechT5Tokenizer
+      "SpeechT5Tokenizer" => SpeechT5Tokenizer,
+      "PreTrainedTokenizer" => PreTrainedTokenizer
     }
 
     def self.from_pretrained(
