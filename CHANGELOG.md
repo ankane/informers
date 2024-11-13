@@ -2,6 +2,7 @@
 
 - Added support for models with external data
 - Added `device` option
+- Added `dtype` option
 
 ## 1.1.1 (2024-10-14)
 

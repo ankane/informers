@@ -13,6 +13,7 @@ require "uri"
 # modules
 require_relative "informers/utils/audio"
 require_relative "informers/utils/core"
+require_relative "informers/utils/dtypes"
 require_relative "informers/utils/generation"
 require_relative "informers/utils/ffmpeg"
 require_relative "informers/utils/hub"

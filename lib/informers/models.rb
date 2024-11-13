@@ -22,8 +22,9 @@ module Informers
       cache_dir: nil,
       local_files_only: false,
       revision: "main",
-      model_file_name: nil,
-      device: nil
+      device: nil,
+      dtype: nil,
+      model_file_name: nil
     )
       options = {
         quantized:,
@@ -32,8 +33,9 @@ module Informers
         cache_dir:,
         local_files_only:,
         revision:,
-        model_file_name:,
-        device:
+        device:,
+        dtype:,
+        model_file_name:
       }
       config = AutoConfig.from_pretrained(pretrained_model_name_or_path, **options)
       if options[:config].nil?
@@ -111,8 +113,9 @@ module Informers
       cache_dir: nil,
       local_files_only: false,
       revision: "main",
-      model_file_name: nil,
-      device:
+      device: nil,
+      dtype: nil,
+      model_file_name: nil
     )
       options = {
         quantized:,
@@ -121,8 +124,9 @@ module Informers
         cache_dir:,
         local_files_only:,
         revision:,
-        model_file_name:,
-        device:
+        device:,
+        dtype:,
+        model_file_name:
       }
 
       model_name = MODEL_CLASS_TO_NAME_MAPPING[self]
@@ -179,7 +183,9 @@ module Informers
         prefix = ""
         file_name = file_name[1..]
       end
-      model_file_name = "#{prefix}#{file_name}#{options[:quantized] ? "_quantized" : ""}.onnx"
+      suffix = options[:dtype] ? Utils::DEFAULT_DTYPE_SUFFIX_MAPPING.fetch(options[:dtype].to_sym) : ""
+      suffix += "_quantized" if options[:quantized]
+      model_file_name = "#{prefix}#{file_name}#{suffix}.onnx"
       path = Utils::Hub.get_model_file(pretrained_model_name_or_path, model_file_name, true, **options)
 
       session_options = {log_severity_level: 4}
