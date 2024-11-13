@@ -85,12 +85,14 @@ module Informers
           output_path = resolve_path(request)
 
           begin
+            tmp_path = "#{output_path}.incomplete"
             FileUtils.mkdir_p(File.dirname(output_path))
-            File.open(output_path, "wb") do |f|
+            File.open(tmp_path, "wb") do |f|
               while !response.eof?
                 f.write(response.read(1024 * 1024))
               end
             end
+            FileUtils.move(tmp_path, output_path)
           rescue => e
             warn "An error occurred while writing the file to cache: #{e}"
           end
