@@ -184,7 +184,6 @@ module Informers
         raise e unless e.message.include?(".onnx_data")
 
         Utils::Hub.get_model_file(pretrained_model_name_or_path, "#{model_file_name}_data", true, **options)
-
         OnnxRuntime::InferenceSession.new(path)
       end
     end
