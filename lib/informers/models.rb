@@ -188,20 +188,10 @@ module Informers
       model_file_name = "#{prefix}#{file_name}#{suffix}.onnx"
       path = Utils::Hub.get_model_file(pretrained_model_name_or_path, model_file_name, true, **options)
 
-      session_options = {log_severity_level: 4}
-
-      device = options[:device]
-      session_options[:providers] =
-        case device
-        when "cpu", nil
-          []
-        when "cuda"
-          ["CUDAExecutionProvider"]
-        when "coreml"
-          ["CoreMLExecutionProvider"]
-        else
-          raise ArgumentError, "Unsupported device: #{device.inspect}"
-        end
+      session_options = {
+        providers: Backends::Onnx.device_to_execution_providers(options[:device]),
+        log_severity_level: 4
+      }
 
       begin
         OnnxRuntime::InferenceSession.new(path, **session_options)

@@ -11,6 +11,7 @@ require "stringio"
 require "uri"
 
 # modules
+require_relative "informers/backends/onnx"
 require_relative "informers/utils/audio"
 require_relative "informers/utils/core"
 require_relative "informers/utils/dtypes"
