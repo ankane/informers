@@ -81,12 +81,14 @@ module Informers
           file if file.exists
         end
 
-        def put(request, buffer)
+        def put(request, response)
           output_path = resolve_path(request)
 
           begin
             FileUtils.mkdir_p(File.dirname(output_path))
-            File.binwrite(output_path, buffer)
+            File.open(output_path, "wb") do |f|
+              f.write(response.read(1024 * 1024)) until response.eof?
+            end
           rescue => e
             warn "An error occurred while writing the file to cache: #{e}"
           end
@@ -189,10 +191,8 @@ module Informers
           to_cache_response = cache && !response.is_a?(FileResponse) && response.status[0] == "200"
         end
 
-        buffer = response.read
-
         if to_cache_response && cache_key && cache.match(cache_key).nil?
-          cache.put(cache_key, buffer)
+          cache.put(cache_key, response)
         end
 
         Utils.dispatch_callback(options[:progress_callback], {

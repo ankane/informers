@@ -1,3 +1,7 @@
+## 1.2.0 (unreleased)
+
+- Added support for models with external data
+
 ## 1.1.1 (2024-10-14)
 
 - Added `audio-classification` pipeline

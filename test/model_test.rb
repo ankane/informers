@@ -174,6 +174,14 @@ class ModelTest < Minitest::Test
     assert_elements_in_delta [0.04170236, 0.00109747, -0.01553415], embeddings[1][..2]
   end
 
+  # https://huggingface.co/BAAI/bge-m3
+  def test_bge_m3
+    sentences = ["This is an example sentence", "Each sentence is converted"]
+
+    model = Informers.pipeline("embedding", "BAAI/bge-m3")
+    model.(sentences, model_output: "token_embeddings")
+  end
+
   # https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1
   def test_mxbai_rerank
     query = "How many people live in London?"
