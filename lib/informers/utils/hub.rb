@@ -87,7 +87,9 @@ module Informers
           begin
             FileUtils.mkdir_p(File.dirname(output_path))
             File.open(output_path, "wb") do |f|
-              f.write(response.read(1024 * 1024)) until response.eof?
+              while !response.eof?
+                f.write(response.read(1024 * 1024))
+              end
             end
           rescue => e
             warn "An error occurred while writing the file to cache: #{e}"
