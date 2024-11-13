@@ -10,4 +10,8 @@ class Minitest::Test
       assert_in_delta exp, act, delta
     end
   end
+
+  def mac?
+    RbConfig::CONFIG["host_os"] =~ /darwin/i
+  end
 end

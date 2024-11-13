@@ -22,7 +22,8 @@ module Informers
       cache_dir: nil,
       local_files_only: false,
       revision: "main",
-      model_file_name: nil
+      model_file_name: nil,
+      device: nil
     )
       options = {
         quantized:,
@@ -31,7 +32,8 @@ module Informers
         cache_dir:,
         local_files_only:,
         revision:,
-        model_file_name:
+        model_file_name:,
+        device:
       }
       config = AutoConfig.from_pretrained(pretrained_model_name_or_path, **options)
       if options[:config].nil?
@@ -109,7 +111,8 @@ module Informers
       cache_dir: nil,
       local_files_only: false,
       revision: "main",
-      model_file_name: nil
+      model_file_name: nil,
+      device:
     )
       options = {
         quantized:,
@@ -118,7 +121,8 @@ module Informers
         cache_dir:,
         local_files_only:,
         revision:,
-        model_file_name:
+        model_file_name:,
+        device:
       }
 
       model_name = MODEL_CLASS_TO_NAME_MAPPING[self]
@@ -179,6 +183,20 @@ module Informers
       path = Utils::Hub.get_model_file(pretrained_model_name_or_path, model_file_name, true, **options)
 
       session_options = {log_severity_level: 4}
+
+      device = options[:device]
+      session_options[:providers] =
+        case device
+        when "cpu", nil
+          []
+        when "cuda"
+          ["CUDAExecutionProvider"]
+        when "coreml"
+          ["CoreMLExecutionProvider"]
+        else
+          raise ArgumentError, "Unsupported device: #{device.inspect}"
+        end
+
       begin
         OnnxRuntime::InferenceSession.new(path, **session_options)
       rescue OnnxRuntime::Error => e

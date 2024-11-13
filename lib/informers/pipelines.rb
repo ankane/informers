@@ -1360,6 +1360,7 @@ module Informers
       cache_dir: nil,
       local_files_only: false,
       revision: "main",
+      device: nil,
       model_file_name: nil
     )
       # Apply aliases
@@ -1389,7 +1390,8 @@ module Informers
         cache_dir:,
         local_files_only:,
         revision:,
-        model_file_name:
+        model_file_name:,
+        device:
       }
 
       classes = {

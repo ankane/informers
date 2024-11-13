@@ -248,4 +248,14 @@ class PipelineTest < Minitest::Test
       assert_includes msgs, expected
     end
   end
+
+  def test_device
+    skip unless mac?
+
+    sentences = ["This is an example sentence", "Each sentence is converted"]
+    embed = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", device: "coreml")
+    embeddings = embed.(sentences)
+    assert_elements_in_delta [0.067657, 0.063496, 0.048713], embeddings[0][..2]
+    assert_elements_in_delta [0.086439, 0.10276, 0.0053946], embeddings[1][..2]
+  end
 end
