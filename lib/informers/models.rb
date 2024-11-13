@@ -178,13 +178,14 @@ module Informers
       model_file_name = "#{prefix}#{file_name}#{options[:quantized] ? "_quantized" : ""}.onnx"
       path = Utils::Hub.get_model_file(pretrained_model_name_or_path, model_file_name, true, **options)
 
+      session_options = {log_severity_level: 4}
       begin
-        OnnxRuntime::InferenceSession.new(path)
+        OnnxRuntime::InferenceSession.new(path, **session_options)
       rescue OnnxRuntime::Error => e
         raise e unless e.message.include?("No such file or directory") && e.message.include?(".onnx_data")
 
         Utils::Hub.get_model_file(pretrained_model_name_or_path, "#{model_file_name}_data", true, **options)
-        OnnxRuntime::InferenceSession.new(path)
+        OnnxRuntime::InferenceSession.new(path, **session_options)
       end
     end
 
