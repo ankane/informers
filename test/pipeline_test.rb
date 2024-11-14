@@ -280,4 +280,9 @@ class PipelineTest < Minitest::Test
     end
     assert_equal "Invalid dtype: bad. Should be one of: fp32, fp16, int8, uint8, q8, q4, q4f16, bnb4", error.message
   end
+
+  def test_session_options
+    # TODO improve test
+    Informers.pipeline("embedding", session_options: {log_severity_level: 2})
+  end
 end
