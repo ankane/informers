@@ -1,4 +1,5 @@
 module Informers
+  # TODO remove in 2.0
   class Model
     def initialize(model_id, quantized: false)
       @model = Informers.pipeline("embedding", model_id, quantized: quantized)
