@@ -1,6 +1,6 @@
 # Informers
 
-:fire: Fast [transformer](https://github.com/xenova/transformers.js) inference for Ruby
+:fire: Fast [transformer](https://github.com/huggingface/transformers.js) inference for Ruby
 
 For non-ONNX models, check out [Transformers.rb](https://github.com/ankane/transformers-ruby) :slightly_smiling_face:
 
@@ -438,7 +438,7 @@ qa.("image.jpg", "What is the invoice number?")
 
 ## Credits
 
-This library was ported from [Transformers.js](https://github.com/xenova/transformers.js) and is available under the same license.
+This library was ported from [Transformers.js](https://github.com/huggingface/transformers.js) and is available under the same license.
 
 ## Upgrading
 
