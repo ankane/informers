@@ -436,6 +436,28 @@ qa = Informers.pipeline("document-question-answering")
 qa.("image.jpg", "What is the invoice number?")
 ```
 
+## Reference
+
+Specify a variant of the model [unreleased]
+
+```ruby
+Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", dtype: "fp16")
+```
+
+Specify a device [unreleased]
+
+```ruby
+Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", device: "coreml")
+```
+
+Note: Follow [these instructions](https://github.com/ankane/onnxruntime-ruby?tab=readme-ov-file#gpu-support) for `cuda`
+
+Specify ONNX Runtime [session options](https://github.com/ankane/onnxruntime-ruby?tab=readme-ov-file#session-options)
+
+```ruby
+Informers.pipeline("embedding", session_options: {log_severity_level: 2})
+```
+
 ## Credits
 
 This library was ported from [Transformers.js](https://github.com/huggingface/transformers.js) and is available under the same license.
