@@ -444,10 +444,10 @@ Specify a variant of the model [unreleased]
 Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", dtype: "fp16")
 ```
 
-Specify a device [unreleased]
+Specify a device (supports `cpu`, `cuda`, and `coreml`) [unreleased]
 
 ```ruby
-Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", device: "coreml")
+Informers.pipeline("embedding", device: "cuda")
 ```
 
 Note: Follow [these instructions](https://github.com/ankane/onnxruntime-ruby?tab=readme-ov-file#gpu-support) for `cuda`
