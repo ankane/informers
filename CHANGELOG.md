@@ -1,4 +1,4 @@
-## 1.2.0 (unreleased)
+## 1.2.0 (2024-11-14)
 
 - Added support for models with external data
 - Added `device` option

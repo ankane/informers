@@ -438,13 +438,13 @@ qa.("image.jpg", "What is the invoice number?")
 
 ## Reference
 
-Specify a variant of the model [unreleased]
+Specify a variant of the model
 
 ```ruby
 Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", dtype: "fp16")
 ```
 
-Specify a device (supports `cpu`, `cuda`, and `coreml`) [unreleased]
+Specify a device (supports `cpu`, `cuda`, and `coreml`)
 
 ```ruby
 Informers.pipeline("embedding", device: "cuda")
