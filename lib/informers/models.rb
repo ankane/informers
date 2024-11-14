@@ -24,7 +24,8 @@ module Informers
       revision: "main",
       device: nil,
       dtype: nil,
-      model_file_name: nil
+      model_file_name: nil,
+      session_options: {}
     )
       options = {
         quantized:,
@@ -35,7 +36,8 @@ module Informers
         revision:,
         device:,
         dtype:,
-        model_file_name:
+        model_file_name:,
+        session_options:
       }
       config = AutoConfig.from_pretrained(pretrained_model_name_or_path, **options)
       if options[:config].nil?
@@ -115,7 +117,8 @@ module Informers
       revision: "main",
       device: nil,
       dtype: nil,
-      model_file_name: nil
+      model_file_name: nil,
+      session_options: {}
     )
       options = {
         quantized:,
@@ -126,7 +129,8 @@ module Informers
         revision:,
         device:,
         dtype:,
-        model_file_name:
+        model_file_name:,
+        session_options:
       }
 
       model_name = MODEL_CLASS_TO_NAME_MAPPING[self]
@@ -188,7 +192,7 @@ module Informers
       session_options = {
         providers: Backends::Onnx.device_to_execution_providers(options[:device]),
         log_severity_level: 4
-      }
+      }.merge(options[:session_options] || {})
 
       begin
         OnnxRuntime::InferenceSession.new(path, **session_options)

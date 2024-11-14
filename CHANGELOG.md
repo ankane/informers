@@ -3,6 +3,7 @@
 - Added support for models with external data
 - Added `device` option
 - Added `dtype` option
+- Added `session_options` option
 
 ## 1.1.1 (2024-10-14)
 

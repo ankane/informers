@@ -1362,7 +1362,8 @@ module Informers
       revision: "main",
       device: nil,
       dtype: nil,
-      model_file_name: nil
+      model_file_name: nil,
+      session_options: {}
     )
       # Apply aliases
       task = TASK_ALIASES[task] || task
@@ -1393,7 +1394,8 @@ module Informers
         revision:,
         device:,
         dtype:,
-        model_file_name:
+        model_file_name:,
+        session_options:
       }
 
       classes = {
