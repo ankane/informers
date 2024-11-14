@@ -10,7 +10,8 @@ module Informers
         when "coreml"
           ["CoreMLExecutionProvider"]
         else
-          raise ArgumentError, "Unsupported device: #{device.inspect}"
+          supported_devices = ["cpu", "cuda", "coreml"]
+          raise ArgumentError, "Unsupported device: #{device}. Should be one of: #{supported_devices.join(", ")}"
         end
       end
     end

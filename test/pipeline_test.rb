@@ -257,6 +257,11 @@ class PipelineTest < Minitest::Test
     embeddings = embed.(sentences)
     assert_elements_in_delta [0.067657, 0.063496, 0.048713], embeddings[0][..2]
     assert_elements_in_delta [0.086439, 0.10276, 0.0053946], embeddings[1][..2]
+
+    error = assert_raises(ArgumentError) do
+      Informers.pipeline("embedding", device: "bad")
+    end
+    assert_equal "Unsupported device: bad. Should be one of: cpu, cuda, coreml", error.message
   end
 
   def test_dtype
@@ -265,5 +270,10 @@ class PipelineTest < Minitest::Test
     embeddings = embed.(sentences)
     assert_elements_in_delta [0.067657, 0.063496, 0.048713], embeddings[0][..2]
     assert_elements_in_delta [0.086439, 0.10276, 0.0053946], embeddings[1][..2]
+
+    error = assert_raises(ArgumentError) do
+      Informers.pipeline("embedding", dtype: "bad")
+    end
+    assert_equal "Invalid dtype: bad. Should be one of: fp32, fp16, int8, uint8, q8, q4, q4f16, bnb4", error.message
   end
 end
