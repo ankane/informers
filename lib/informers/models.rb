@@ -132,16 +132,16 @@ module Informers
       model_name = MODEL_CLASS_TO_NAME_MAPPING[self]
       model_type = MODEL_TYPE_MAPPING[model_name]
 
+      config = AutoConfig.from_pretrained(pretrained_model_name_or_path, **options)
+
       if model_type == MODEL_TYPES[:DecoderOnly]
         info = [
-          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
           construct_session(pretrained_model_name_or_path, options[:model_file_name] || "decoder_model_merged", **options),
           Utils::Hub.get_model_json(pretrained_model_name_or_path, "generation_config.json", false, **options)
         ]
 
       elsif model_type == MODEL_TYPES[:Seq2Seq] || model_type == MODEL_TYPES[:Vision2Seq]
         info = [
-          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
           construct_session(pretrained_model_name_or_path, "encoder_model", **options),
           construct_session(pretrained_model_name_or_path, "decoder_model_merged", **options),
           Utils::Hub.get_model_json(pretrained_model_name_or_path, "generation_config.json", false, **options)
@@ -149,14 +149,12 @@ module Informers
 
       elsif model_type == MODEL_TYPES[:MaskGeneration]
         info = [
-          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
           construct_session(pretrained_model_name_or_path, "vision_encoder", **options),
           construct_session(pretrained_model_name_or_path, "prompt_encoder_mask_decoder", **options)
         ]
 
       elsif model_type == MODEL_TYPES[:EncoderDecoder]
         info = [
-          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
           construct_session(pretrained_model_name_or_path, "encoder_model", **options),
           construct_session(pretrained_model_name_or_path, "decoder_model_merged", **options)
         ]
@@ -166,12 +164,11 @@ module Informers
           warn "Model type for '#{model_name || config[:model_type]}' not found, assuming encoder-only architecture. Please report this."
         end
         info = [
-          AutoConfig.from_pretrained(pretrained_model_name_or_path, **options),
           construct_session(pretrained_model_name_or_path, options[:model_file_name] || "model", **options)
         ]
       end
 
-      new(*info)
+      new(config, *info)
     end
 
     def self.construct_session(pretrained_model_name_or_path, file_name, **options)
