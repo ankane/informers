@@ -132,7 +132,7 @@ module Informers
       model_name = MODEL_CLASS_TO_NAME_MAPPING[self]
       model_type = MODEL_TYPE_MAPPING[model_name]
 
-      config = AutoConfig.from_pretrained(pretrained_model_name_or_path, **options)
+      config ||= AutoConfig.from_pretrained(pretrained_model_name_or_path, **options)
 
       if model_type == MODEL_TYPES[:DecoderOnly]
         info = [
