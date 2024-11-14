@@ -184,12 +184,11 @@ module Informers
         prefix = ""
         file_name = file_name[1..]
       end
-      dtype = options[:dtype] || "fp32"
+      dtype = options[:dtype] || (options[:quantized] ? "q8" : "fp32")
       suffix = Utils::DEFAULT_DTYPE_SUFFIX_MAPPING[dtype.to_sym]
       if !suffix
         raise ArgumentError, "Invalid dtype: #{dtype}. Should be one of: #{Utils::DEFAULT_DTYPE_SUFFIX_MAPPING.keys.join(", ")}"
       end
-      suffix += "_quantized" if options[:quantized]
       model_file_name = "#{prefix}#{file_name}#{suffix}.onnx"
       path = Utils::Hub.get_model_file(pretrained_model_name_or_path, model_file_name, true, **options)
 
