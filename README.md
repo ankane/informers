@@ -53,12 +53,6 @@ model = Informers.pipeline("embedding", "sentence-transformers/all-MiniLM-L6-v2"
 embeddings = model.(sentences)
 ```
 
-For a quantized version, use:
-
-```ruby
-model = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", quantized: true)
-```
-
 ### sentence-transformers/multi-qa-MiniLM-L6-cos-v1
 
 [Docs](https://huggingface.co/Xenova/multi-qa-MiniLM-L6-cos-v1)
@@ -254,7 +248,7 @@ result = model.(query, docs)
 
 ### Other
 
-The model must include a `.onnx` file ([example](https://huggingface.co/Xenova/all-MiniLM-L6-v2/tree/main/onnx)). If the file is not at `onnx/model.onnx` or `onnx/model_quantized.onnx`, use the `model_file_name` option to specify the location.
+The model must include a `.onnx` file ([example](https://huggingface.co/Xenova/all-MiniLM-L6-v2/tree/main/onnx)). If the file is not at `onnx/model.onnx`, use the `model_file_name` option to specify the location.
 
 ## Pipelines
 
@@ -438,13 +432,13 @@ qa.("image.jpg", "What is the invoice number?")
 
 ## Reference
 
-Specify a variant of the model
+Specify a variant of the model if available (`fp32`, `fp16`, `int8`, `uint8`, `q8`, `q4`, `q4f16`, or `bnb4`)
 
 ```ruby
 Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", dtype: "fp16")
 ```
 
-Specify a device (supports `cpu`, `cuda`, and `coreml`)
+Specify a device (`cpu`, `cuda`, or `coreml`)
 
 ```ruby
 Informers.pipeline("embedding", device: "cuda")

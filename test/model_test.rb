@@ -16,7 +16,7 @@ class ModelTest < Minitest::Test
   def test_all_minilm_xenova
     sentences = ["This is an example sentence", "Each sentence is converted"]
 
-    model = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", quantized: true)
+    model = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", dtype: "q8")
     embeddings = model.(sentences)
 
     assert_elements_in_delta [0.045927, 0.07328, 0.05401], embeddings[0][..2]
