@@ -815,6 +815,19 @@ module Informers
   class NomicBertModel < NomicBertPreTrainedModel
   end
 
+  class ConvBertPreTrainedModel < PreTrainedModel
+  end
+
+  class ConvBertModel < ConvBertPreTrainedModel
+  end
+
+  class ElectraPreTrainedModel < PreTrainedModel
+  end
+
+  # TODO add ElectraForPreTraining
+  class ElectraModel < ElectraPreTrainedModel
+  end
+
   class DebertaV2PreTrainedModel < PreTrainedModel
   end
 
@@ -1174,6 +1187,8 @@ module Informers
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
+    "electra" => ["ElectraModel", ElectraModel],
+    "convbert" => ["ConvBertModel", ConvBertModel],
     "deberta-v2" => ["DebertaV2Model", DebertaV2Model],
     "mpnet" => ["MPNetModel", MPNetModel],
     "distilbert" => ["DistilBertModel", DistilBertModel],
