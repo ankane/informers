@@ -1369,7 +1369,7 @@ module Informers
       task = TASK_ALIASES[task] || task
 
       if quantized == NO_DEFAULT
-        # TODO move default to task class
+        # TODO no quantization by default in 2.0
         quantized = ["text-classification", "token-classification", "question-answering", "feature-extraction"].include?(task)
       end
 
