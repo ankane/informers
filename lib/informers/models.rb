@@ -972,6 +972,18 @@ module Informers
   class RobertaModel < RobertaPreTrainedModel
   end
 
+  class RobertaForTokenClassification <  RobertaPreTrainedModel
+    def call(model_inputs)
+      TokenClassifierOutput.new(*super(model_inputs))
+    end
+  end
+
+  class RobertaForSequenceClassification < RobertaPreTrainedModel
+    def call(model_inputs)
+      SequenceClassifierOutput.new(*super(model_inputs))
+    end
+  end
+
   class RobertaForMaskedLM < RobertaPreTrainedModel
     def call(model_inputs)
       MaskedLMOutput.new(*super(model_inputs))
@@ -1224,12 +1236,14 @@ module Informers
   MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES = {
     "bert" => ["BertForSequenceClassification", BertForSequenceClassification],
     "distilbert" => ["DistilBertForSequenceClassification", DistilBertForSequenceClassification],
+    "roberta" => ["RobertaForSequenceClassification", RobertaForSequenceClassification],
     "xlm-roberta" => ["XLMRobertaForSequenceClassification", XLMRobertaForSequenceClassification],
     "bart" => ["BartForSequenceClassification", BartForSequenceClassification]
   }
 
   MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES = {
-    "bert" => ["BertForTokenClassification", BertForTokenClassification]
+    "bert" => ["BertForTokenClassification", BertForTokenClassification],
+    "roberta" => ["RobertaForTokenClassification", RobertaForTokenClassification]
   }
 
   MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES = {
