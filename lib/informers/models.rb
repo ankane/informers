@@ -972,6 +972,12 @@ module Informers
   class RobertaModel < RobertaPreTrainedModel
   end
 
+  class RobertaForMaskedLM < RobertaPreTrainedModel
+    def call(model_inputs)
+      MaskedLMOutput.new(*super(model_inputs))
+    end
+  end
+
   class RobertaForTokenClassification <  RobertaPreTrainedModel
     def call(model_inputs)
       TokenClassifierOutput.new(*super(model_inputs))
@@ -981,12 +987,6 @@ module Informers
   class RobertaForSequenceClassification < RobertaPreTrainedModel
     def call(model_inputs)
       SequenceClassifierOutput.new(*super(model_inputs))
-    end
-  end
-
-  class RobertaForMaskedLM < RobertaPreTrainedModel
-    def call(model_inputs)
-      MaskedLMOutput.new(*super(model_inputs))
     end
   end
 
