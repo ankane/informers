@@ -234,7 +234,7 @@ module Informers
 
       def self.display_progress(filename, width, size, expected_size)
         bar_width = [width - (filename.length + 3), 1].max
-        progress = expected_size ? size / expected_size.to_f : 0
+        progress = expected_size && expected_size > 0 ? size / expected_size.to_f : 0
         done = (progress * bar_width).round
         not_done = bar_width - done
         "#{filename} |#{"█" * done}#{" " * not_done}|"
