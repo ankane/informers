@@ -1,3 +1,7 @@
+## 1.2.1 (unreleased)
+
+- Fixed error when terminal width is zero
+
 ## 1.2.0 (2024-11-14)
 
 - Added support for models with external data
