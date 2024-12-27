@@ -1336,6 +1336,7 @@ module Informers
     stream = $stderr
     tty = stream.tty?
     width = tty ? stream.winsize[1] : 80
+    width = 80 if width == 0
 
     if msg[:status] == "progress" && tty
       stream.print "\r#{Utils::Hub.display_progress(msg[:file], width, msg[:size], msg[:total_size])}"
