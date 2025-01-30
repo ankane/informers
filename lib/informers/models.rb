@@ -809,6 +809,30 @@ module Informers
     end
   end
 
+  class ModernBertPreTrainedModel < PreTrainedModel
+  end
+
+  class ModernBertModel < ModernBertPreTrainedModel
+  end
+
+  class ModernBertForMaskedLM < ModernBertPreTrainedModel
+    def call(model_inputs)
+      MaskedLMOutput.new(*super(model_inputs))
+    end
+  end
+
+  class ModernBertForSequenceClassification < ModernBertPreTrainedModel
+    def call(model_inputs)
+      SequenceClassifierOutput.new(*super(model_inputs))
+    end
+  end
+
+  class ModernBertForTokenClassification < ModernBertPreTrainedModel
+    def call(model_inputs)
+      TokenClassifierOutput.new(*super(model_inputs))
+    end
+  end
+
   class NomicBertPreTrainedModel < PreTrainedModel
   end
 
@@ -1198,6 +1222,7 @@ module Informers
 
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
+    "modernbert" => ["ModernBertModel", ModernBertModel],
     "nomic_bert" => ["NomicBertModel", NomicBertModel],
     "electra" => ["ElectraModel", ElectraModel],
     "convbert" => ["ConvBertModel", ConvBertModel],
@@ -1235,6 +1260,7 @@ module Informers
 
   MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES = {
     "bert" => ["BertForSequenceClassification", BertForSequenceClassification],
+    "modernbert" => ["ModernBertForSequenceClassification", ModernBertForSequenceClassification],
     "distilbert" => ["DistilBertForSequenceClassification", DistilBertForSequenceClassification],
     "roberta" => ["RobertaForSequenceClassification", RobertaForSequenceClassification],
     "xlm-roberta" => ["XLMRobertaForSequenceClassification", XLMRobertaForSequenceClassification],
@@ -1243,6 +1269,7 @@ module Informers
 
   MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES = {
     "bert" => ["BertForTokenClassification", BertForTokenClassification],
+    "modernbert" => ["ModernBertForTokenClassification", ModernBertForTokenClassification],
     "roberta" => ["RobertaForTokenClassification", RobertaForTokenClassification]
   }
 
@@ -1259,6 +1286,7 @@ module Informers
 
   MODEL_FOR_MASKED_LM_MAPPING_NAMES = {
     "bert" => ["BertForMaskedLM", BertForMaskedLM],
+    "modernbert" => ["ModernBertForMaskedLM", ModernBertForMaskedLM],
     "roberta" => ["RobertaForMaskedLM", RobertaForMaskedLM]
   }
 
