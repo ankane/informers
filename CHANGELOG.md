@@ -1,4 +1,4 @@
-## 1.2.1 (unreleased)
+## 1.2.1 (2025-02-01)
 
 - Fixed error when terminal width is zero
 
