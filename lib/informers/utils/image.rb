@@ -72,7 +72,7 @@ module Informers
       end
 
       def rgb
-        if @channels == 3
+        if @image.interpretation == :srgb && @image.bands == 3 && !@image.has_alpha?
           return self
         end
 
