@@ -103,7 +103,7 @@ module Informers
 
       if is_batched
         input = text_pair ? text.zip(text_pair) : text
-        encoded = @tokenizer.encode_batch(input, add_special_tokens: add_special_tokens)
+        encoded = @tokenizer.encode_batch(input, add_special_tokens: add_special_tokens).flatten
       else
         encoded = [@tokenizer.encode(text, text_pair, add_special_tokens: add_special_tokens)]
       end
