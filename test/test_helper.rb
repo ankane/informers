@@ -1,7 +1,6 @@
 require "bundler/setup"
 Bundler.require(:default)
 require "minitest/autorun"
-require "minitest/pride"
 
 class Minitest::Test
   def assert_elements_in_delta(expected, actual, delta = 0.001)
