@@ -182,6 +182,31 @@ class ModelTest < Minitest::Test
     model.(sentences, model_output: "token_embeddings")
   end
 
+  # https://huggingface.co/onnx-community/embeddinggemma-300m-ONNX
+  def test_embeddinggemma_300m_sentence_similarity
+    query_prefix = "task: sentence similarity | query:"
+
+    input = [
+      query_prefix + "The dog is barking loudly when sit at home during night",
+      query_prefix + "The puppy is sitting at home during night",
+      query_prefix + "Around 9 Million people live in London in twenty twenty-three."
+    ]
+
+    model = Informers.pipeline("embedding", "onnx-community/embeddinggemma-300m-ONNX")
+    embeddings = model.(input, model_output: "sentence_embedding", pooling: "none")
+    
+    cosine_similarity = ->(a, b) {
+      dot_product = a.zip(b).sum { |x, y| x * y }
+      norm_a = Math.sqrt(a.sum { |x| x * x })
+      norm_b = Math.sqrt(b.sum { |x| x * x })
+      dot_product / (norm_a * norm_b)
+    }
+    
+    assert_in_delta 0.347, cosine_similarity.(embeddings[-1], embeddings[0]), 0.01
+    assert_in_delta 0.319, cosine_similarity.(embeddings[-1], embeddings[1]), 0.01
+    assert_in_delta 0.847, cosine_similarity.(embeddings[0], embeddings[1]), 0.01, "Dog and puppy sentence embeddings should be similar"
+  end
+
   # https://huggingface.co/mixedbread-ai/mxbai-rerank-base-v1
   def test_mxbai_rerank
     query = "How many people live in London?"

@@ -1220,6 +1220,9 @@ module Informers
   class ClapModel < ClapPreTrainedModel
   end
 
+  class Gemma3TextModel < PreTrainedModel
+  end
+
   MODEL_MAPPING_NAMES_ENCODER_ONLY = {
     "bert" => ["BertModel", BertModel],
     "modernbert" => ["ModernBertModel", ModernBertModel],
@@ -1236,7 +1239,8 @@ module Informers
     "detr" => ["DetrModel", DetrModel],
     "vit" => ["ViTModel", ViTModel],
     "owlvit" => ["OwlViTModel", OwlViTModel],
-    "donut-swin" => ["DonutSwinModel", DonutSwinModel]
+    "donut-swin" => ["DonutSwinModel", DonutSwinModel],
+    "gemma3_text" => ["Gemma3TextModel", Gemma3TextModel]
   }
 
   MODEL_MAPPING_NAMES_ENCODER_DECODER = {
