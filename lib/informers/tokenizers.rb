@@ -212,6 +212,9 @@ module Informers
     end
   end
 
+  class GemmaTokenizer < PreTrainedTokenizer
+  end
+
   module Utils
     def self._build_translation_inputs(slf, raw_inputs, tokenizer_options, generate_kwargs)
       if !slf.respond_to?(:language_codes) || !slf.language_codes.is_a?(Array)
@@ -262,6 +265,7 @@ module Informers
       "NllbTokenizer" => NllbTokenizer,
       "M2M100Tokenizer" => M2M100Tokenizer,
       "SpeechT5Tokenizer" => SpeechT5Tokenizer,
+      "GemmaTokenizer" => GemmaTokenizer,
       "PreTrainedTokenizer" => PreTrainedTokenizer
     }
 
