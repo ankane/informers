@@ -456,22 +456,6 @@ Informers.pipeline("embedding", session_options: {log_severity_level: 2})
 
 This library was ported from [Transformers.js](https://github.com/huggingface/transformers.js) and is available under the same license.
 
-## Upgrading
-
-### 1.0
-
-Task classes have been replaced with the `pipeline` method.
-
-```ruby
-# before
-model = Informers::SentimentAnalysis.new("sentiment-analysis.onnx")
-model.predict("This is super cool")
-
-# after
-model = Informers.pipeline("sentiment-analysis")
-model.("This is super cool")
-```
-
 ## History
 
 View the [changelog](https://github.com/ankane/informers/blob/master/CHANGELOG.md)
