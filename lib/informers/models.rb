@@ -1044,6 +1044,40 @@ module Informers
   class CLIPModel < CLIPPreTrainedModel
   end
 
+  class SiglipPreTrainedModel < PreTrainedModel
+  end
+
+  class SiglipModel < SiglipPreTrainedModel
+  end
+
+  class SiglipTextModel < SiglipPreTrainedModel
+    def self.from_pretrained(
+      pretrained_model_name_or_path,
+      **options
+    )
+      # Update default model file name if not provided
+      options[:model_file_name] ||= "text_model"
+      super(
+        pretrained_model_name_or_path,
+        **options
+      )
+    end
+  end
+
+  class SiglipVisionModel < SiglipPreTrainedModel
+    def self.from_pretrained(
+      pretrained_model_name_or_path,
+      **options
+    )
+      # Update default model file name if not provided
+      options[:model_file_name] ||= "vision_model"
+      super(
+        pretrained_model_name_or_path,
+        **options
+      )
+    end
+  end
+
   class GPT2PreTrainedModel < PreTrainedModel
     attr_reader :num_heads, :num_layers, :dim_kv
 
@@ -1236,7 +1270,8 @@ module Informers
     "detr" => ["DetrModel", DetrModel],
     "vit" => ["ViTModel", ViTModel],
     "owlvit" => ["OwlViTModel", OwlViTModel],
-    "donut-swin" => ["DonutSwinModel", DonutSwinModel]
+    "donut-swin" => ["DonutSwinModel", DonutSwinModel],
+    "siglip" => ["SiglipModel", SiglipModel]
   }
 
   MODEL_MAPPING_NAMES_ENCODER_DECODER = {
@@ -1349,6 +1384,7 @@ module Informers
   }
 
   MODEL_FOR_IMAGE_FEATURE_EXTRACTION_MAPPING_NAMES = {
+    "siglip" => ["SiglipVisionModel", SiglipVisionModel]
   }
 
   MODEL_CLASS_TYPE_MAPPING = [
@@ -1387,6 +1423,16 @@ module Informers
       MODEL_CLASS_TO_NAME_MAPPING[model] = name
       MODEL_NAME_TO_CLASS_MAPPING[name] = model
     end
+  end
+
+  CUSTOM_MAPPING = [
+    ["SiglipTextModel", SiglipTextModel, MODEL_TYPES[:EncoderOnly]]
+  ]
+
+  CUSTOM_MAPPING.each do |name, model, type|
+    MODEL_TYPE_MAPPING[name] = type
+    MODEL_CLASS_TO_NAME_MAPPING[model] = name
+    MODEL_NAME_TO_CLASS_MAPPING[name] = model
   end
 
   class AutoModel < PretrainedMixin

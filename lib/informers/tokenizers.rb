@@ -178,6 +178,9 @@ module Informers
   class CLIPTokenizer < PreTrainedTokenizer
   end
 
+  class SiglipTokenizer < PreTrainedTokenizer
+  end
+
   class NllbTokenizer < PreTrainedTokenizer
     attr_reader :language_regex, :language_codes, :lang_to_token
 
@@ -258,6 +261,7 @@ module Informers
       "XLMRobertaTokenizer" => XLMRobertaTokenizer,
       "MPNetTokenizer" => MPNetTokenizer,
       "CLIPTokenizer" => CLIPTokenizer,
+      "SiglipTokenizer" => SiglipTokenizer,
       "GPT2Tokenizer" => GPT2Tokenizer,
       "NllbTokenizer" => NllbTokenizer,
       "M2M100Tokenizer" => M2M100Tokenizer,
