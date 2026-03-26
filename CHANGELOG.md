@@ -1,3 +1,7 @@
+## 1.3.0 (unreleased)
+
+- Dropped support for Ruby < 3.3
+
 ## 1.2.1 (2025-02-01)
 
 - Fixed error when terminal width is zero
