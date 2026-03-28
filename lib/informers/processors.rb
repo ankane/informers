@@ -354,6 +354,9 @@ module Informers
   class CLIPFeatureExtractor < ImageFeatureExtractor
   end
 
+  class SiglipImageProcessor < ImageFeatureExtractor
+  end
+
   class DPTFeatureExtractor < ImageFeatureExtractor
   end
 
@@ -802,6 +805,7 @@ module Informers
       "ViTFeatureExtractor" => ViTFeatureExtractor,
       "OwlViTFeatureExtractor" => OwlViTFeatureExtractor,
       "CLIPFeatureExtractor" => CLIPFeatureExtractor,
+      "SiglipImageProcessor" => SiglipImageProcessor,
       "DPTFeatureExtractor" => DPTFeatureExtractor,
       "DetrFeatureExtractor" => DetrFeatureExtractor,
       "Swin2SRImageProcessor" => Swin2SRImageProcessor,
