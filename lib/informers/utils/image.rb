@@ -72,11 +72,33 @@ module Informers
       end
 
       def rgb
-        if @channels == 3
+        if @image.interpretation == :srgb && @image.bands == 3 && !@image.has_alpha?
           return self
         end
 
-        raise Todo
+        converted_image = @image.colourspace(:srgb)
+
+        if converted_image.has_alpha?
+          converted_image = converted_image.flatten
+        end
+
+        if converted_image.bands == 1
+          converted_image = converted_image.colourspace(:srgb)
+        end
+
+        if converted_image.bands == 3 && converted_image.interpretation == :srgb
+          RawImage.new(converted_image)
+        else
+          if converted_image.bands == 3 && converted_image.interpretation != :srgb
+              final_attempt = converted_image.copy(interpretation: :srgb)
+
+              if final_attempt.bands == 3 && final_attempt.interpretation == :srgb
+                  return RawImage.new(final_attempt)
+              end
+          end
+
+          raise Informers::Error, "Failed to convert image to sRGB."
+        end
       end
 
       def save(path)
