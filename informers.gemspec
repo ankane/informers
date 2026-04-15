@@ -16,5 +16,5 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3.3"
 
   spec.add_dependency "onnxruntime", ">= 0.9"
-  spec.add_dependency "tokenizers", ">= 0.5.3"
+  spec.add_dependency "tokenizers", ">= 0.6"
 end
