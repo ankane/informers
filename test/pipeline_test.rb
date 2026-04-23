@@ -267,6 +267,8 @@ class PipelineTest < Minitest::Test
   end
 
   def test_dtype
+    skip "initialization error with ONNX Runtime 1.23+"
+
     sentences = ["This is an example sentence", "Each sentence is converted"]
     embed = Informers.pipeline("embedding", "Xenova/all-MiniLM-L6-v2", dtype: "fp16")
     embeddings = embed.(sentences)
