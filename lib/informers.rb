@@ -10,8 +10,10 @@ require "open3"
 require "stringio"
 require "uri"
 
-# modules
+# backends
 require_relative "informers/backends/onnx"
+
+# utils
 require_relative "informers/utils/audio"
 require_relative "informers/utils/core"
 require_relative "informers/utils/dtypes"
@@ -21,6 +23,8 @@ require_relative "informers/utils/hub"
 require_relative "informers/utils/image"
 require_relative "informers/utils/math"
 require_relative "informers/utils/tensor"
+
+# modules
 require_relative "informers/configs"
 require_relative "informers/env"
 require_relative "informers/model"
