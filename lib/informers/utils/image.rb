@@ -72,8 +72,18 @@ module Informers
       end
 
       def rgb
-        if @channels == 3
-          return self
+        image = @image
+
+        if image.interpretation != :srgb
+          image = image.colourspace(:srgb)
+        end
+
+        if image.bands == 4
+          image = image.extract_band(0, n: 3)
+        end
+
+        if image.bands == 3
+          return RawImage.new(image)
         end
 
         raise Todo
