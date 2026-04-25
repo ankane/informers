@@ -83,7 +83,7 @@ module Informers
         end
 
         if img.bands != 3
-          raise Todo
+          raise Error, "Conversion failed due to unsupported number of channels: #{img.bands}"
         end
 
         RawImage.new(img)
