@@ -72,21 +72,21 @@ module Informers
       end
 
       def rgb
-        image = @image
+        img = @image
 
-        if image.interpretation != :srgb
-          image = image.colourspace(:srgb)
+        if img.interpretation != :srgb
+          img = img.colourspace(:srgb)
         end
 
-        if image.bands == 4
-          image = image.extract_band(0, n: 3)
+        if img.bands == 4
+          img = img.extract_band(0, n: 3)
         end
 
-        if image.bands == 3
-          return RawImage.new(image)
+        if img.bands != 3
+          raise Todo
         end
 
-        raise Todo
+        RawImage.new(img)
       end
 
       def save(path)
