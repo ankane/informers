@@ -168,7 +168,7 @@ module Informers
       end
 
       if !shortest_edge.nil? || !longest_edge.nil?
-        # http://opensourcehacker.com/2011/12/01/calculate-aspect-ratio-conserving-resize-for-images-in-javascript/
+        # https://opensourcehacker.com/2011/12/01/calculate-aspect-ratio-conserving-resize-for-images-in-javascript/
         # Try resize so that shortest edge is `shortest_edge` (target)
         short_resize_factor =
           if shortest_edge.nil?
